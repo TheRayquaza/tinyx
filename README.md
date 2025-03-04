@@ -1,1 +1,1 @@
-# INFO 8
+# INFO 8 - TinyX
