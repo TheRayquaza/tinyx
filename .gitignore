@@ -1,0 +1,34 @@
+# Java and Build System
+*.class
+*.jar
+*.war
+*.ear
+*.iml
+
+# Maven
+.mvn/
+target/
+
+# Gradle
+.gradle/
+build/
+!gradle/wrapper/
+
+# IDEs and Editors
+/.idea/
+*.swp
+*.swo
+*.bak
+*.tmp
+.vscode/
+
+# Kubernetes
+helm/
+.kube/
+
+# Docker
+docker-compose.override.yml
+
+# Environment and Secrets
+.env
+
