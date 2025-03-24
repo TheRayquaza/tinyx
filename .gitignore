@@ -15,7 +15,8 @@ build/
 !gradle/wrapper/
 
 # IDEs and Editors
-/.idea/
+*/.idea/
+.idea/
 *.swp
 *.swo
 *.bak

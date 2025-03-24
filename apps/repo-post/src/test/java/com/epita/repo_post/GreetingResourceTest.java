@@ -1,4 +1,4 @@
-package com.epita;
+package com.epita.repo_post;
 
 import io.quarkus.test.junit.QuarkusTest;
 import org.junit.jupiter.api.Test;
