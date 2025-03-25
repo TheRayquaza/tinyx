@@ -192,7 +192,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/User"
-    
+
     put:
       summary: Modify my user's account
       operationId: modifyUser
@@ -211,7 +211,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/User"
-  
+
     delete:
       summary: Delete my user's account
       operationId: deleteUser
@@ -232,7 +232,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/User"
-  
+
   /user/{id}:
     get:
       summary: Get a specific user's account

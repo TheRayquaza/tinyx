@@ -12,11 +12,12 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@With
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class UserAggregate implements Serializable {
     private UUID uuid;
-    private Long id;
+    private String id;
     private String username;
     private String email;
     private String bio;

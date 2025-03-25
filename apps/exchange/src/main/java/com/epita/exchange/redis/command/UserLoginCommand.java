@@ -19,4 +19,3 @@ public class UserLoginCommand implements Serializable {
     private String userId;
     private String bearerToken;
 }
-

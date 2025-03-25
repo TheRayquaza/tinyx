@@ -17,6 +17,15 @@
     <dependencies>
         <!-- Add module-specific dependencies here -->
         <!-- TODO: import elastic -->
+        <!-- Quarkus MongoDB -->
+        <dependency>
+            <groupId>io.quarkus</groupId>
+            <artifactId>quarkus-mongodb-panache</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.quarkus</groupId>
+            <artifactId>quarkus-mongodb-rest-data-panache</artifactId>
+        </dependency>
     </dependencies>
 
     <build>

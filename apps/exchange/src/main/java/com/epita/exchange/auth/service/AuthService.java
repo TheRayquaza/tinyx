@@ -1,51 +1,57 @@
 package com.epita.exchange.auth.service;
 
-import io.quarkus.security.identity.SecurityIdentity;
-import io.quarkus.runtime.StartupEvent;
-import org.eclipse.microprofile.config.inject.ConfigProperty;
+import io.quarkus.security.UnauthorizedException;
 
 import jakarta.enterprise.context.ApplicationScoped;
-import jakarta.enterprise.event.Observes;
-import jakarta.inject.Inject;
-import javax.security.auth.login.LoginException;
-import java.util.UUID;
-import java.util.Optional;
 
 import com.epita.exchange.utils.Logger;
 
+import jakarta.ws.rs.container.ContainerRequestContext;
+import jakarta.ws.rs.container.ContainerRequestFilter;
+import jakarta.ws.rs.ext.Provider;
+import java.util.Base64;
+
 @ApplicationScoped
-public class AuthService implements Logger {
+@Provider
+public class AuthService implements ContainerRequestFilter, Logger {
 
-    @Inject
-    SecurityIdentity securityIdentity;
+    private static ThreadLocal<AuthModel> authModelThreadLocal = new ThreadLocal<>();
 
-    @ConfigProperty(name = "jwt.user.claim", defaultValue = "userId")
-    String userClaim;
+    @Override
+    public void filter(ContainerRequestContext requestContext) {
+        String bearerToken = requestContext.getHeaderString("Authorization");
 
-    public void onStart(@Observes StartupEvent ev) {
-        this.logger().info("AuthService started successfully.");
+        if (bearerToken != null && bearerToken.startsWith("Bearer ")) {
+            String token = bearerToken.substring(7);
+            String decodedString = new String(Base64.getDecoder().decode(token));
+            AuthModel authModel = decodeAuthModel(decodedString);
+            authModelThreadLocal.set(authModel);
+        } else {
+            this.logger().error("Missing or invalid Bearer token");
+            throw new UnauthorizedException("Missing or invalid Bearer token");
+        }
     }
 
-    public String getUserId() throws LoginException {
-        if (securityIdentity == null) {
-            this.logger().error("No security identity available.");
-            throw new LoginException("User is not authenticated.");
-        }
+    private AuthModel decodeAuthModel(String decodedString) {
+        String[] parts = decodedString.split(",");
+        String userId = parts[0];
+        String username = parts[1];
+        String email = parts[2];
 
-        Optional<String> userIdClaim = securityIdentity.getAttributes().containsKey(userClaim)
-                ? Optional.ofNullable(securityIdentity.getAttribute(userClaim).toString())
-                : Optional.empty();
+        return new AuthModel(userId, username, email);
+    }
 
-        if (userIdClaim.isPresent()) {
-            try {
-                return UUID.fromString(userIdClaim.get()).toString();
-            } catch (IllegalArgumentException e) {
-                this.logger().error("Invalid UUID format in user claim.", e);
-                throw new LoginException("Invalid user ID format in the token.");
-            }
-        } else {
-            this.logger().error("User ID claim not found in the JWT token.");
-            throw new LoginException("User ID claim not found in the token.");
-        }
+    private AuthModel getAuthModel() {
+        return authModelThreadLocal.get();
+    }
+
+    public String getUserId() {
+        AuthModel authModel = getAuthModel();
+        return (authModel != null) ? authModel.getUserId() : null;
+    }
+
+    public String getUsername() {
+        AuthModel authModel = getAuthModel();
+        return (authModel != null) ? authModel.getUsername() : null;
     }
 }

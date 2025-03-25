@@ -1,4 +1,4 @@
-package com.epita.exchange.aggregate;
+package com.epita.exchange.redis.aggregate;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;

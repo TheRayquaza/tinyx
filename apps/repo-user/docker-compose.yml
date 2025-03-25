@@ -1,0 +1,20 @@
+services:
+  mongo:
+    image: mongo:8.0.6-nanoserver
+    container_name: mongo
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: admin
+      MONGO_INITDB_DATABASE: RepoUser
+    volumes:
+      - ./src/main/resources/init.js:/docker-entrypoint-initdb.d/init.js:ro
+    ports:
+      - 27017:27017
+    expose:
+      - "27017"
+  redis:
+    image: redis:8.0-M04-alpine3.21
+    container_name: redis
+    ports:
+      - "6379:6379"
