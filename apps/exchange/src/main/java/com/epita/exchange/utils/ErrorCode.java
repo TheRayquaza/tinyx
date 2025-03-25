@@ -1,4 +1,4 @@
-package com.epita.exchange.error;
+package com.epita.exchange.utils;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

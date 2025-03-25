@@ -13,8 +13,25 @@ services:
       - 27017:27017
     expose:
       - "27017"
+
   redis:
     image: redis:8.0-M04-alpine3.21
     container_name: redis
     ports:
       - "6379:6379"
+    expose:
+      - "6379"
+
+  minio:
+    image: quay.io/minio/minio:RELEASE.2025-03-12T18-04-18Z
+    container_name: minio
+    ports:
+      - "9000:9000"
+      - "9090:9090"
+    environment:
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadmin
+    command: server /data --console-address ":9090"
+    expose:
+      - "9000"
+      - "9090"

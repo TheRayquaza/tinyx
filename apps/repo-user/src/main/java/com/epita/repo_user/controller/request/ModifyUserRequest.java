@@ -1,6 +1,7 @@
 package com.epita.repo_user.controller.request;
 
 import lombok.*;
+import org.eclipse.microprofile.openapi.annotations.media.Schema;
 
 @AllArgsConstructor
 @With

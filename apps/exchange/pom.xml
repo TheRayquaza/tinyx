@@ -108,6 +108,13 @@
             <artifactId>quarkus-mongodb-rest-data-panache</artifactId>
         </dependency>
 
+        <!-- Quarkus Minio -->
+        <dependency>
+            <groupId>io.minio</groupId>
+            <artifactId>minio</artifactId>
+            <version>8.5.17</version>
+        </dependency>
+
         <!-- Quarkus Security Context -->
         <dependency>
             <groupId>io.quarkus</groupId>

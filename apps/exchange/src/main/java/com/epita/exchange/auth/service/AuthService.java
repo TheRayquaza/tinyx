@@ -1,5 +1,6 @@
 package com.epita.exchange.auth.service;
 
+import com.epita.exchange.auth.service.entity.AuthEntity;
 import io.quarkus.security.UnauthorizedException;
 
 import jakarta.enterprise.context.ApplicationScoped;
@@ -15,7 +16,7 @@ import java.util.Base64;
 @Provider
 public class AuthService implements ContainerRequestFilter, Logger {
 
-    private static ThreadLocal<AuthModel> authModelThreadLocal = new ThreadLocal<>();
+    private static final ThreadLocal<AuthEntity> authEntityThreadLocal = new ThreadLocal<>();
 
     @Override
     public void filter(ContainerRequestContext requestContext) {
@@ -23,35 +24,34 @@ public class AuthService implements ContainerRequestFilter, Logger {
 
         if (bearerToken != null && bearerToken.startsWith("Bearer ")) {
             String token = bearerToken.substring(7);
-            String decodedString = new String(Base64.getDecoder().decode(token));
-            AuthModel authModel = decodeAuthModel(decodedString);
-            authModelThreadLocal.set(authModel);
+            authEntityThreadLocal.set(decodeAuthEntity(token));
         } else {
             this.logger().error("Missing or invalid Bearer token");
             throw new UnauthorizedException("Missing or invalid Bearer token");
         }
     }
 
-    private AuthModel decodeAuthModel(String decodedString) {
+    private AuthEntity decodeAuthEntity(String token) {
+        String decodedString = new String(Base64.getDecoder().decode(token));
         String[] parts = decodedString.split(",");
         String userId = parts[0];
         String username = parts[1];
         String email = parts[2];
 
-        return new AuthModel(userId, username, email);
+        return new AuthEntity(userId, username, email);
     }
 
-    private AuthModel getAuthModel() {
-        return authModelThreadLocal.get();
+    private AuthEntity getAuthEntity() {
+        return authEntityThreadLocal.get();
     }
 
     public String getUserId() {
-        AuthModel authModel = getAuthModel();
-        return (authModel != null) ? authModel.getUserId() : null;
+        AuthEntity authEntity = getAuthEntity();
+        return (authEntity != null) ? authEntity.getUserId() : null;
     }
 
     public String getUsername() {
-        AuthModel authModel = getAuthModel();
-        return (authModel != null) ? authModel.getUsername() : null;
+        AuthEntity authEntity = getAuthEntity();
+        return (authEntity != null) ? authEntity.getUsername() : null;
     }
 }

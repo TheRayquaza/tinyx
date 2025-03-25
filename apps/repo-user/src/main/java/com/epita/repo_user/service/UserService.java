@@ -1,11 +1,13 @@
 package com.epita.repo_user.service;
 
+import com.epita.exchange.redis.aggregate.UserAggregate;
 import com.epita.exchange.redis.service.RedisPublisher;
+import com.epita.exchange.s3.service.S3Service;
 import com.epita.repo_user.RepoUserErrorCode;
-import com.epita.repo_user.controller.RepoUserControllerApi;
 import com.epita.repo_user.controller.request.CreateUserRequest;
 import com.epita.repo_user.controller.request.LoginRequest;
 import com.epita.repo_user.controller.request.ModifyUserRequest;
+import com.epita.repo_user.controller.request.UploadImageRequest;
 import com.epita.repo_user.service.entity.UserEntity;
 import com.epita.repo_user.converter.UserModelToUserAggregateConverter;
 import com.epita.repo_user.converter.UserModelToUserEntityConverter;
@@ -15,12 +17,15 @@ import io.quarkus.redis.datasource.RedisDataSource;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
+import org.apache.commons.io.FileUtils;
 import org.bson.types.ObjectId;
 import org.mindrot.jbcrypt.BCrypt;
 
+import java.io.*;
 import java.time.LocalDateTime;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.UUID;
 
 @ApplicationScoped
 public class UserService {
@@ -33,9 +38,14 @@ public class UserService {
     @Inject
     UserModelToUserAggregateConverter userModelToUserAggregate;
 
+    @Inject
+    S3Service s3Service;
+
     RedisDataSource redisDataSource;
 
-    RedisPublisher redisPublisher = new RedisPublisher(redisDataSource.);
+    RedisPublisher redisPublisher = new RedisPublisher(redisDataSource);
+    @Inject
+    UserModelToUserEntityConverter userModelToUserEntityConverter;
 
     public UserEntity login(LoginRequest request) {
         if (request == null || request.username == null || request.password == null) {
@@ -113,11 +123,32 @@ public class UserService {
         throw RepoUserErrorCode.USER_NOT_FOUND.createError();
     }
 
+    @Transactional
     public void deleteUser(ObjectId id) {
-        Optional<UserModel> userModel = userRepository.findByIdOptional(id);
-        if (userModel.isEmpty())
-            throw RepoUserErrorCode.USER_NOT_FOUND.createError(id.toString());
+        UserModel userModel = userRepository.findByIdOptional(id)
+                .orElseThrow(() -> RepoUserErrorCode.USER_NOT_FOUND.createError(id.toString()));
+        userModel.setDeleted(true);
+        UserAggregate userAggregate = userModelToUserAggregate.convertNotNull(userModel);
         userRepository.deleteById(id);
-        redisPublisher.publish("user_aggregate", userModelToUserAggregate.convertNotNull(userModel.get()));
+        redisPublisher.publish("user_aggregate", userAggregate);
+    }
+
+    @Transactional
+    public UserEntity uploadProfileImage(ObjectId userId, UploadImageRequest request) {
+        String objectKey = "user/" + userId + "/image/" + UUID.randomUUID() + ".jpeg";
+
+        UserModel userModel = userRepository.findByIdOptional(userId)
+                .orElseThrow(() -> RepoUserErrorCode.USER_NOT_FOUND.createError(userId));
+        try {
+            File tempFile = File.createTempFile("S3", userId.toString());
+            tempFile.deleteOnExit();
+            FileUtils.copyInputStreamToFile(request.getFile(), tempFile);
+            s3Service.uploadFile(objectKey, tempFile);
+            s3Service.deleteFile(userModel.getProfileImage());
+            userModel.setProfileImage(objectKey);
+            return userModelToUserEntityConverter.convertNotNull(userModel);
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to upload profile image to S3", e);
+        }
     }
 }

@@ -5,11 +5,13 @@ import com.epita.repo_user.RepoUserErrorCode;
 import com.epita.repo_user.controller.request.CreateUserRequest;
 import com.epita.repo_user.controller.request.LoginRequest;
 import com.epita.repo_user.controller.request.ModifyUserRequest;
+import com.epita.repo_user.controller.request.UploadImageRequest;
 import com.epita.repo_user.service.entity.UserEntity;
 import com.github.javaparser.quality.NotNull;
 import io.quarkus.security.Authenticated;
 import jakarta.validation.Valid;
 import jakarta.ws.rs.*;
+import jakarta.ws.rs.core.Response;
 import org.eclipse.microprofile.openapi.annotations.Operation;
 import org.eclipse.microprofile.openapi.annotations.media.Content;
 import org.eclipse.microprofile.openapi.annotations.media.Schema;
@@ -51,7 +53,7 @@ public interface RepoUserControllerApi extends Logger {
     UserEntity createUser(@RequestBody(required = true) @NotNull @Valid CreateUserRequest request);
 
     @PUT
-    @Path("/user/{id}")
+    @Path("/user")
     @Authenticated
     @Operation(summary = "Modify my user's account")
     @APIResponses({
@@ -62,7 +64,21 @@ public interface RepoUserControllerApi extends Logger {
             @APIResponse(responseCode = "404", description = "User not found",
                     content = @Content(schema = @Schema(implementation = RepoUserErrorCode.class)))
     })
-    UserEntity modifyUser(@PathParam("id") String id, @RequestBody(required = true) @NotNull @Valid ModifyUserRequest request);
+    UserEntity modifyUser(@RequestBody(required = true) @NotNull @Valid ModifyUserRequest request);
+
+    @PUT
+    @Path("/user/image")
+    @Authenticated
+    @Operation(summary = "Upload Profile image for my user's account")
+    @APIResponses({
+            @APIResponse(responseCode = "200", description = "User account updated successfully",
+                    content = @Content(schema = @Schema(implementation = UserEntity.class))),
+            @APIResponse(responseCode = "400", description = "Invalid input",
+                    content = @Content(schema = @Schema(implementation = RepoUserErrorCode.class))),
+            @APIResponse(responseCode = "404", description = "User not found",
+                    content = @Content(schema = @Schema(implementation = RepoUserErrorCode.class)))
+    })
+    UserEntity uploadProfileImage(@RequestBody(required = true) @NotNull @Valid UploadImageRequest request);
 
     @DELETE
     @Path("/user")

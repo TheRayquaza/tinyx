@@ -1,4 +1,4 @@
-package com.epita.exchange.auth.service;
+package com.epita.exchange.auth.service.entity;
 
 import lombok.*;
 
@@ -9,7 +9,7 @@ import java.io.Serializable;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class AuthModel implements Serializable {
+public class AuthEntity implements Serializable {
     private String userId;
     private String username;
     private String email;

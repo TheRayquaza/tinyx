@@ -4,12 +4,12 @@ import com.epita.exchange.auth.service.AuthService;
 import com.epita.repo_user.controller.request.CreateUserRequest;
 import com.epita.repo_user.controller.request.LoginRequest;
 import com.epita.repo_user.controller.request.ModifyUserRequest;
+import com.epita.repo_user.controller.request.UploadImageRequest;
 import com.epita.repo_user.service.entity.UserEntity;
 import com.epita.repo_user.service.UserService;
 import com.github.javaparser.quality.NotNull;
 import jakarta.inject.Inject;
 import jakarta.validation.Valid;
-import jakarta.ws.rs.PathParam;
 import org.bson.types.ObjectId;
 import org.eclipse.microprofile.openapi.annotations.parameters.RequestBody;
 
@@ -28,14 +28,22 @@ public class RepoUserController implements RepoUserControllerApi {
 
     @Override
     public UserEntity createUser(@RequestBody(required = true) @NotNull @Valid CreateUserRequest request) {
-        logger().info("POST /user");
+        logger().info("POST /user - username {}", request.username);
         return userService.createUser(request);
     }
 
     @Override
-    public UserEntity modifyUser(@PathParam("id") String id, @RequestBody(required = true) @NotNull @Valid ModifyUserRequest request) {
-        logger().info("PUT /user/{}", id);
-        return userService.updateUser(new ObjectId(id), request);
+    public UserEntity modifyUser(@RequestBody(required = true) @NotNull @Valid ModifyUserRequest request) {
+        String userId = authService.getUserId();
+        logger().info("PUT /user/{}", userId);
+        return userService.updateUser(new ObjectId(userId), request);
+    }
+
+    @Override
+    public UserEntity uploadProfileImage(@RequestBody(required = true) @NotNull @Valid UploadImageRequest request) {
+        String userId = authService.getUserId();
+        logger().info("PUT /user/image - {}", userId);
+        return userService.uploadProfileImage(new ObjectId(userId), request);
     }
 
     @Override

@@ -1,6 +1,6 @@
 package com.epita.repo_user;
 
-import com.epita.exchange.error.ErrorCode;
+import com.epita.exchange.utils.ErrorCode;
 import lombok.Getter;
 
 @Getter
