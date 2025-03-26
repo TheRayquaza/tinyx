@@ -9,8 +9,7 @@ import lombok.*;
 @Getter
 @Setter
 public class CreateUserRequest {
-    @NotNull
-    public String username;
-    @NotNull public String password;
-    public String email;
+  @NotNull public String username;
+  @NotNull public String password;
+  public String email;
 }

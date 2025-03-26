@@ -1,8 +1,7 @@
 package com.epita.exchange.auth.service.entity;
 
-import lombok.*;
-
 import java.io.Serializable;
+import lombok.*;
 
 @Getter
 @Setter
@@ -10,7 +9,6 @@ import java.io.Serializable;
 @AllArgsConstructor
 @NoArgsConstructor
 public class AuthEntity implements Serializable {
-    private String userId;
-    private String username;
-    private String email;
+  private String userId;
+  private String username;
 }

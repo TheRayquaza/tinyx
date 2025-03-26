@@ -9,13 +9,12 @@ import jakarta.ws.rs.Path;
 @Path("/hello")
 public class RepoPostController implements RepoPostControllerApi {
 
-    @Inject
-    AuthService authService;
+  @Inject AuthService authService;
 
-    @Authenticated
-    @GET
-    public String hello() {
-        authService.getUserId();
-        return "Hello from RESTEasy Reactive";
-    }
+  @Authenticated
+  @GET
+  public String hello() {
+    authService.getUserId();
+    return "Hello from RESTEasy Reactive";
+  }
 }

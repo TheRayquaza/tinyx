@@ -1,27 +1,25 @@
 package com.epita.exchange.s3.service;
 
-import io.minio.MinioClient;
-import jakarta.enterprise.context.ApplicationScoped;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.eclipse.microprofile.config.inject.ConfigProperty;
 
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-@ApplicationScoped
 public class S3Configuration {
-    private String endpoint;
-    private String bucketName;
-    private String accessKey;
-    private String secretKey;
+  @ConfigProperty(defaultValue = "s3.endpoint")
+  public String endpoint;
 
-    public MinioClient createClient() {
-        return MinioClient.builder()
-                .endpoint(endpoint)
-                .credentials(accessKey, secretKey)
-                .build();
-    }
+  @ConfigProperty(name = "s3.bucket")
+  public String bucketName;
+
+  @ConfigProperty(name = "s3.access-key")
+  public String accessKey;
+
+  @ConfigProperty(name = "s3.secret-key")
+  public String secretKey;
 }

@@ -1,8 +1,7 @@
 package com.epita.repo_user.controller.request;
 
+import jakarta.validation.constraints.NotNull;
 import lombok.*;
-
-import javax.validation.constraints.NotNull;
 
 @AllArgsConstructor
 @With
@@ -10,6 +9,6 @@ import javax.validation.constraints.NotNull;
 @Getter
 @Setter
 public class LoginRequest {
-    @NotNull public String username;
-    @NotNull public String password;
+  @NotNull public String username;
+  @NotNull public String password;
 }

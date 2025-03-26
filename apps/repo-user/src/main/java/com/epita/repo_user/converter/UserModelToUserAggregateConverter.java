@@ -7,16 +7,16 @@ import jakarta.enterprise.context.ApplicationScoped;
 
 @ApplicationScoped
 public class UserModelToUserAggregateConverter implements Converter<UserModel, UserAggregate> {
-    @Override
-    public UserAggregate convertNotNull(UserModel input) {
-        return new UserAggregate()
-                .withBio(input.getBio())
-                .withId(input.getId())
-                .withEmail(input.getEmail())
-                .withDeleted(input.isDeleted())
-                .withUsername(input.getUsername())
-                .withProfileImage(input.getProfileImage())
-                .withCreatedAt(input.getCreatedAt())
-                .withUpdatedAt(input.getUpdatedAt());
-    }
+  @Override
+  public UserAggregate convertNotNull(UserModel input) {
+    return new UserAggregate()
+        .withBio(input.getBio())
+        .withId(input.getId())
+        .withEmail(input.getEmail())
+        .withDeleted(input.isDeleted())
+        .withUsername(input.getUsername())
+        .withProfileImage(input.getProfileImage())
+        .withCreatedAt(input.getCreatedAt())
+        .withUpdatedAt(input.getUpdatedAt());
+  }
 }
