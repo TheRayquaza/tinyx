@@ -1,9 +1,7 @@
 include:
   - "ci/repo-user.gitlab-ci.yml"
-  - "ci/repo-post.gitlab-ci.yml"
-  - "ci/repo-social.gitlab-ci.yml"
 
 stages:
   - lint
-  - build
   - test
+  - build
