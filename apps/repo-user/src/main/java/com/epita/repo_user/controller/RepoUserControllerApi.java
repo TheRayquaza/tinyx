@@ -6,6 +6,7 @@ import com.epita.repo_user.controller.request.CreateUserRequest;
 import com.epita.repo_user.controller.request.LoginRequest;
 import com.epita.repo_user.controller.request.ModifyUserRequest;
 import com.epita.repo_user.controller.request.UploadImageRequest;
+import com.epita.repo_user.controller.response.UserLoginResponse;
 import com.epita.repo_user.service.entity.UserEntity;
 import io.quarkus.security.Authenticated;
 import jakarta.validation.Valid;
@@ -28,8 +29,8 @@ public interface RepoUserControllerApi extends Logger {
   @Operation(summary = "Login user credentials")
   @APIResponses({
     @APIResponse(
-        responseCode = "201",
-        description = "User account created successfully",
+        responseCode = "200",
+        description = "User JWT",
         content = @Content(schema = @Schema(implementation = UserEntity.class))),
     @APIResponse(
         responseCode = "400",
@@ -44,7 +45,8 @@ public interface RepoUserControllerApi extends Logger {
         description = "User Not Found",
         content = @Content(schema = @Schema(implementation = RepoUserErrorCode.class))),
   })
-  UserEntity login(@RequestBody(required = true) @NotNull @Valid LoginRequest request);
+  @NotNull
+  UserLoginResponse login(@RequestBody(required = true) @NotNull @Valid LoginRequest request);
 
   @POST
   @Path("/user")
@@ -87,6 +89,7 @@ public interface RepoUserControllerApi extends Logger {
 
   @PUT
   @Path("/user/image")
+  @Consumes(MediaType.MULTIPART_FORM_DATA)
   @Authenticated
   @Operation(summary = "Upload Profile image for my user's account")
   @APIResponses({

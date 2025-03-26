@@ -9,6 +9,7 @@ import com.epita.repo_user.controller.request.CreateUserRequest;
 import com.epita.repo_user.controller.request.LoginRequest;
 import com.epita.repo_user.controller.request.ModifyUserRequest;
 import com.epita.repo_user.controller.request.UploadImageRequest;
+import com.epita.repo_user.controller.response.UserLoginResponse;
 import com.epita.repo_user.converter.UserModelToUserAggregateConverter;
 import com.epita.repo_user.converter.UserModelToUserEntityConverter;
 import com.epita.repo_user.repository.UserRepository;
@@ -19,9 +20,7 @@ import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import java.io.*;
 import java.time.LocalDateTime;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 import org.apache.commons.io.FileUtils;
 import org.bson.types.ObjectId;
 import org.mindrot.jbcrypt.BCrypt;
@@ -37,11 +36,11 @@ public class UserService {
 
   @Inject UserModelToUserEntityConverter userModelToUserEntityConverter;
 
-  //@Inject S3Service s3Service;
+  @Inject S3Service s3Service;
 
-  //@Inject RedisPublisher redisPublisher;
+  @Inject RedisPublisher redisPublisher;
 
-  public UserEntity login(LoginRequest request) {
+  public UserLoginResponse login(LoginRequest request) {
     if (request == null || request.username == null || request.password == null) {
       throw RepoUserErrorCode.INVALID_USER_DATA.createError("request / username / password");
     }
@@ -55,7 +54,11 @@ public class UserService {
       throw RepoUserErrorCode.UNAUTHORIZED.createError();
     }
 
-    return userModelToUserEntity.convertNotNull(userModel);
+    String token = userModel.getId() + "," + userModel.getUsername();
+    return new UserLoginResponse(
+        userModel.getId(),
+        userModel.getUsername(),
+        Arrays.toString(Base64.getDecoder().decode(token)));
   }
 
   @Transactional
@@ -108,7 +111,7 @@ public class UserService {
     userModel.setUpdatedAt(now);
     userModel.setPasswordHash(BCrypt.hashpw(request.password, BCrypt.gensalt()));
 
-    //redisPublisher.publish("user_aggregate", userModelToUserAggregate.convertNotNull(userModel));
+    // redisPublisher.publish("user_aggregate", userModelToUserAggregate.convertNotNull(userModel));
     return userModelToUserEntity.convertNotNull(userModel);
   }
 
@@ -127,7 +130,7 @@ public class UserService {
     userModel.setDeleted(true);
     UserAggregate userAggregate = userModelToUserAggregate.convertNotNull(userModel);
     userRepository.deleteById(id);
-    //redisPublisher.publish("user_aggregate", userAggregate);
+    redisPublisher.publish("user_aggregate", userAggregate);
   }
 
   @Transactional
@@ -142,8 +145,8 @@ public class UserService {
       File tempFile = File.createTempFile("S3", userId.toString());
       tempFile.deleteOnExit();
       FileUtils.copyInputStreamToFile(request.getFile(), tempFile);
-      //s3Service.uploadFile(new S3Configuration(), objectKey, tempFile);
-      //s3Service.deleteFile(new S3Configuration(), userModel.getProfileImage());
+      s3Service.uploadFile(new S3Configuration(), objectKey, tempFile);
+      s3Service.deleteFile(new S3Configuration(), userModel.getProfileImage());
       userModel.setProfileImage(objectKey);
       return userModelToUserEntityConverter.convertNotNull(userModel);
     } catch (Exception e) {

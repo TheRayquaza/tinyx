@@ -4,7 +4,6 @@ import com.epita.exchange.utils.Logger;
 import io.minio.*;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.validation.constraints.NotNull;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
@@ -32,7 +31,8 @@ public class S3Service implements Logger {
     }
   }
 
-  public File downloadFile(@NotNull S3Configuration s3Configuration, String key, String downloadPath) {
+  public File downloadFile(
+      @NotNull S3Configuration s3Configuration, String key, String downloadPath) {
     MinioClient minioClient =
         MinioClient.builder()
             .endpoint(s3Configuration.endpoint)

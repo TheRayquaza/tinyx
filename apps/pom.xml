@@ -71,44 +71,17 @@
             <version>${quarkus.platform.version}</version>
         </dependency>
 
-        <!--
-<dependency>
-    <groupId>io.quarkus</groupId>
-    <artifactId>quarkus-extension-processor</artifactId>
-    <version>${quarkus.platform.version}</version>
-</dependency>
+        <dependency>
+            <groupId>io.quarkus</groupId>
+            <artifactId>quarkus-arc</artifactId>
+            <version>${quarkus.platform.version}</version>
+        </dependency>
 
-
-<dependency>
-    <groupId>jakarta.inject</groupId>
-    <artifactId>jakarta.inject-api</artifactId>
-</dependency>
-
-<dependency>
-    <groupId>jakarta.persistence</groupId>
-    <artifactId>jakarta.persistence-api</artifactId>
-</dependency>
-
-<dependency>
-    <groupId>jakarta.enterprise</groupId>
-    <artifactId>jakarta.enterprise.cdi-api</artifactId>
-    <version>4.1.0</version>
-</dependency>
-
-<dependency>
-    <groupId>io.quarkus.arc</groupId>
-    <artifactId>arc</artifactId>
-    <version>${quarkus.platform.version}</version>
-</dependency>
-
-<dependency>
-    <groupId>io.quarkus.arc</groupId>
-    <artifactId>arc-processor</artifactId>
-    <version>${quarkus.platform.version}</version>
-</dependency>
-
-
--->
+        <dependency>
+            <groupId>io.quarkus</groupId>
+            <artifactId>quarkus-smallrye-health</artifactId>
+            <version>${quarkus.platform.version}</version>
+        </dependency>
 
         <!-- Quarkus Redis Client -->
         <dependency>
@@ -225,6 +198,19 @@
                             <goal>build</goal>
                             <goal>generate-code</goal>
                             <goal>generate-code-tests</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>io.smallrye</groupId>
+                <artifactId>jandex-maven-plugin</artifactId>
+                <version>3.2.7</version>
+                <executions>
+                    <execution>
+                        <id>make-index</id>
+                        <goals>
+                            <goal>jandex</goal>
                         </goals>
                     </execution>
                 </executions>
