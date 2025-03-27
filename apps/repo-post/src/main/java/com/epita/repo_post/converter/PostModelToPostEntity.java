@@ -7,14 +7,15 @@ import jakarta.enterprise.context.ApplicationScoped;
 
 @ApplicationScoped
 public class PostModelToPostEntity implements Converter<PostModel, PostEntity> {
-    @Override
-    public PostEntity convertNotNull(PostModel input) {
-        return new PostEntity().withId(input.getId())
-            .withOwnerId(input.getOwnerId())
-            .withMedia(input.getMedia())
-            .withText(input.getText())
-            .withCreatedAt(input.getCreatedAt())
-            .withUpdatedAt(input.getUpdatedAt())
-                .withDeleted(input.isDeleted());
-    }
+  @Override
+  public PostEntity convertNotNull(PostModel input) {
+    return new PostEntity()
+        .withId(input.getId())
+        .withOwnerId(input.getOwnerId())
+        .withMedia(input.getMedia())
+        .withText(input.getText())
+        .withCreatedAt(input.getCreatedAt())
+        .withUpdatedAt(input.getUpdatedAt())
+        .withDeleted(input.isDeleted());
+  }
 }

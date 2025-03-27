@@ -9,6 +9,5 @@ import lombok.*;
 @Getter
 @Setter
 public class PostReplyRequest {
-    @NotNull
-    String text;
+  @NotNull String text;
 }

@@ -6,7 +6,7 @@ import jakarta.enterprise.context.ApplicationScoped;
 
 @ApplicationScoped
 public class PostRepository implements PanacheMongoRepository<PostModel> {
-    public void create(PostModel model) {
-        persist(model);
-    }
+  public void create(PostModel model) {
+    persist(model);
+  }
 }

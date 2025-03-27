@@ -1,7 +1,7 @@
 package com.epita.repo_post.controller.request;
 
-import lombok.*;
 import java.util.List;
+import lombok.*;
 
 @AllArgsConstructor
 @With
@@ -9,7 +9,7 @@ import java.util.List;
 @Getter
 @Setter
 public class EditPostRequest {
-    // Either text or media should be present
-    public String text;
-    public List<String> media;
+  // Either text or media should be present
+  public String text;
+  public List<String> media;
 }
