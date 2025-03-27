@@ -48,7 +48,7 @@ public class UserService {
     UserModel userModel =
         userRepository
             .findByUsername(request.username)
-            .orElseThrow(() -> RepoUserErrorCode.USER_NOT_FOUND.createError(request.username));
+            .orElseThrow(() -> RepoUserErrorCode.USER_WITH_USERNAME_FOUND.createError(request.username));
 
     if (!BCrypt.checkpw(request.password, userModel.getPasswordHash())) {
       throw RepoUserErrorCode.UNAUTHORIZED.createError();
@@ -93,7 +93,7 @@ public class UserService {
 
     if (request.username != null) {
       if (userRepository.findByUsername(request.username).stream().findFirst().isPresent()) {
-        throw RepoUserErrorCode.USER_ALREADY_EXISTS.createError("username");
+        throw RepoUserErrorCode.USER_WITH_USERNAME_ALREADY_EXISTS.createError("username");
       }
       userModel.setUsername(request.username);
     }
@@ -150,7 +150,7 @@ public class UserService {
       userModel.setProfileImage(objectKey);
       return userModelToUserEntityConverter.convertNotNull(userModel);
     } catch (Exception e) {
-      throw new RuntimeException("Failed to upload profile image to S3", e);
+      throw RepoUserErrorCode.INTERNAL_SERVER_ERROR.createError();
     }
   }
 }

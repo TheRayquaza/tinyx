@@ -1,6 +1,7 @@
-package com.epita.exchange.utils;
+package com.epita.exchange.error;
 
-import javax.ws.rs.core.Response;
+import com.epita.exchange.error.controller.response.ErrorResponse;
+import jakarta.ws.rs.core.Response;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -17,12 +18,19 @@ public interface ErrorCode {
     private final Object[] parameters;
 
     public Response asResponse() {
-      return Response.status(errorCode.getHttpCode()).entity(getMessage()).build();
+      return Response.status(errorCode.getHttpCode())
+          .entity(new ErrorResponse(errorCode.getHttpCode(), getMessage()))
+          .build();
     }
 
     @Override
     public String getMessage() {
       return errorCode.getMessage(parameters);
+    }
+
+    @Override
+    public synchronized Throwable fillInStackTrace() {
+      return this; // Prevent stack traces
     }
   }
 

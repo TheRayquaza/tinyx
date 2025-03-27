@@ -7,8 +7,10 @@ services:
       MONGO_INITDB_ROOT_USERNAME: admin
       MONGO_INITDB_ROOT_PASSWORD: admin
       MONGO_INITDB_DATABASE: RepoUser
+    command: ["mongod", "--replSet", "rs0", "--bind_ip_all", "--keyFile", "/etc/mongo/rsKeyFile"]
     volumes:
-      - ./src/main/resources/init.js:/docker-entrypoint-initdb.d/init.js:ro
+      - ./src/main/resources/init.js:/docker-entrypoint-initdb.d/init.js
+      - ./src/main/resources/rsKeyFile:/etc/mongo/rsKeyFile:ro
     ports:
       - 27017:27017
     expose:
@@ -35,3 +37,18 @@ services:
     expose:
       - "9000"
       - "9090"
+
+  mongo-express:
+    image: mongo-express:1.0.2
+    container_name: mongo-express
+    restart: unless-stopped
+    ports:
+      - "8081:8081"
+    environment:
+      ME_CONFIG_MONGODB_ADMINUSERNAME: admin
+      ME_CONFIG_MONGODB_ADMINPASSWORD: admin
+      ME_CONFIG_MONGODB_SERVER: mongo
+    depends_on:
+      - mongo
+    expose:
+      - "8081"

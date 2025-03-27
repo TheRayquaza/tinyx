@@ -12,7 +12,7 @@ import org.bson.codecs.pojo.annotations.BsonId;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-@MongoEntity(collection = "users")
+@MongoEntity(collection = "users", database = "")
 public class UserModel {
   @BsonId private String id;
   private String username;
