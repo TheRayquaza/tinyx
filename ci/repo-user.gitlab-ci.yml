@@ -1,4 +1,4 @@
-build-job:
+repo-user:build:
   image:
     name: gcr.io/kaniko-project/executor:v1.23.2-debug
     entrypoint: [""]
@@ -10,23 +10,21 @@ build-job:
   before_script:
     - cd apps/repo-user
   script:
-    - mvn package -Dquarkus.package.type=uber-jar
     - echo "{\"auths\":{\"$DOCKER_REGISTRY\":{\"auth\":\"$(echo -n ${CI_REGISTRY_USER}:${CI_REGISTRY_PASSWORD} | base64)\"}}}" > /kaniko/.docker/config.json
     - /kaniko/executor --context . --dockerfile Dockerfile --destination $DOCKER_IMAGE:$DOCKER_TAG
 
-lint-job:
+repo-user:lint:
   before_script:
     - cd apps/repo-user
-  image: eclipse-temurin:17-alpine
+  image: maven:3.8.5-eclipse-temurin-17-alpine
   stage: lint
   script:
     - mvn spotless:check
-    - mvn spotless:apply
 
-test-job:
+repo-user:test:
   before_script:
     - cd apps/repo-user
-  image: eclipse-temurin:17-alpine
+  image: maven:3.8.5-eclipse-temurin-17-alpine
   stage: test
   script:
     - mvn test # ADD more configurations here when the tests are ready
