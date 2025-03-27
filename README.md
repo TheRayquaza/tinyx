@@ -40,10 +40,10 @@ mvn test
 
 | Project                      | Members |
 |--------------------------------|---------|
-| **Repo-User / Exchange**       | Aurélien, Matéo, Khaled, Samy, Maxime |
+| **Repo-User / Exchange**       | Aurélien, Matéo, Khaled, Samy, Maxim |
 | **Infra Mongo**                | Matéo, Samy, Khaled |
 | **CI (lint, test, build, deploy)** | Samy, (Armand) |
-| **Repo-Post**                  | Khaled, Maxime, Armand, Baptiste, Aurélien |
+| **Repo-Post**                  | Khaled, Maxim, Armand, Baptiste, Aurélien |
 | **Repo-Social**                | Achille, Gab M, Matéo |
 | **Infra S3**                   | Équipe SRS (Alexis, Gab T, Tim, Noé) |
 | **Infra Neo4j**                | Achille, Matéo, Samy / Baptiste |
