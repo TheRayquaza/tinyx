@@ -33,3 +33,6 @@ docker-compose.override.yml
 # Environment and Secrets
 .env
 .venv
+
+# Gitlab CI
+.gitlab-ci-local/
