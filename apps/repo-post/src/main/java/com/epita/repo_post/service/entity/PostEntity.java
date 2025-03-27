@@ -22,5 +22,4 @@ public class PostEntity implements Serializable {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     private Boolean deleted;
-
 }

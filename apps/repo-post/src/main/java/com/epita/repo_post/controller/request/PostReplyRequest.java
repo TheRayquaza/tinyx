@@ -8,6 +8,7 @@ import lombok.*;
 @NoArgsConstructor
 @Getter
 @Setter
-public class ReplyPostRequest {
-    @NotNull public String text;
+public class PostReplyRequest {
+    @NotNull
+    String text;
 }
