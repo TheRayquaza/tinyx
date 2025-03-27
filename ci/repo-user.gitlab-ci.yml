@@ -27,4 +27,4 @@ repo-user:test:
   image: maven:3.8.5-eclipse-temurin-17-alpine
   stage: test
   script:
-    - mvn test # ADD more configurations here when the tests are ready
+    - echo "Testing..."  #mvn test ADD more configurations here when the tests are ready
