@@ -2,6 +2,7 @@ package com.epita.exchange.redis.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import io.quarkus.redis.datasource.RedisDataSource;
 import io.quarkus.redis.datasource.pubsub.PubSubCommands;
 import jakarta.enterprise.context.ApplicationScoped;
@@ -12,7 +13,7 @@ import java.io.IOException;
 public class RedisPublisher {
 
   private final PubSubCommands<String> publisher;
-  private final ObjectMapper objectMapper = new ObjectMapper();
+  private final ObjectMapper objectMapper = new ObjectMapper().registerModule(new JavaTimeModule());
 
   @Inject
   public RedisPublisher(RedisDataSource rd) {

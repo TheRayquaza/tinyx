@@ -79,6 +79,7 @@ public class RepoUserController implements RepoUserControllerApi {
 
   @GET
   @Path("/user")
+  @Authenticated
   @Override
   public @NotNull UserEntity getCurrentUserAccount() {
     String userId = authService.getUserId();
@@ -88,6 +89,7 @@ public class RepoUserController implements RepoUserControllerApi {
 
   @GET
   @Path("/user/{id}")
+  @Authenticated
   @Override
   public UserEntity getUserAccount(@PathParam("id") String id) {
     logger().info("GET /user/{}", id);

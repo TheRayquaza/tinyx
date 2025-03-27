@@ -3,7 +3,7 @@ package com.epita.exchange.s3.service;
 import com.epita.exchange.utils.Logger;
 import io.minio.*;
 import jakarta.enterprise.context.ApplicationScoped;
-import jakarta.validation.constraints.NotNull;
+import jakarta.inject.Inject;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
@@ -11,7 +11,9 @@ import java.io.InputStream;
 @ApplicationScoped
 public class S3Service implements Logger {
 
-  public void uploadFile(@NotNull S3Configuration s3Configuration, String key, File file) {
+  @Inject S3Configuration s3Configuration;
+
+  public void uploadFile(String key, File file) {
     MinioClient minioClient =
         MinioClient.builder()
             .endpoint(s3Configuration.endpoint)
@@ -31,8 +33,7 @@ public class S3Service implements Logger {
     }
   }
 
-  public File downloadFile(
-      @NotNull S3Configuration s3Configuration, String key, String downloadPath) {
+  public File downloadFile(String key, String downloadPath) {
     MinioClient minioClient =
         MinioClient.builder()
             .endpoint(s3Configuration.endpoint)
@@ -54,7 +55,7 @@ public class S3Service implements Logger {
     }
   }
 
-  public void deleteFile(@NotNull S3Configuration s3Configuration, String key) {
+  public void deleteFile(String key) {
     MinioClient minioClient =
         MinioClient.builder()
             .endpoint(s3Configuration.endpoint)

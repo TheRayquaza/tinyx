@@ -7,10 +7,10 @@ services:
       MONGO_INITDB_ROOT_USERNAME: admin
       MONGO_INITDB_ROOT_PASSWORD: admin
       MONGO_INITDB_DATABASE: RepoUser
-    command: ["mongod", "--replSet", "rs0", "--bind_ip_all", "--keyFile", "/etc/mongo/rsKeyFile"]
+    #command: ["mongod", "--replSet", "rs0", "--bind_ip_all", "--keyFile", "/etc/mongo/rsKeyFile"]
     volumes:
       - ./src/main/resources/init.js:/docker-entrypoint-initdb.d/init.js
-      - ./src/main/resources/rsKeyFile:/etc/mongo/rsKeyFile:ro
+      #- ./src/main/resources/rsKeyFile:/etc/mongo/rsKeyFile:ro
     ports:
       - 27017:27017
     expose:
@@ -23,6 +23,19 @@ services:
       - "6379:6379"
     expose:
       - "6379"
+
+  redisinsight:
+    image: redislabs/redisinsight:2.66
+    container_name: redisinsight
+    ports:
+      - "8001:8001"
+      - "5540:5540"
+    environment:
+      - REDISINSIGHT_PASSWORD=admin
+    depends_on:
+      - redis
+    expose:
+      - "8001"
 
   minio:
     image: quay.io/minio/minio:RELEASE.2025-03-12T18-04-18Z

@@ -13,6 +13,7 @@ import lombok.*;
 @AllArgsConstructor
 @Builder
 @With
+@ToString
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class UserAggregate implements Serializable {

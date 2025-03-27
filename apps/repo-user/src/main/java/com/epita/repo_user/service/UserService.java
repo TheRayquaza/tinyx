@@ -2,7 +2,6 @@ package com.epita.repo_user.service;
 
 import com.epita.exchange.redis.aggregate.UserAggregate;
 import com.epita.exchange.redis.service.RedisPublisher;
-import com.epita.exchange.s3.service.S3Configuration;
 import com.epita.exchange.s3.service.S3Service;
 import com.epita.repo_user.RepoUserErrorCode;
 import com.epita.repo_user.controller.request.CreateUserRequest;
@@ -23,6 +22,7 @@ import java.time.LocalDateTime;
 import java.util.*;
 import org.apache.commons.io.FileUtils;
 import org.bson.types.ObjectId;
+import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.mindrot.jbcrypt.BCrypt;
 
 @ApplicationScoped
@@ -40,6 +40,10 @@ public class UserService {
 
   @Inject RedisPublisher redisPublisher;
 
+  @ConfigProperty(name = "repo.user.aggregate.channel")
+  @Inject
+  String userAggregateChannel;
+
   public UserLoginResponse login(LoginRequest request) {
     if (request == null || request.username == null || request.password == null) {
       throw RepoUserErrorCode.INVALID_USER_DATA.createError("request / username / password");
@@ -48,7 +52,8 @@ public class UserService {
     UserModel userModel =
         userRepository
             .findByUsername(request.username)
-            .orElseThrow(() -> RepoUserErrorCode.USER_WITH_USERNAME_FOUND.createError(request.username));
+            .orElseThrow(
+                () -> RepoUserErrorCode.USER_WITH_USERNAME_FOUND.createError(request.username));
 
     if (!BCrypt.checkpw(request.password, userModel.getPasswordHash())) {
       throw RepoUserErrorCode.UNAUTHORIZED.createError();
@@ -84,10 +89,12 @@ public class UserService {
 
     userModel.setUpdatedAt(LocalDateTime.now());
 
+    userRepository.persist(userModel);
+
     return userModelToUserEntity.convertNotNull(userModel);
   }
 
-  @Transactional
+  // @Transactional
   public UserEntity createUser(CreateUserRequest request) {
     UserModel userModel = new UserModel();
 
@@ -111,7 +118,9 @@ public class UserService {
     userModel.setUpdatedAt(now);
     userModel.setPasswordHash(BCrypt.hashpw(request.password, BCrypt.gensalt()));
 
-    // redisPublisher.publish("user_aggregate", userModelToUserAggregate.convertNotNull(userModel));
+    userRepository.persist(userModel);
+
+    redisPublisher.publish("user_aggregate", userModelToUserAggregate.convertNotNull(userModel));
     return userModelToUserEntity.convertNotNull(userModel);
   }
 
@@ -129,7 +138,7 @@ public class UserService {
             .orElseThrow(() -> RepoUserErrorCode.USER_NOT_FOUND.createError(id.toString()));
     userModel.setDeleted(true);
     UserAggregate userAggregate = userModelToUserAggregate.convertNotNull(userModel);
-    userRepository.deleteById(id);
+    // userRepository.deleteById(id); // TODO: delete this ?
     redisPublisher.publish("user_aggregate", userAggregate);
   }
 
@@ -145,8 +154,8 @@ public class UserService {
       File tempFile = File.createTempFile("S3", userId.toString());
       tempFile.deleteOnExit();
       FileUtils.copyInputStreamToFile(request.getFile(), tempFile);
-      s3Service.uploadFile(new S3Configuration(), objectKey, tempFile);
-      s3Service.deleteFile(new S3Configuration(), userModel.getProfileImage());
+      s3Service.uploadFile(objectKey, tempFile);
+      s3Service.deleteFile(userModel.getProfileImage());
       userModel.setProfileImage(objectKey);
       return userModelToUserEntityConverter.convertNotNull(userModel);
     } catch (Exception e) {
