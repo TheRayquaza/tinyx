@@ -28,6 +28,8 @@ public class PostService {
   AuthService authService;
 
   public PostEntity createPost(CreatePostRequest request, String ownerId) {
+
+    System.out.println("CREATE USER");
     if (request == null || ownerId == null || (request.media == null && request.text == null)) {
       throw RepoPostErrorCode.INVALID_POST_DATA.createError("request / ownerId / media / text is null");
     }

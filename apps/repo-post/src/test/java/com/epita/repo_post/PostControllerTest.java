@@ -42,7 +42,7 @@ class PostControllerTest {
   @Order(1)
   void createPost() {
     
-    String token = AuthService.generateToken("test_id", "test_username");
+    String token = AuthService.generateToken(TEST_USERNAME, TEST_USERNAME);
 
     AuthEntity authEntity = new AuthEntity(TEST_USERNAME, TEST_USERNAME);
       authContext.setAuthEntity(authEntity);
@@ -53,7 +53,7 @@ class PostControllerTest {
   
        Response response = given()
               .contentType(ContentType.JSON)
-              .header("Authorization : ", "Bearer " + token)
+              .header("Authorization", "Bearer " + token)
               .body(request)
               .when()
               .post("/create")
