@@ -8,6 +8,7 @@ import lombok.*;
 @NoArgsConstructor
 @Getter
 @Setter
+@With
 public class AllRepliesResponse {
   private List<PostEntity> replies;
 }

@@ -13,7 +13,6 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
-import jakarta.ws.rs.core.Response;
 import org.eclipse.microprofile.openapi.annotations.parameters.RequestBody;
 
 @Produces(MediaType.APPLICATION_JSON)
@@ -41,42 +40,42 @@ public class RepoPostController implements RepoPostControllerApi {
   @Override
   public PostEntity getPostById(@PathParam("id") String id) {
     logger().info("GET /post/{} - Retrieve post n°{}", id, id);
-    return null;
+    return postService.getPostById(id);
   }
 
   @PUT
   @Authenticated
   @Path("/post/{id}")
   @Override
-  public Response editPost(
+  public void editPost(
       @RequestBody(required = true) @NotNull @Valid EditPostRequest request,
       @PathParam("id") String postId) {
     String userId = authService.getUserId();
     logger().info("PUT /post/{} - Edit post {} with user {}", postId, postId, userId);
-    return Response.ok().build();
+    postService.editPost(request, postId);
   }
 
   @DELETE
   @Authenticated
   @Path("/post/{id}")
   @Override
-  public Response deletePost(@PathParam("id") String postId) {
+  public void deletePost(@PathParam("id") String postId) {
     String userId = authService.getUserId();
     logger().info("DELETE /post/{} - Delete post with user {}", postId, userId);
     // User can delete its own post only
-    return Response.status(204).build();
+    postService.deletePost(postId);
   }
 
   @POST
   @Authenticated
   @Override
   @Path("/post/{id}/reply")
-  public Response replyToPost(
+  public void replyToPost(
       @RequestBody(required = true) @NotNull @Valid PostReplyRequest request,
       @PathParam("id") String postId) {
     String userId = authService.getUserId();
     logger().info("POST /post/{}/reply - Reply to post {} with user {}", postId, userId);
-    return Response.status(201).build();
+    postService.replyToPost(request, postId);
   }
 
   @GET
@@ -85,7 +84,7 @@ public class RepoPostController implements RepoPostControllerApi {
   @Override
   public AllRepliesResponse getAllRepliesForPost(@PathParam("id") String postId) {
     String userId = authService.getUserId();
-    logger().info("Get /post/{}/reply - Get all replies from post {}", postId, postId);
-    return null;
+    logger().info("Get /post/{}/reply - Get all replies from post {} with user {}", postId, postId, userId);
+    return postService.getAllRepliesForPost(postId);
   }
 }

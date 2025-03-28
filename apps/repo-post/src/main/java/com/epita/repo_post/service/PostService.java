@@ -1,6 +1,6 @@
 package com.epita.repo_post.service;
 
-import com.epita.exchange.s3.service.S3Service;
+import com.epita.exchange.auth.service.AuthService;
 import com.epita.repo_post.RepoPostErrorCode;
 import com.epita.repo_post.controller.request.CreatePostRequest;
 import com.epita.repo_post.controller.request.EditPostRequest;
@@ -12,7 +12,10 @@ import com.epita.repo_post.repository.model.PostModel;
 import com.epita.repo_post.service.entity.PostEntity;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
-import jakarta.ws.rs.core.Response;
+import jakarta.transaction.Transactional;
+import org.bson.types.ObjectId;
+
+import java.util.List;
 
 @ApplicationScoped
 public class PostService {
@@ -21,16 +24,22 @@ public class PostService {
 
   @Inject PostModelToPostEntity postModelToPostEntity;
 
-  @Inject S3Service s3Service;
+  @Inject
+  AuthService authService;
 
   public PostEntity createPost(CreatePostRequest request, String ownerId) {
-    if (request == null || ownerId == null) {
-      throw RepoPostErrorCode.INVALID_POST_DATA.createError("request / ownerId");
+    if (request == null || ownerId == null || (request.media == null && request.text == null)) {
+      throw RepoPostErrorCode.INVALID_POST_DATA.createError("request / ownerId / media / text is null");
     }
 
     PostModel postModel = new PostModel();
 
-    // TODO: Check ownerId exists
+    postModel.setId(new ObjectId().toString());
+
+    if (!authService.getUserId().equals(ownerId)) {
+      throw RepoPostErrorCode.FORBIDDEN.createError("auth user is not provided ownerId");
+    }
+
     postModel.setOwnerId(ownerId);
     if (request.media != null) {
       postModel.setMedia(request.media);
@@ -47,22 +56,54 @@ public class PostService {
   }
 
   public PostEntity getPostById(String id) {
-    return null;
+    PostModel postModel = postRepository.getById(id).orElseThrow(() -> RepoPostErrorCode.POST_NOT_FOUND.createError(id));
+    return postModelToPostEntity.convertNotNull(postModel);
   }
 
-  public Response editPost(EditPostRequest request, String postId) {
-    return null;
+  @Transactional
+  public void editPost(EditPostRequest request, String postId) {
+    PostModel postModel = postRepository.getById(postId).orElseThrow(() -> RepoPostErrorCode.POST_NOT_FOUND.createError(postId));
+
+    if (!authService.getUserId().equals(postModel.getOwnerId())) {
+      throw RepoPostErrorCode.FORBIDDEN.createError("auth user is not the owner of the post");
+    }
+
+    if (request.text != null) {
+      postModel.setText(request.text);
+    }
+
+    if (request.media != null) {
+      postModel.setMedia(request.media);
+    }
+
+    postRepository.update(postModel);
   }
 
-  public Response deletePost(String postId) {
-    return null;
+  @Transactional
+  public void deletePost(String postId) {
+    PostModel postModel = postRepository.getById(postId).orElseThrow(() -> RepoPostErrorCode.POST_NOT_FOUND.createError(postId));
+    if (!authService.getUserId().equals(postModel.getOwnerId())) {
+      throw RepoPostErrorCode.FORBIDDEN.createError("auth user is not the owner of the post");
+    }
+    postModel.setDeleted(true);
+    postRepository.update(postModel);
   }
 
-  public Response replyToPost(PostReplyRequest request, String postId) {
-    return null;
+  public void replyToPost(PostReplyRequest request, String postId) {
+    PostModel postModel = postRepository.getById(postId).orElseThrow(() -> RepoPostErrorCode.POST_NOT_FOUND.createError(postId));
+    postModel.setIsReply(true);
+    postModel.setReplyToPostId(postId);
+    postModel.setOwnerId(authService.getUserId());
+    if (request.getText() != null) {
+      postModel.setText(request.getText());
+    }
+
+    postRepository.create(postModel);
   }
 
   public AllRepliesResponse getAllRepliesForPost(String postId) {
-    return null;
+    postRepository.getById(postId).orElseThrow(() -> RepoPostErrorCode.POST_NOT_FOUND.createError(postId));
+    List<PostModel> replies = postRepository.findAllReplies(postId);
+    return new AllRepliesResponse().withReplies(replies.stream().map((postModel) -> postModelToPostEntity.convertNotNull(postModel)).toList());
   }
 }
