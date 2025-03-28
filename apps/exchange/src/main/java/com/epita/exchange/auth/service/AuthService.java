@@ -3,6 +3,8 @@ package com.epita.exchange.auth.service;
 import com.epita.exchange.auth.service.entity.AuthEntity;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
+
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Base64;
 
@@ -23,6 +25,8 @@ public class AuthService {
 
   public static String generateToken(String id, String username) {
     String token = id + "," + username;
-    return Arrays.toString(Base64.getDecoder().decode(token));
+    byte[] new_token = token.getBytes(StandardCharsets.UTF_8);
+
+    return Arrays.toString(Base64.getEncoder().encode(new_token));
   }
 }
