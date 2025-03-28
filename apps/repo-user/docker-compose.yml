@@ -19,6 +19,7 @@ services:
   redis:
     image: redis:8.0-M04-alpine3.21
     container_name: redis
+    command: redis-server --requirepass admin
     ports:
       - "6379:6379"
     expose:
@@ -28,7 +29,6 @@ services:
     image: redislabs/redisinsight:2.66
     container_name: redisinsight
     ports:
-      - "8001:8001"
       - "5540:5540"
     environment:
       - REDISINSIGHT_PASSWORD=admin
@@ -56,7 +56,7 @@ services:
     container_name: mongo-express
     restart: unless-stopped
     ports:
-      - "8081:8081"
+      - "8082:8081"
     environment:
       ME_CONFIG_MONGODB_ADMINUSERNAME: admin
       ME_CONFIG_MONGODB_ADMINPASSWORD: admin
@@ -64,4 +64,4 @@ services:
     depends_on:
       - mongo
     expose:
-      - "8081"
+      - "8082"

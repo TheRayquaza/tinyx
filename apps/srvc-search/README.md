@@ -1,10 +1,11 @@
-# srvc-home-timeline
+# srvc-search
 
 ## Requirements
 
 - Java 17
 - MongoDB
 - Redis
+- Elastic
 
 ## Development
 
@@ -44,9 +45,11 @@ variables.
 
 | Variable                      | Description                                        |
 |-------------------------------|----------------------------------------------------|
-| `SRVC_HOME_TIMELINE_REDIS_HOST`        | Redis host                                         |
-| `SRVC_HOME_TIMELINE_REDIS_PASSWORD`    | Redis Password                                     |
-| `SRVC_HOME_TIMELINE_MONGODB_HOST`      | MongoDB server host                                |
-| `SRVC_HOME_TIMELINE_MONGODB_DATABASE`  | MongoDB database name                              |
-| `SRVC_HOME_TIMELINE_QUARKUS_HTTP_PORT` | Quarkus HTTP port (e.g., `8080`)                   |
-| `SRVC_HOME_TIMELINE_APP_PROFILE`       | Application profile (`dev` / `prod`)               |
+| `SRVC_SEARCH_REDIS_HOST`        | Redis host                                         |
+| `SRVC_SEARCH_REDIS_PASSWORD`    | Redis Password                                     |
+| `SRVC_SEARCH_MONGODB_HOST`      | MongoDB server host                                |
+| `SRVC_SEARCH_MONGODB_DATABASE`  | MongoDB database name                              |
+| `SRVC_SEARCH_QUARKUS_HTTP_PORT` | Quarkus HTTP port (e.g., `8080`)                   |
+| `SRVC_SEARCH_APP_PROFILE`       | Application profile (`dev` / `prod`)               |
+
+ADD MORE HERE (CHANNELS)

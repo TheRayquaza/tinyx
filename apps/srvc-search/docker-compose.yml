@@ -16,6 +16,21 @@ services:
     expose:
       - "27017"
 
+  mongo-express:
+    image: mongo-express:1.0.2
+    container_name: mongo-express
+    restart: unless-stopped
+    ports:
+      - "8082:8081"
+    environment:
+      ME_CONFIG_MONGODB_ADMINUSERNAME: admin
+      ME_CONFIG_MONGODB_ADMINPASSWORD: admin
+      ME_CONFIG_MONGODB_SERVER: mongo
+    depends_on:
+      - mongo
+    expose:
+      - "8082"
+
   redis:
     image: redis:8.0-M04-alpine3.21
     container_name: redis
@@ -37,17 +52,29 @@ services:
     expose:
       - "8001"
 
-  mongo-express:
-    image: mongo-express:1.0.2
-    container_name: mongo-express
-    restart: unless-stopped
-    ports:
-      - "8082:8081"
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.7.0
+    container_name: elasticsearch
     environment:
-      ME_CONFIG_MONGODB_ADMINUSERNAME: admin
-      ME_CONFIG_MONGODB_ADMINPASSWORD: admin
-      ME_CONFIG_MONGODB_SERVER: mongo
-    depends_on:
-      - mongo
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+      - bootstrap.memory_lock=true
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    ports:
+      - "9200:9200"
+      - "9300:9300"
     expose:
-      - "8082"
+      - "9300"
+      - "9200"
+
+  kibana:
+    image: docker.elastic.co/kibana/kibana:8.7.0
+    container_name: kibana
+    environment:
+      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+    ports:
+      - "5601:5601"
+    expose:
+      - "5601"
+    depends_on:
+      - elasticsearch

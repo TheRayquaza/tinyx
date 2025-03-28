@@ -42,15 +42,16 @@ The application, packaged as an _über-jar_, is now runnable using `java -jar ta
 For a deployment in production, you must configure the following environment
 variables.
 
-| Variable                        | Description                                |
-|----------------------------------|--------------------------------------------|
-| `REPO_USER_REDIS_HOST`          | Redis host                                 |
-| `REPO_USER_REDIS_PASSWORD`      | Redis Password                             |
-| `REPO_USER_MONGODB_HOST`        | MongoDB server host                        |
-| `REPO_USER_MONGODB_DATABASE`    | MongoDB database name                      |
-| `REPO_USER_QUARKUS_HTTP_PORT`   | Quarkus HTTP port (e.g., `8080`)           |
-| `REPO_USER_APP_PROFILE`         | Application profile (`dev` / `prod`)       |
-| `REPO_USER_MINIO_ENDPOINT`      | MinIO endpoint (e.g., `http://localhost:9000`) |
-| `REPO_USER_MINIO_BUCKET`        | MinIO bucket name (`default` by default)   |
-| `REPO_USER_MINIO_ACCESS_KEY`    | MinIO access key (`minioadmin` by default) |
-| `REPO_USER_MINIO_SECRET_KEY`    | MinIO secret key (`minioadmin` by default) |
+| Variable                      | Description                                        |
+|-------------------------------|----------------------------------------------------|
+| `REPO_USER_REDIS_HOST`        | Redis host                                         |
+| `REPO_USER_REDIS_PASSWORD`    | Redis Password                                     |
+| `REPO_USER_AGGREGATE_CHANNEL` | Redis User aggregate channel                       |
+| `REPO_USER_MONGODB_HOST`      | MongoDB server host                                |
+| `REPO_USER_MONGODB_DATABASE`  | MongoDB database name                              |
+| `REPO_USER_QUARKUS_HTTP_PORT` | Quarkus HTTP port (e.g., `8080`)                   |
+| `REPO_USER_APP_PROFILE`       | Application profile (`dev` / `prod`)               |
+| `REPO_USER_MINIO_ENDPOINT`    | MinIO endpoint (`http://localhost:9000` by default) |
+| `REPO_USER_MINIO_BUCKET`      | MinIO bucket name (`default` by default)           |
+| `REPO_USER_MINIO_ACCESS_KEY`  | MinIO access key (`minioadmin` by default)         |
+| `REPO_USER_MINIO_SECRET_KEY`  | MinIO secret key (`minioadmin` by default)         |

@@ -19,7 +19,6 @@ import com.epita.repo_user.service.entity.UserEntity;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
-import java.io.*;
 import java.time.LocalDateTime;
 import java.util.*;
 import org.bson.types.ObjectId;
@@ -56,9 +55,8 @@ public class UserService implements Logger {
             .orElseThrow(
                 () -> RepoUserErrorCode.USER_WITH_USERNAME_FOUND.createError(request.username));
 
-    if (!BCrypt.checkpw(request.password, userModel.getPasswordHash())) {
+    if (!BCrypt.checkpw(request.password, userModel.getPasswordHash()))
       throw RepoUserErrorCode.UNAUTHORIZED.createError();
-    }
 
     return new UserLoginResponse(
         userModel.getId().toString(),
@@ -68,9 +66,7 @@ public class UserService implements Logger {
 
   @Transactional
   public UserEntity updateUser(ObjectId id, ModifyUserRequest request) {
-    if (request == null) {
-      throw RepoUserErrorCode.INVALID_USER_DATA.createError("request");
-    }
+    if (request == null) throw RepoUserErrorCode.INVALID_USER_DATA.createError("request");
 
     UserModel userModel =
         userRepository
@@ -79,7 +75,13 @@ public class UserService implements Logger {
 
     if (request.username != null && !Objects.equals(request.username, userModel.getUsername())) {
       if (userRepository.findByUsername(request.username).isPresent())
-        throw RepoUserErrorCode.USER_ALREADY_EXISTS.createError(request.username);
+        throw RepoUserErrorCode.USER_WITH_USERNAME_FOUND.createError(request.username);
+      logger()
+          .info(
+              "User '{}' ('{}') changes its username to '{}'",
+              userModel.getUsername(),
+              userModel.getId(),
+              request.username);
       userModel.setUsername(request.username);
     }
 
@@ -90,6 +92,11 @@ public class UserService implements Logger {
     userModel.setUpdatedAt(LocalDateTime.now());
 
     userRepository.persist(userModel);
+    logger().info("New User model registered: '{}'", userModel.getId());
+
+    redisPublisher.publish(
+        userAggregateChannel, userModelToUserAggregate.convertNotNull(userModel));
+    logger().info("New User Aggregate pushed to Redis: '{}'", userModel.getId());
 
     return userModelToUserEntity.convertNotNull(userModel);
   }
@@ -99,9 +106,8 @@ public class UserService implements Logger {
     UserModel userModel = new UserModel();
 
     if (request.username != null) {
-      if (userRepository.findByUsername(request.username).stream().findFirst().isPresent()) {
+      if (userRepository.findByUsername(request.username).stream().findFirst().isPresent())
         throw RepoUserErrorCode.USER_WITH_USERNAME_ALREADY_EXISTS.createError("username");
-      }
       userModel.setUsername(request.username);
     }
 

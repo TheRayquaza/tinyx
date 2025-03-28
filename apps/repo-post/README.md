@@ -1,10 +1,10 @@
-# repo-social
+# repo-post
 
 ## Requirements
 
 - Java 17
 - MongoDB
-- Neo4j
+- Minio
 - Redis
 
 ## Development
@@ -45,9 +45,13 @@ variables.
 
 | Variable                      | Description                                        |
 |-------------------------------|----------------------------------------------------|
-| `REPO_SOCIAL_REDIS_HOST`        | Redis host                                         |
-| `REPO_SOCIAL_REDIS_PASSWORD`    | Redis Password                                     |
-| `REPO_SOCIAL_MONGODB_HOST`      | MongoDB server host                                |
-| `REPO_SOCIAL_MONGODB_DATABASE`  | MongoDB database name                              |
-| `REPO_SOCIAL_QUARKUS_HTTP_PORT` | Quarkus HTTP port (e.g., `8080`)                   |
-| `REPO_SOCIAL_APP_PROFILE`       | Application profile (`dev` / `prod`)               |
+| `REPO_POST_REDIS_HOST`        | Redis host                                         |
+| `REPO_POST_REDIS_PASSWORD`    | Redis Password                                     |
+| `REPO_POST_MONGODB_HOST`      | MongoDB server host                                |
+| `REPO_POST_MONGODB_DATABASE`  | MongoDB database name                              |
+| `REPO_POST_QUARKUS_HTTP_PORT` | Quarkus HTTP port (e.g., `8080`)                   |
+| `REPO_POST_APP_PROFILE`       | Application profile (`dev` / `prod`)               |
+| `REPO_POST_MINIO_ENDPOINT`    | MinIO endpoint (`http://localhost:9000` by default) |
+| `REPO_POST_MINIO_BUCKET`      | MinIO bucket name (`default` by default)           |
+| `REPO_POST_MINIO_ACCESS_KEY`  | MinIO access key (`minioadmin` by default)         |
+| `REPO_POST_MINIO_SECRET_KEY`  | MinIO secret key (`minioadmin` by default)         |

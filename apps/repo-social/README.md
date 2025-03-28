@@ -1,9 +1,10 @@
-# srvc-home-timeline
+# repo-social
 
 ## Requirements
 
 - Java 17
 - MongoDB
+- Neo4j
 - Redis
 
 ## Development
@@ -44,9 +45,9 @@ variables.
 
 | Variable                      | Description                                        |
 |-------------------------------|----------------------------------------------------|
-| `SRVC_HOME_TIMELINE_REDIS_HOST`        | Redis host                                         |
-| `SRVC_HOME_TIMELINE_REDIS_PASSWORD`    | Redis Password                                     |
-| `SRVC_HOME_TIMELINE_MONGODB_HOST`      | MongoDB server host                                |
-| `SRVC_HOME_TIMELINE_MONGODB_DATABASE`  | MongoDB database name                              |
-| `SRVC_HOME_TIMELINE_QUARKUS_HTTP_PORT` | Quarkus HTTP port (e.g., `8080`)                   |
-| `SRVC_HOME_TIMELINE_APP_PROFILE`       | Application profile (`dev` / `prod`)               |
+| `REPO_SOCIAL_REDIS_HOST`        | Redis host                                         |
+| `REPO_SOCIAL_REDIS_PASSWORD`    | Redis Password                                     |
+| `REPO_SOCIAL_MONGODB_HOST`      | MongoDB server host                                |
+| `REPO_SOCIAL_MONGODB_DATABASE`  | MongoDB database name                              |
+| `REPO_SOCIAL_QUARKUS_HTTP_PORT` | Quarkus HTTP port (e.g., `8080`)                   |
+| `REPO_SOCIAL_APP_PROFILE`       | Application profile (`dev` / `prod`)               |
