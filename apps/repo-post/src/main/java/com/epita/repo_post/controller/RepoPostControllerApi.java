@@ -10,7 +10,6 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
-import jakarta.ws.rs.core.Response;
 import org.eclipse.microprofile.openapi.annotations.Operation;
 import org.eclipse.microprofile.openapi.annotations.media.Content;
 import org.eclipse.microprofile.openapi.annotations.media.Schema;
@@ -67,7 +66,7 @@ public interface RepoPostControllerApi extends Logger {
     @APIResponse(responseCode = "404", description = "Post or User Not Found"),
   })
   @NotNull
-  Response editPost(
+  void editPost(
       @RequestBody(required = true) @NotNull @Valid EditPostRequest request,
       @PathParam("id") String id);
 
@@ -77,7 +76,7 @@ public interface RepoPostControllerApi extends Logger {
   @Operation(summary = "Delete a post")
   @APIResponses({
     @APIResponse(
-        responseCode = "200",
+        responseCode = "204",
         description = "Post deleted successfully",
         content = @Content(schema = @Schema(implementation = PostEntity.class))),
     @APIResponse(responseCode = "400", description = "Invalid input"),
@@ -85,7 +84,7 @@ public interface RepoPostControllerApi extends Logger {
     @APIResponse(responseCode = "404", description = "User Not Found"),
   })
   @NotNull
-  Response deletePost(@PathParam("id") String id);
+  void deletePost(@PathParam("id") String id);
 
   @POST
   @Consumes(MediaType.APPLICATION_JSON)
@@ -101,7 +100,7 @@ public interface RepoPostControllerApi extends Logger {
     @APIResponse(responseCode = "404", description = "User Not Found"),
   })
   @NotNull
-  Response replyToPost(
+  void replyToPost(
       @RequestBody(required = true) @NotNull @Valid PostReplyRequest request,
       @PathParam("id") String id);
 
