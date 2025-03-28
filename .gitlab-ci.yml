@@ -1,0 +1,19 @@
+include:
+  - "ci/common.gitlab-ci.yml"
+  - "ci/repo-user.gitlab-ci.yml"
+
+verify-commit-message:
+  image: alpine:3.18
+  stage: verify-commit-message
+  script:
+    - |
+      if ! echo $CI_COMMIT_MESSAGE | grep -qE '(repo-user|exchange|repo-post|repo-social|srvc-search|srvc-user-timeline|srvc-home-timeline)'; then
+        echo "Commit message must contains AT LEAST the name of one of the services to trigger the associated CI."
+        exit 1
+      fi
+
+stages:
+  - verify-commit-message
+  - lint
+  - test
+  - build

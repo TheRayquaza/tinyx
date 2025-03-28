@@ -1,0 +1,568 @@
+openapi: 3.0.3
+info:
+  title: Repo API
+  description: API for managing posts, replies, and social interactions in a MongoDB-backed system.
+  version: 1.0.0
+servers:
+  - url: https://api.example.com
+
+paths:
+  /post:
+    post:
+      summary: Create a new post
+      operationId: createPost
+      tags:
+      - Post
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreatePostRequest"
+      responses:
+        "201":
+          description: Post created successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Post"
+
+  /post/{id}:
+    get:
+      summary: Get a specific post
+      operationId: getPost
+      tags:
+      - Post
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Post retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Post"
+    put:
+      summary: Edit a post
+      operationId: editPost
+      tags:
+      - Post
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/EditPostRequest"
+      responses:
+        "200":
+          description: Post updated successfully
+    delete:
+      summary: Delete a post
+      operationId: deletePost
+      tags:
+      - Post
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "204":
+          description: Post deleted successfully
+
+  /post/{id}/reply:
+    post:
+      summary: Reply to a post
+      operationId: replyToPost
+      tags:
+        - Post
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateReplyRequest"
+      responses:
+        "201":
+          description: Reply created successfully
+    get:
+      summary: Get all replies for a post
+      operationId: getPostReplies
+      tags:
+      - Post
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: List of replies retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Post"
+
+  /post/{id}/like:
+    post:
+      summary: Like a Post
+      operationId: togglePostLike
+      tags:
+        - Social
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Post liked successfully
+    delete:
+      summary: Unlike a Post
+      operationId: postUnlike
+      tags:
+        - Social
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Post unliked successfully
+    get:
+      summary: Get Users Who Liked a Post
+      operationId: getPostLikingUsers
+      tags:
+        - Social
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: List of users who liked the post
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/User"
+
+  /user:
+    post:
+      summary: Create a new user account
+      operationId: createUser
+      tags:
+        - User
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateUserRequest"
+      responses:
+        "201":
+          description: User account created successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+
+    put:
+      summary: Modify my user's account
+      operationId: modifyUser
+      tags:
+        - User
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ModifyUserRequest"
+      responses:
+        "200":
+          description: User account updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+
+    delete:
+      summary: Delete my user's account
+      operationId: deleteUser
+      tags:
+        - User
+      responses:
+        "204":
+          description: User account deleted successfully
+    get:
+      summary: Get my user's account
+      operationId: getCurrentUserAccount
+      tags:
+        - User
+      responses:
+        "200":
+          description: Current user account retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+
+  /user/{id}:
+    get:
+      summary: Get a specific user's account
+      operationId: getUserAccount
+      tags:
+        - User
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: User account retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+
+  /user/{id}/block:
+    post:
+      summary: Block a User
+      operationId: blockUser
+      tags:
+        - Social
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: User blocked successfully
+    delete:
+      summary: Unblock a User
+      operationId: unblockUser
+      tags:
+        - Social
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: User unblocked successfully
+
+  /user/{id}/follower:
+    get:
+      summary: Get User's Followers
+      operationId: getUserFollowers
+      tags:
+        - Social
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: List of users following the given user
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/User"
+  /user/{id}/follow:
+    post:
+      summary: Follow a User
+      operationId: followUser
+      tags:
+        - Social
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Follow action successful
+    delete:
+      summary: Unfollow a User
+      operationId: unfollowUser
+      tags:
+        - Social
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Follow action successful
+    get:
+      summary: Get Followed Users
+      operationId: getUserFollows
+      tags:
+        - Social
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: List of users the given user follows
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/User"
+
+  /user/{id}/timeline:
+    get:
+      summary: Get posts related to a specific user, including authored and liked posts
+      operationId: getUserTimeline
+      tags:
+        - User-Timeline
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: limit
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 20
+          description: The number of posts to retrieve.
+        - name: offset
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 0
+          description: The number of posts to skip (for pagination).
+      responses:
+        "200":
+          description: List of posts related to the user, including authored and liked posts, sorted chronologically
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/PostWithLikeDate"
+  /user/{id}/follows/timeline:
+    get:
+      summary: Get posts related to a specific user’s follows, including authored and liked posts
+      operationId: getUserFollowsTimeline
+      tags:
+        - Home-Timeline
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: limit
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 20
+          description: The number of posts to retrieve.
+        - name: offset
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 0
+          description: The number of posts to skip (for pagination).
+      responses:
+        "200":
+          description: List of posts related to the user’s follows, including authored and liked posts, sorted chronologically
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/PostWithLikeDate"
+
+components:
+  schemas:
+    Post:
+      type: object
+      properties:
+        id:
+          type: string
+          format: objectId
+        ownerId:
+          type: string
+          format: objectId
+        text:
+          type: string
+        media:
+          type: string
+          description: Link to S3
+        repostId:
+          type: string
+          format: objectId
+          nullable: true
+        replyToPostId:
+          type: string
+          format: objectId
+          nullable: true
+        isReply:
+          type: boolean
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+          nullable: true
+        deleted:
+          type: boolean
+          default: false
+
+    User:
+      type: object
+      properties:
+        id:
+          type: string
+          format: objectId
+        username:
+          type: string
+          uniqueItems: true
+        email:
+          type: string
+          format: email
+          uniqueItems: true
+        profileImage:
+          type: string
+          description: Link to S3
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+          nullable: true
+        deleted:
+          type: boolean
+          default: false
+
+    PostWithLikeDate:
+      type: object
+      properties:
+        post:
+          $ref: "#/components/schemas/Post"
+        likeDate:
+          type: string
+          format: date-time
+          description: The date the post was liked by the user (if applicable)
+          nullable: true
+
+    CreateUserRequest:
+      type: object
+      required:
+        - username
+        - email
+        - passwordHash
+      properties:
+        username:
+          type: string
+        email:
+          type: string
+          format: email
+        passwordHash:
+          type: string
+        bio:
+          type: string
+        profileImage:
+          type: string
+
+    ModifyUserRequest:
+      type: object
+      properties:
+        username:
+          type: string
+        email:
+          type: string
+          format: email
+        bio:
+          type: string
+        profileImage:
+          type: string
+
+    CreatePostRequest:
+      type: object
+      required:
+        - ownerId
+        - text
+      properties:
+        ownerId:
+          type: string
+          format: objectId
+        text:
+          type: string
+        media:
+          type: string
+          nullable: true
+
+    EditPostRequest:
+      type: object
+      properties:
+        text:
+          type: string
+        media:
+          type: string
+
+    CreateReplyRequest:
+      type: object
+      required:
+        - ownerId
+        - text
+      properties:
+        ownerId:
+          type: string
+          format: objectId
+        text:
+          type: string
