@@ -20,10 +20,8 @@ import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import java.io.*;
-import java.nio.file.Files;
 import java.time.LocalDateTime;
 import java.util.*;
-import org.apache.commons.io.FileUtils;
 import org.bson.types.ObjectId;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.mindrot.jbcrypt.BCrypt;
@@ -154,7 +152,8 @@ public class UserService implements Logger {
             .findByIdOptional(userId)
             .orElseThrow(() -> RepoUserErrorCode.USER_NOT_FOUND.createError(userId));
     try {
-      s3Service.uploadFile(objectKey, request.getFile(), request.getFile().available()); // TODO: fix size
+      s3Service.uploadFile(
+          objectKey, request.getFile(), request.getFile().available()); // TODO: fix size
       s3Service.deleteFile(userModel.getProfileImage());
       userModel.setProfileImage(objectKey);
       userRepository.persist(userModel);
