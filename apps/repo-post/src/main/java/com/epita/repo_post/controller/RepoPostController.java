@@ -30,7 +30,7 @@ public class RepoPostController implements RepoPostControllerApi {
   @Override
   public PostEntity createPost(
       @RequestBody(required = true) @NotNull @Valid CreatePostRequest request) {
-    String ownerId = authService.getUserId();
+        String ownerId = authService.getUserId();
     logger().info("POST /create - User {} creates a post", ownerId);
     return postService.createPost(request, ownerId);
   }
