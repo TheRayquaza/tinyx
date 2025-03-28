@@ -68,7 +68,7 @@ public class RepoUserController implements RepoUserControllerApi {
   }
 
   @DELETE
-  @Path("/user/{id}")
+  @Path("/user")
   @Authenticated
   @Override
   public void deleteUser() {
@@ -83,7 +83,7 @@ public class RepoUserController implements RepoUserControllerApi {
   @Override
   public @NotNull UserEntity getCurrentUserAccount() {
     String userId = authService.getUserId();
-    logger().info("GET /user");
+    logger().info("GET /user with id '{}'", userId);
     return userService.getUser(new ObjectId(userId));
   }
 

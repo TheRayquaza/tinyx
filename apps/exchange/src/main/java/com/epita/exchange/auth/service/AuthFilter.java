@@ -9,7 +9,6 @@ import jakarta.ws.rs.Priorities;
 import jakarta.ws.rs.container.ContainerRequestContext;
 import jakarta.ws.rs.container.ContainerRequestFilter;
 import jakarta.ws.rs.ext.Provider;
-
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 
@@ -38,7 +37,8 @@ public class AuthFilter implements ContainerRequestFilter, Logger {
 
   private AuthEntity decodeAuthEntity(String token) {
     String decodedString = new String(Base64.getDecoder().decode(token), StandardCharsets.UTF_8);
-    String[] parts = decodedString.split(",", 1);
+    logger().info("Decoded string: " + decodedString);
+    String[] parts = decodedString.split(",", 2);
     String userId = parts[0];
     String username = parts[1];
     return new AuthEntity(userId, username);

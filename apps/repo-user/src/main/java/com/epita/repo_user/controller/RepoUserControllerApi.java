@@ -53,7 +53,7 @@ public interface RepoUserControllerApi extends Logger {
   @Operation(summary = "Create a new user account")
   @APIResponses({
     @APIResponse(
-        responseCode = "201",
+        responseCode = "200",
         description = "User account created successfully",
         content = @Content(schema = @Schema(implementation = UserEntity.class))),
     @APIResponse(
