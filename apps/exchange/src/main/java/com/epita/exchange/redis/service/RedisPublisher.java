@@ -12,8 +12,8 @@ import java.io.IOException;
 @ApplicationScoped
 public class RedisPublisher {
 
-  private final PubSubCommands<String> publisher;
-  private final ObjectMapper objectMapper = new ObjectMapper().registerModule(new JavaTimeModule());
+  final PubSubCommands<String> publisher;
+  final ObjectMapper objectMapper = new ObjectMapper().registerModule(new JavaTimeModule());
 
   @Inject
   public RedisPublisher(RedisDataSource rd) {

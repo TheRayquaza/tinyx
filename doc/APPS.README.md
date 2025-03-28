@@ -67,6 +67,12 @@ pre-commit run --all-file
 pre-commit install
 ```
 
+Otherwise just use spotless for your java code:
+
+```
+mvn spotless:apply
+```
+
 ## POM
 
 POM is just your java package manager (just like `npm`, `poetry`, `cargo`). 
