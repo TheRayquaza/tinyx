@@ -1,7 +1,7 @@
 .rules_template:
   script:
     - |
-      if [[ "$CI_COMMIT_MESSAGE" =~ $SERVICE_NAME ]] || [[$CI_COMMIT_BRANCH == "main"]]; then
+      if [[ "$CI_COMMIT_MESSAGE" =~ $SERVICE_NAME ]] || [[$CI_COMMIT_BRANCH == "main"]] || [[$CI_COMMIT_BRANCH == "main"]]; then
         echo "Regex matched: Running job"
       else
         echo "Regex did not match: Skipping job"
