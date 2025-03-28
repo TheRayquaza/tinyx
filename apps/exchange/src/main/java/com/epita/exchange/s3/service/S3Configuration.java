@@ -1,22 +1,25 @@
 package com.epita.exchange.s3.service;
 
-import io.quarkus.runtime.annotations.ConfigGroup;
-import io.quarkus.runtime.annotations.ConfigItem;
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
+import org.eclipse.microprofile.config.inject.ConfigProperty;
 
 @ApplicationScoped
-@ConfigGroup
 public class S3Configuration {
 
-  @ConfigItem(name = "s3.endpoint")
+  @ConfigProperty(name = "s3.endpoint")
+  @Inject
   public String endpoint;
 
-  @ConfigItem(name = "s3.accessKey")
+  @ConfigProperty(name = "s3.accessKey")
+  @Inject
   public String accessKey;
 
-  @ConfigItem(name = "s3.secretKey")
+  @ConfigProperty(name = "s3.secretKey")
+  @Inject
   public String secretKey;
 
-  @ConfigItem(name = "s3.bucketName")
+  @ConfigProperty(name = "s3.bucketName")
+  @Inject
   public String bucketName;
 }

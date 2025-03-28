@@ -2,28 +2,66 @@ package com.epita.exchange.s3.service;
 
 import com.epita.exchange.utils.Logger;
 import io.minio.*;
+import jakarta.annotation.PostConstruct;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.InputStream;
+import org.eclipse.microprofile.config.inject.ConfigProperty;
 
 @ApplicationScoped
 public class S3Service implements Logger {
+  private MinioClient minioClient;
 
-  @Inject S3Configuration s3Configuration;
+  @Inject
+  @ConfigProperty(name = "s3.endpoint", defaultValue = "http://localhost:9000")
+  String endpoint;
 
-  public void uploadFile(String key, File file) {
-    MinioClient minioClient =
-        MinioClient.builder()
-            .endpoint(s3Configuration.endpoint)
-            .credentials(s3Configuration.accessKey, s3Configuration.secretKey)
-            .build();
+  @Inject
+  @ConfigProperty(name = "s3.accessKey", defaultValue = "minioadmin")
+  String accessKey;
 
-    try (InputStream inputStream = new FileInputStream(file)) {
+  @Inject
+  @ConfigProperty(name = "s3.secretKey", defaultValue = "minioadmin")
+  String secretKey;
+
+  @Inject
+  @ConfigProperty(name = "s3.bucketName", defaultValue = "default")
+  String bucketName;
+
+  @PostConstruct
+  public void init() {
+    minioClient =
+        MinioClient.builder().endpoint(endpoint).credentials(accessKey, secretKey).build();
+
+    logger().info("S3Configuration - Endpoint: {}", endpoint);
+    logger().info("S3Configuration - Bucket: {}", bucketName);
+    logger().info("S3Configuration - AccessKey: {}", accessKey);
+    logger().info("S3Configuration - Bucket: {}", bucketName);
+
+    ensureBucketExists();
+  }
+
+  public void ensureBucketExists() {
+    try {
+      boolean found =
+          minioClient.bucketExists(BucketExistsArgs.builder().bucket(bucketName).build());
+      if (!found) {
+        minioClient.makeBucket(MakeBucketArgs.builder().bucket(bucketName).build());
+        logger().info("Bucket created: {}", bucketName);
+      } else {
+        logger().info("Bucket already exists: {}", bucketName);
+      }
+    } catch (Exception e) {
+      logger().error("Failed to verify or create bucket: {}", e.getMessage());
+      throw new RuntimeException("Bucket verification/creation failed", e);
+    }
+  }
+
+  public void uploadFile(String key, InputStream inputStream, long size) {
+    try {
       minioClient.putObject(
-          PutObjectArgs.builder().bucket(s3Configuration.bucketName).object(key).stream(
-                  inputStream, file.length(), -1)
+          PutObjectArgs.builder().bucket(bucketName).object(key).stream(inputStream, size, -1)
               .contentType("application/octet-stream")
               .build());
       logger().info("File uploaded: {}", key);
@@ -34,16 +72,10 @@ public class S3Service implements Logger {
   }
 
   public File downloadFile(String key, String downloadPath) {
-    MinioClient minioClient =
-        MinioClient.builder()
-            .endpoint(s3Configuration.endpoint)
-            .credentials(s3Configuration.accessKey, s3Configuration.secretKey)
-            .build();
-
     try {
       minioClient.downloadObject(
           DownloadObjectArgs.builder()
-              .bucket(s3Configuration.bucketName)
+              .bucket(bucketName)
               .object(key)
               .filename(downloadPath)
               .build());
@@ -56,15 +88,8 @@ public class S3Service implements Logger {
   }
 
   public void deleteFile(String key) {
-    MinioClient minioClient =
-        MinioClient.builder()
-            .endpoint(s3Configuration.endpoint)
-            .credentials(s3Configuration.accessKey, s3Configuration.secretKey)
-            .build();
-
     try {
-      minioClient.removeObject(
-          RemoveObjectArgs.builder().bucket(s3Configuration.bucketName).object(key).build());
+      minioClient.removeObject(RemoveObjectArgs.builder().bucket(bucketName).object(key).build());
       logger().info("File deleted: {}", key);
     } catch (Exception e) {
       logger().error("Failed to delete file from MinIO");

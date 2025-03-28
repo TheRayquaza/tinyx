@@ -11,7 +11,7 @@ public class UserModelToUserAggregateConverter implements Converter<UserModel, U
   public UserAggregate convertNotNull(UserModel input) {
     return new UserAggregate()
         .withBio(input.getBio())
-        .withId(input.getId())
+        .withId(input.getId().toString())
         .withEmail(input.getEmail())
         .withDeleted(input.isDeleted())
         .withUsername(input.getUsername())
