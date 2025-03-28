@@ -1,0 +1,67 @@
+services:
+  mongo:
+    image: mongo:8.0.6-noble
+    container_name: mongo
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: admin
+      MONGO_INITDB_DATABASE: RepoPost
+    #command: ["mongod", "--replSet", "rs0", "--bind_ip_all", "--keyFile", "/etc/mongo/rsKeyFile"]
+    volumes:
+      - ./src/main/resources/init.js:/docker-entrypoint-initdb.d/init.js
+      #- ./src/main/resources/rsKeyFile:/etc/mongo/rsKeyFile:ro
+    ports:
+      - 27017:27017
+    expose:
+      - "27017"
+
+  redis:
+    image: redis:8.0-M04-alpine3.21
+    container_name: redis
+    ports:
+      - "6379:6379"
+    expose:
+      - "6379"
+
+  redisinsight:
+    image: redislabs/redisinsight:2.66
+    container_name: redisinsight
+    ports:
+      - "8001:8001"
+      - "5540:5540"
+    environment:
+      - REDISINSIGHT_PASSWORD=admin
+    depends_on:
+      - redis
+    expose:
+      - "8001"
+
+  minio:
+    image: quay.io/minio/minio:RELEASE.2025-03-12T18-04-18Z
+    container_name: minio
+    ports:
+      - "9000:9000"
+      - "9090:9090"
+    environment:
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadmin
+    command: server /data --console-address ":9090"
+    expose:
+      - "9000"
+      - "9090"
+
+  mongo-express:
+    image: mongo-express:1.0.2
+    container_name: mongo-express
+    restart: unless-stopped
+    ports:
+      - "8081:8081"
+    environment:
+      ME_CONFIG_MONGODB_ADMINUSERNAME: admin
+      ME_CONFIG_MONGODB_ADMINPASSWORD: admin
+      ME_CONFIG_MONGODB_SERVER: mongo
+    depends_on:
+      - mongo
+    expose:
+      - "8081"
