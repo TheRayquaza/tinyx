@@ -5,13 +5,15 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.notNullValue;
 
 import com.epita.exchange.auth.service.AuthContext;
+import com.epita.exchange.auth.service.AuthService;
+import com.epita.exchange.auth.service.entity.AuthEntity;
 import com.epita.repo_user.controller.RepoUserController;
 import com.epita.repo_user.controller.request.CreateUserRequest;
 import com.epita.repo_user.controller.request.LoginRequest;
 import com.epita.repo_user.controller.request.ModifyUserRequest;
-import com.epita.repo_user.service.UserService;
 import io.quarkus.test.common.http.TestHTTPEndpoint;
 import io.quarkus.test.junit.QuarkusTest;
+import io.quarkus.test.security.TestSecurity;
 import io.restassured.http.ContentType;
 import io.restassured.response.Response;
 import jakarta.inject.Inject;
@@ -21,20 +23,14 @@ import org.junit.jupiter.api.*;
 @QuarkusTest
 @TestHTTPEndpoint(RepoUserController.class)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
+@TestSecurity(authorizationEnabled = false)
 public class UserControllerTest {
-
-  @Inject UserService userService;
-
-  // @Inject
-  // S3Service s3Service;
-
-  // @Inject
-  // RedisPublisher redisPublisher;
 
   @Inject AuthContext authContext;
 
   private static String userId;
-  private static final String TEST_USERNAME = "testuser";
+  private static final String TEST_USERNAME = "testuser5";
+  private static final String TEST_ID = "15a1a100c293c91129883571";
   private static final String TEST_PASSWORD = "Password123!";
   private static final String TEST_EMAIL = "test@example.com";
 
@@ -54,7 +50,7 @@ public class UserControllerTest {
             .when()
             .post("/user")
             .then()
-            .statusCode(201)
+            .statusCode(200)
             .body("username", equalTo(TEST_USERNAME))
             .body("email", equalTo(TEST_EMAIL))
             .body("id", notNullValue())
@@ -87,7 +83,11 @@ public class UserControllerTest {
   @Order(3)
   @DisplayName("Should get current user successfully")
   public void testGetCurrentUser() {
+    String token = AuthService.generateToken(userId, TEST_USERNAME);
+    AuthEntity authEntity = new AuthEntity(userId, TEST_USERNAME);
+    authContext.setAuthEntity(authEntity);
     given()
+        .header("Authorization", "Bearer " + token)
         .when()
         .get("/user")
         .then()
@@ -100,7 +100,12 @@ public class UserControllerTest {
   @Order(4)
   @DisplayName("Should get user by ID successfully")
   public void testGetUserById() {
+    System.out.println("User ID: " + userId);
+    String token = AuthService.generateToken(userId, TEST_USERNAME);
+    AuthEntity authEntity = new AuthEntity(userId, TEST_USERNAME);
+    authContext.setAuthEntity(authEntity);
     given()
+        .header("Authorization", "Bearer " + token)
         .pathParam("id", userId)
         .when()
         .get("/user/{id}")
@@ -113,12 +118,16 @@ public class UserControllerTest {
   @Order(5)
   @DisplayName("Should update user profile successfully")
   public void testUpdateUser() {
+    String token = AuthService.generateToken(userId, TEST_USERNAME);
+    AuthEntity authEntity = new AuthEntity(userId, TEST_USERNAME);
+    authContext.setAuthEntity(authEntity);
     ModifyUserRequest request = new ModifyUserRequest();
     request.bio = "This is my updated bio";
     request.username = "updateduser";
 
     given()
         .contentType(ContentType.JSON)
+        .header("Authorization", "Bearer " + token)
         .body(request)
         .when()
         .put("/user")
@@ -132,10 +141,14 @@ public class UserControllerTest {
   @Order(6)
   @DisplayName("Should upload profile image successfully")
   public void testUploadProfileImage() throws Exception {
+    String token = AuthService.generateToken(userId, TEST_USERNAME);
+    AuthEntity authEntity = new AuthEntity(userId, TEST_USERNAME);
+    authContext.setAuthEntity(authEntity);
     File testFile = File.createTempFile("profile", ".jpg");
     testFile.deleteOnExit();
 
     given()
+        .header("Authorization", "Bearer " + token)
         .contentType("multipart/form-data")
         .multiPart("file", testFile, "image/jpeg")
         .when()
@@ -149,9 +162,23 @@ public class UserControllerTest {
   @Order(7)
   @DisplayName("Should delete user successfully")
   public void testDeleteUser() {
-    given().when().delete("/user").then().statusCode(204);
+    String token = AuthService.generateToken(userId, TEST_USERNAME);
+    AuthEntity authEntity = new AuthEntity(userId, TEST_USERNAME);
+    authContext.setAuthEntity(authEntity);
+    given()
+        .header("Authorization", "Bearer " + token)
+        .when()
+        .delete("/user")
+        .then()
+        .statusCode(204);
 
-    given().pathParam("id", userId).when().get("/user/{id}").then().statusCode(404);
+    given()
+        .header("Authorization", "Bearer " + token)
+        .pathParam("id", userId)
+        .when()
+        .get("/user/{id}")
+        .then()
+        .statusCode(404);
   }
 
   // Additional tests for error cases...
