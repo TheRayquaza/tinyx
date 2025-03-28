@@ -11,15 +11,14 @@ import com.epita.repo_user.controller.RepoUserController;
 import com.epita.repo_user.controller.request.CreateUserRequest;
 import com.epita.repo_user.controller.request.LoginRequest;
 import com.epita.repo_user.controller.request.ModifyUserRequest;
-import com.epita.repo_user.service.UserService;
 import io.quarkus.test.common.http.TestHTTPEndpoint;
 import io.quarkus.test.junit.QuarkusTest;
+import io.quarkus.test.security.TestSecurity;
 import io.restassured.http.ContentType;
 import io.restassured.response.Response;
 import jakarta.inject.Inject;
 import java.io.File;
 import org.junit.jupiter.api.*;
-import io.quarkus.test.security.TestSecurity;
 
 @QuarkusTest
 @TestHTTPEndpoint(RepoUserController.class)
@@ -166,9 +165,20 @@ public class UserControllerTest {
     String token = AuthService.generateToken(userId, TEST_USERNAME);
     AuthEntity authEntity = new AuthEntity(userId, TEST_USERNAME);
     authContext.setAuthEntity(authEntity);
-    given().header("Authorization", "Bearer " + token).when().delete("/user").then().statusCode(204);
+    given()
+        .header("Authorization", "Bearer " + token)
+        .when()
+        .delete("/user")
+        .then()
+        .statusCode(204);
 
-    given().header("Authorization", "Bearer " + token).pathParam("id", userId).when().get("/user/{id}").then().statusCode(404);
+    given()
+        .header("Authorization", "Bearer " + token)
+        .pathParam("id", userId)
+        .when()
+        .get("/user/{id}")
+        .then()
+        .statusCode(404);
   }
 
   // Additional tests for error cases...
