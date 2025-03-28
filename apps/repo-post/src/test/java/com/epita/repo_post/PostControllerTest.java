@@ -5,6 +5,7 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 
 import com.epita.exchange.auth.service.AuthContext;
+// import com.epita.exchange.auth.service.AuthService;
 import com.epita.exchange.auth.service.entity.AuthEntity;
 import com.epita.repo_post.controller.RepoPostController;
 import com.epita.repo_post.controller.request.CreatePostRequest;
@@ -12,6 +13,7 @@ import com.epita.repo_post.controller.request.EditPostRequest;
 import com.epita.repo_post.controller.request.ReplyPostRequest;
 import io.quarkus.test.common.http.TestHTTPEndpoint;
 import io.quarkus.test.junit.QuarkusTest;
+// import io.quarkus.test.security.TestSecurity;
 import io.restassured.http.ContentType;
 import jakarta.inject.Inject;
 import org.junit.jupiter.api.MethodOrderer;
@@ -35,29 +37,33 @@ class PostControllerTest {
   private static final String TEST_PASSWORD = "Password123!";
   private static final String TEST_EMAIL = "test@example.com";
 
+  // @TestSecurity(user = "testuser", roles = "user")
   @Test
   @Order(1)
   void createPost() {
+    
+    // AuthService.generateToken("test_id", "test_username");
     AuthEntity authEntity = new AuthEntity(TEST_USERNAME, TEST_USERNAME);
-    authContext.setAuthEntity(authEntity);
+      authContext.setAuthEntity(authEntity);
+  
+      CreatePostRequest request = new CreatePostRequest();
+      request.text = "Test Post";
+      request.media = null;
+  
+       Response response = given().contentType(ContentType.JSON)
+              .body(request)
+              .when()
+              .post("/create")
+              .then()
+              .statusCode(201)
+              .body("text", is("Test Post"))
+              .body("id", is(notNullValue()))
+              .extract()
+              .response();
+  
+      postIds.add(response.jsonPath().getString("id"));
+    }
 
-    CreatePostRequest request = new CreatePostRequest();
-    request.text = "Test Post";
-    request.media = null;
-
-     Response response = given().contentType(ContentType.JSON)
-            .body(request)
-            .when()
-            .post("/create")
-            .then()
-            .statusCode(201)
-            .body("text", is("Test Post"))
-            .body("id", is(notNullValue()))
-            .extract()
-            .response();
-
-    postIds.add(response.jsonPath().getString("id"));
-  }
 
   @Test
   @Order(2)
