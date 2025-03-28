@@ -1,9 +1,10 @@
-# repo-user
+# repo-post
 
 ## Requirements
 
 - Java 17
 - MongoDB
+- Minio
 - Redis
 
 ## Development
@@ -44,14 +45,13 @@ variables.
 
 | Variable                      | Description                                        |
 |-------------------------------|----------------------------------------------------|
-| `REPO_USER_REDIS_HOST`        | Redis host                                         |
-| `REPO_USER_REDIS_PASSWORD`    | Redis Password                                     |
-| `REPO_USER_AGGREGATE_CHANNEL` | Redis User aggregate channel                       |
-| `REPO_USER_MONGODB_HOST`      | MongoDB server host                                |
-| `REPO_USER_MONGODB_DATABASE`  | MongoDB database name                              |
-| `REPO_USER_QUARKUS_HTTP_PORT` | Quarkus HTTP port (e.g., `8080`)                   |
-| `REPO_USER_APP_PROFILE`       | Application profile (`dev` / `prod`)               |
-| `REPO_USER_MINIO_ENDPOINT`    | MinIO endpoint (`http://localhost:9000` by default) |
-| `REPO_USER_MINIO_BUCKET`      | MinIO bucket name (`default` by default)           |
-| `REPO_USER_MINIO_ACCESS_KEY`  | MinIO access key (`minioadmin` by default)         |
-| `REPO_USER_MINIO_SECRET_KEY`  | MinIO secret key (`minioadmin` by default)         |
+| `REPO_POST_REDIS_HOST`        | Redis host                                         |
+| `REPO_POST_REDIS_PASSWORD`    | Redis Password                                     |
+| `REPO_POST_MONGODB_HOST`      | MongoDB server host                                |
+| `REPO_POST_MONGODB_DATABASE`  | MongoDB database name                              |
+| `REPO_POST_QUARKUS_HTTP_PORT` | Quarkus HTTP port (e.g., `8080`)                   |
+| `REPO_POST_APP_PROFILE`       | Application profile (`dev` / `prod`)               |
+| `REPO_POST_MINIO_ENDPOINT`    | MinIO endpoint (`http://localhost:9000` by default) |
+| `REPO_POST_MINIO_BUCKET`      | MinIO bucket name (`default` by default)           |
+| `REPO_POST_MINIO_ACCESS_KEY`  | MinIO access key (`minioadmin` by default)         |
+| `REPO_POST_MINIO_SECRET_KEY`  | MinIO secret key (`minioadmin` by default)         |

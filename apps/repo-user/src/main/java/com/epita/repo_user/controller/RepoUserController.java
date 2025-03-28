@@ -31,7 +31,7 @@ public class RepoUserController implements RepoUserControllerApi {
   @Override
   public @NotNull UserLoginResponse login(
       @RequestBody(required = true) @NotNull @Valid LoginRequest request) {
-    logger().info("POST /login - username {}", request.username);
+    logger().info("POST /login - username '{}'", request.username);
     return userService.login(request);
   }
 
@@ -40,7 +40,7 @@ public class RepoUserController implements RepoUserControllerApi {
   @Override
   public @NotNull UserEntity createUser(
       @RequestBody(required = true) @NotNull @Valid CreateUserRequest request) {
-    logger().info("POST /user - username {}", request.username);
+    logger().info("POST /user - username '{}'", request.username);
     return userService.createUser(request);
   }
 
@@ -63,7 +63,7 @@ public class RepoUserController implements RepoUserControllerApi {
   public @NotNull UserEntity uploadProfileImage(
       @RequestBody(required = true) @NotNull @Valid UploadImageRequest request) {
     String userId = authService.getUserId();
-    logger().info("PUT /user/image - {}", userId);
+    logger().info("PUT /user/image - '{}'", userId);
     return userService.uploadProfileImage(new ObjectId(userId), request);
   }
 
@@ -73,7 +73,7 @@ public class RepoUserController implements RepoUserControllerApi {
   @Override
   public void deleteUser() {
     String userId = authService.getUserId();
-    logger().info("DELETE /user with id {}", userId);
+    logger().info("DELETE /user with id '{}'", userId);
     userService.deleteUser(new ObjectId(userId));
   }
 
