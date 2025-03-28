@@ -1,8 +1,10 @@
 package com.epita.repo_user.service;
 
+import com.epita.exchange.auth.service.AuthService;
 import com.epita.exchange.redis.aggregate.UserAggregate;
 import com.epita.exchange.redis.service.RedisPublisher;
 import com.epita.exchange.s3.service.S3Service;
+import com.epita.exchange.utils.Logger;
 import com.epita.repo_user.RepoUserErrorCode;
 import com.epita.repo_user.controller.request.CreateUserRequest;
 import com.epita.repo_user.controller.request.LoginRequest;
@@ -18,6 +20,7 @@ import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import java.io.*;
+import java.nio.file.Files;
 import java.time.LocalDateTime;
 import java.util.*;
 import org.apache.commons.io.FileUtils;
@@ -26,7 +29,7 @@ import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.mindrot.jbcrypt.BCrypt;
 
 @ApplicationScoped
-public class UserService {
+public class UserService implements Logger {
 
   @Inject UserRepository userRepository;
 
@@ -59,11 +62,10 @@ public class UserService {
       throw RepoUserErrorCode.UNAUTHORIZED.createError();
     }
 
-    String token = userModel.getId() + "," + userModel.getUsername();
     return new UserLoginResponse(
-        userModel.getId(),
+        userModel.getId().toString(),
         userModel.getUsername(),
-        Arrays.toString(Base64.getDecoder().decode(token)));
+        AuthService.generateToken(userModel.getId().toString(), userModel.getUsername()));
   }
 
   @Transactional
@@ -120,7 +122,8 @@ public class UserService {
 
     userRepository.persist(userModel);
 
-    redisPublisher.publish("user_aggregate", userModelToUserAggregate.convertNotNull(userModel));
+    redisPublisher.publish(
+        userAggregateChannel, userModelToUserAggregate.convertNotNull(userModel));
     return userModelToUserEntity.convertNotNull(userModel);
   }
 
@@ -139,7 +142,7 @@ public class UserService {
     userModel.setDeleted(true);
     UserAggregate userAggregate = userModelToUserAggregate.convertNotNull(userModel);
     // userRepository.deleteById(id); // TODO: delete this ?
-    redisPublisher.publish("user_aggregate", userAggregate);
+    redisPublisher.publish(userAggregateChannel, userAggregate);
   }
 
   @Transactional
@@ -151,12 +154,12 @@ public class UserService {
             .findByIdOptional(userId)
             .orElseThrow(() -> RepoUserErrorCode.USER_NOT_FOUND.createError(userId));
     try {
-      File tempFile = File.createTempFile("S3", userId.toString());
-      tempFile.deleteOnExit();
-      FileUtils.copyInputStreamToFile(request.getFile(), tempFile);
-      s3Service.uploadFile(objectKey, tempFile);
+      s3Service.uploadFile(objectKey, request.getFile(), request.getFile().available()); // TODO: fix size
       s3Service.deleteFile(userModel.getProfileImage());
       userModel.setProfileImage(objectKey);
+      userRepository.persist(userModel);
+      redisPublisher.publish(
+          userAggregateChannel, userModelToUserAggregate.convertNotNull(userModel));
       return userModelToUserEntityConverter.convertNotNull(userModel);
     } catch (Exception e) {
       throw RepoUserErrorCode.INTERNAL_SERVER_ERROR.createError();

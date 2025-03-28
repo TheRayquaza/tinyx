@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.bson.codecs.pojo.annotations.BsonId;
+import org.bson.types.ObjectId;
 
 @Getter
 @Setter
@@ -14,7 +15,7 @@ import org.bson.codecs.pojo.annotations.BsonId;
 @NoArgsConstructor
 @MongoEntity(collection = "users", database = "")
 public class UserModel {
-  @BsonId private String id;
+  @BsonId private ObjectId id;
   private String username;
   private String email;
   private String passwordHash;

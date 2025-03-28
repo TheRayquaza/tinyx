@@ -1,11 +1,11 @@
 package com.epita.repo_post;
 
-import com.epita.exchange.utils.ErrorCode;
+import com.epita.exchange.error.ErrorCode;
 import lombok.Getter;
 
 @Getter
 public enum RepoPostErrorCode implements ErrorCode {
-  OWNER_NOT_FOUND(404, "Owner with ID %s not found"),
+  OWNER_NOT_FOUND(404, "Owner with ID '%s' not found"),
   INVALID_POST_DATA(400, "Invalid post data: %s"),
   UNAUTHORIZED(401, "Unauthorized access"),
   FORBIDDEN(403, "Forbidden action"),

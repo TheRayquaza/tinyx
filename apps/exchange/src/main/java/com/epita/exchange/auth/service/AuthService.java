@@ -3,6 +3,8 @@ package com.epita.exchange.auth.service;
 import com.epita.exchange.auth.service.entity.AuthEntity;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
+import java.util.Arrays;
+import java.util.Base64;
 
 @ApplicationScoped
 public class AuthService {
@@ -17,5 +19,10 @@ public class AuthService {
   public String getUsername() {
     AuthEntity authEntity = authContext.getAuthEntity();
     return (authEntity != null) ? authEntity.getUsername() : null;
+  }
+
+  public static String generateToken(String id, String username) {
+    String token = id + "," + username;
+    return Arrays.toString(Base64.getDecoder().decode(token));
   }
 }

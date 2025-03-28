@@ -11,7 +11,7 @@ public class UserModelToUserEntityConverter implements Converter<UserModel, User
   public UserEntity convertNotNull(UserModel input) {
     return new UserEntity()
         .withBio(input.getBio())
-        .withId(input.getId())
+        .withId(input.getId().toString())
         .withEmail(input.getEmail())
         .withDeleted(input.isDeleted())
         .withUsername(input.getUsername())
