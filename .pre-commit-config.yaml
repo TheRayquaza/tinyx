@@ -1,14 +1,26 @@
 # .pre-commit-config.yaml
 repos:
 -   repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v2.3.0
+    rev: v5.0.0
     hooks:
     -   id: check-yaml
     -   id: end-of-file-fixer
     -   id: trailing-whitespace
 
 -   repo: https://github.com/hadolint/hadolint
-    rev: v2.12.0
+    rev: v2.13.1-beta
     hooks:
       - id: hadolint-docker
         entry: ghcr.io/hadolint/hadolint hadolint --ignore DL3008 --ignore DL3059 --ignore DL3015
+
+-   repo: local
+    hooks:
+      - id: commit-message-validator
+        name: Validate Service Commit Message
+        entry: >
+          python3 -c "import sys, re; message = open(sys.argv[1]).read().strip();
+          pattern = r'(repo-user|exchange|repo-post|repo-social|srvc-search|srvc-user-timeline|srvc-home-timeline)*';
+          sys.exit(0 if re.match(pattern, message) else 1)"
+        language: system
+        stages: [commit-msg]
+        verbose: true
