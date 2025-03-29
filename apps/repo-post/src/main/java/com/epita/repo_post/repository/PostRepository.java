@@ -3,7 +3,6 @@ package com.epita.repo_post.repository;
 import com.epita.repo_post.repository.model.PostModel;
 import io.quarkus.mongodb.panache.PanacheMongoRepository;
 import jakarta.enterprise.context.ApplicationScoped;
-
 import java.util.List;
 import java.util.Optional;
 

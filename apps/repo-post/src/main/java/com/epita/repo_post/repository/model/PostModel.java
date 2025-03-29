@@ -13,7 +13,7 @@ import org.bson.codecs.pojo.annotations.BsonId;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-@MongoEntity(collection = "posts")
+@MongoEntity(collection = "posts", database = "RepoPost")
 public class PostModel {
   @BsonId private String id;
   private String ownerId;

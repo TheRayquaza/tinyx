@@ -13,9 +13,8 @@ import com.epita.repo_post.service.entity.PostEntity;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
-import org.bson.types.ObjectId;
-
 import java.util.List;
+import org.bson.types.ObjectId;
 
 @ApplicationScoped
 public class PostService {
@@ -24,12 +23,14 @@ public class PostService {
 
   @Inject PostModelToPostEntity postModelToPostEntity;
 
-  @Inject
-  AuthService authService;
+  @Inject AuthService authService;
 
   public PostEntity createPost(CreatePostRequest request, String ownerId) {
+
+    System.out.println("CREATE USER");
     if (request == null || ownerId == null || (request.media == null && request.text == null)) {
-      throw RepoPostErrorCode.INVALID_POST_DATA.createError("request / ownerId / media / text is null");
+      throw RepoPostErrorCode.INVALID_POST_DATA.createError(
+          "request / ownerId / media / text is null");
     }
 
     PostModel postModel = new PostModel();
@@ -56,13 +57,19 @@ public class PostService {
   }
 
   public PostEntity getPostById(String id) {
-    PostModel postModel = postRepository.getById(id).orElseThrow(() -> RepoPostErrorCode.POST_NOT_FOUND.createError(id));
+    PostModel postModel =
+        postRepository
+            .getById(id)
+            .orElseThrow(() -> RepoPostErrorCode.POST_NOT_FOUND.createError(id));
     return postModelToPostEntity.convertNotNull(postModel);
   }
 
   @Transactional
   public void editPost(EditPostRequest request, String postId) {
-    PostModel postModel = postRepository.getById(postId).orElseThrow(() -> RepoPostErrorCode.POST_NOT_FOUND.createError(postId));
+    PostModel postModel =
+        postRepository
+            .getById(postId)
+            .orElseThrow(() -> RepoPostErrorCode.POST_NOT_FOUND.createError(postId));
 
     if (!authService.getUserId().equals(postModel.getOwnerId())) {
       throw RepoPostErrorCode.FORBIDDEN.createError("auth user is not the owner of the post");
@@ -81,7 +88,10 @@ public class PostService {
 
   @Transactional
   public void deletePost(String postId) {
-    PostModel postModel = postRepository.getById(postId).orElseThrow(() -> RepoPostErrorCode.POST_NOT_FOUND.createError(postId));
+    PostModel postModel =
+        postRepository
+            .getById(postId)
+            .orElseThrow(() -> RepoPostErrorCode.POST_NOT_FOUND.createError(postId));
     if (!authService.getUserId().equals(postModel.getOwnerId())) {
       throw RepoPostErrorCode.FORBIDDEN.createError("auth user is not the owner of the post");
     }
@@ -90,7 +100,10 @@ public class PostService {
   }
 
   public void replyToPost(PostReplyRequest request, String postId) {
-    PostModel postModel = postRepository.getById(postId).orElseThrow(() -> RepoPostErrorCode.POST_NOT_FOUND.createError(postId));
+    PostModel postModel =
+        postRepository
+            .getById(postId)
+            .orElseThrow(() -> RepoPostErrorCode.POST_NOT_FOUND.createError(postId));
     postModel.setIsReply(true);
     postModel.setReplyToPostId(postId);
     postModel.setOwnerId(authService.getUserId());
@@ -102,8 +115,14 @@ public class PostService {
   }
 
   public AllRepliesResponse getAllRepliesForPost(String postId) {
-    postRepository.getById(postId).orElseThrow(() -> RepoPostErrorCode.POST_NOT_FOUND.createError(postId));
+    postRepository
+        .getById(postId)
+        .orElseThrow(() -> RepoPostErrorCode.POST_NOT_FOUND.createError(postId));
     List<PostModel> replies = postRepository.findAllReplies(postId);
-    return new AllRepliesResponse().withReplies(replies.stream().map((postModel) -> postModelToPostEntity.convertNotNull(postModel)).toList());
+    return new AllRepliesResponse()
+        .withReplies(
+            replies.stream()
+                .map((postModel) -> postModelToPostEntity.convertNotNull(postModel))
+                .toList());
   }
 }
