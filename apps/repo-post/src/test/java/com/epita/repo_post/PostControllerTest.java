@@ -80,7 +80,7 @@ class PostControllerTest {
         .contentType(ContentType.JSON)
         .header("Authorization", "Bearer " + token)
         .when()
-        .get("/get/" + postIds.get(0))
+        .get("/post/" + postIds.get(0))
         .then()
         .statusCode(200)
         .extract()
@@ -100,7 +100,7 @@ class PostControllerTest {
         .contentType(ContentType.JSON)
         .header("Authorization", "Bearer " + token)
         .when()
-        .get("/get/" + postIds.get(0))
+        .get("/post/" + postIds.get(0))
         .then()
         .statusCode(404)
         .extract()
@@ -150,7 +150,7 @@ class PostControllerTest {
         .when()
         .post("/post/" + postIds.get(0) + "/reply")
         .then()
-        .statusCode(201)
+        .statusCode(200)
         .extract()
         .response();
   }
