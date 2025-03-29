@@ -30,7 +30,7 @@ public class RepoPostController implements RepoPostControllerApi {
   @Override
   public PostEntity createPost(
       @RequestBody(required = true) @NotNull @Valid CreatePostRequest request) {
-        String ownerId = authService.getUserId();
+    String ownerId = authService.getUserId();
     logger().info("POST /create - User {} creates a post", ownerId);
     return postService.createPost(request, ownerId);
   }
@@ -84,7 +84,12 @@ public class RepoPostController implements RepoPostControllerApi {
   @Override
   public AllRepliesResponse getAllRepliesForPost(@PathParam("id") String postId) {
     String userId = authService.getUserId();
-    logger().info("Get /post/{}/reply - Get all replies from post {} with user {}", postId, postId, userId);
+    logger()
+        .info(
+            "Get /post/{}/reply - Get all replies from post {} with user {}",
+            postId,
+            postId,
+            userId);
     return postService.getAllRepliesForPost(postId);
   }
 }

@@ -26,7 +26,7 @@ public interface RepoPostControllerApi extends Logger {
   @Operation(summary = "Create a new post")
   @APIResponses({
     @APIResponse(
-        responseCode = "201",
+        responseCode = "200",
         description = "Post created successfully",
         content = @Content(schema = @Schema(implementation = PostEntity.class))),
     @APIResponse(responseCode = "400", description = "Invalid input"),
