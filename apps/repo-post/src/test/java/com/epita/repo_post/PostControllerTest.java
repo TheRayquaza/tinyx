@@ -75,7 +75,6 @@ class PostControllerTest {
 
     AuthEntity authEntity = new AuthEntity(TEST_ID, TEST_USERNAME);
     authContext.setAuthEntity(authEntity);
-
     given()
         .contentType(ContentType.JSON)
         .header("Authorization", "Bearer " + token)
@@ -100,7 +99,7 @@ class PostControllerTest {
         .contentType(ContentType.JSON)
         .header("Authorization", "Bearer " + token)
         .when()
-        .get("/post/" + postIds.get(0))
+        .get("/post/" + "non_existent_post_id")
         .then()
         .statusCode(404)
         .extract()

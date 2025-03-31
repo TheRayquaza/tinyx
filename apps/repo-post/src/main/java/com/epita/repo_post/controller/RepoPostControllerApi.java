@@ -66,7 +66,7 @@ public interface RepoPostControllerApi extends Logger {
     @APIResponse(responseCode = "404", description = "Post or User Not Found"),
   })
   @NotNull
-  void editPost(
+  PostEntity editPost(
       @RequestBody(required = true) @NotNull @Valid EditPostRequest request,
       @PathParam("id") String id);
 
@@ -100,7 +100,7 @@ public interface RepoPostControllerApi extends Logger {
     @APIResponse(responseCode = "404", description = "User Not Found"),
   })
   @NotNull
-  void replyToPost(
+  PostEntity replyToPost(
       @RequestBody(required = true) @NotNull @Valid PostReplyRequest request,
       @PathParam("id") String id);
 

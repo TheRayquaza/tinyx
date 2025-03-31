@@ -2,7 +2,6 @@ package com.epita.repo_post.service.entity;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
-import java.util.List;
 import lombok.*;
 
 @Getter
@@ -15,7 +14,7 @@ public class PostEntity implements Serializable {
   private String id;
   private String ownerId;
   private String text;
-  private List<String> media;
+  private String media;
   private String repostId;
   private String replyToPostId;
   private Boolean isReply;

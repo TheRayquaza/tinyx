@@ -10,11 +10,14 @@ import java.util.Optional;
 public class PostRepository implements PanacheMongoRepository<PostModel> {
 
   public Optional<PostModel> getById(String id) {
-    return find("id", id).firstResultOptional();
+    return find("_id", id).firstResultOptional();
   }
 
   public List<PostModel> findAllReplies(String postId) {
-    return find("replyToPostId", postId).stream().toList();
+    System.out.println("HERE 32");
+    List<PostModel> model = find("replyToPostId", postId).list();
+    System.out.println("Replies for post " + postId + ": " + model.size());
+    return model;
   }
 
   public void create(PostModel model) {

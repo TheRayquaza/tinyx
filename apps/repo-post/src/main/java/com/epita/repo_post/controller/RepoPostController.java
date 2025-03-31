@@ -47,12 +47,12 @@ public class RepoPostController implements RepoPostControllerApi {
   @Authenticated
   @Path("/post/{id}")
   @Override
-  public void editPost(
+  public PostEntity editPost(
       @RequestBody(required = true) @NotNull @Valid EditPostRequest request,
       @PathParam("id") String postId) {
     String userId = authService.getUserId();
     logger().info("PUT /post/{} - Edit post {} with user {}", postId, postId, userId);
-    postService.editPost(request, postId);
+    return postService.editPost(request, postId);
   }
 
   @DELETE
@@ -70,12 +70,12 @@ public class RepoPostController implements RepoPostControllerApi {
   @Authenticated
   @Override
   @Path("/post/{id}/reply")
-  public void replyToPost(
+  public PostEntity replyToPost(
       @RequestBody(required = true) @NotNull @Valid PostReplyRequest request,
       @PathParam("id") String postId) {
     String userId = authService.getUserId();
     logger().info("POST /post/{}/reply - Reply to post {} with user {}", postId, userId);
-    postService.replyToPost(request, postId);
+    return postService.replyToPost(request, postId);
   }
 
   @GET

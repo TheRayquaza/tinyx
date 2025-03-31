@@ -12,7 +12,7 @@ import com.epita.repo_post.repository.model.PostModel;
 import com.epita.repo_post.service.entity.PostEntity;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
-import jakarta.transaction.Transactional;
+import java.time.LocalDateTime;
 import java.util.List;
 import org.bson.types.ObjectId;
 
@@ -26,28 +26,32 @@ public class PostService {
   @Inject AuthService authService;
 
   public PostEntity createPost(CreatePostRequest request, String ownerId) {
-
-    System.out.println("CREATE USER");
     if (request == null || ownerId == null || (request.media == null && request.text == null)) {
       throw RepoPostErrorCode.INVALID_POST_DATA.createError(
           "request / ownerId / media / text is null");
+    }
+
+    if (!authService.getUserId().equals(ownerId)) {
+      throw RepoPostErrorCode.FORBIDDEN.createError("auth user is not provided ownerId");
     }
 
     PostModel postModel = new PostModel();
 
     postModel.setId(new ObjectId().toString());
 
-    if (!authService.getUserId().equals(ownerId)) {
-      throw RepoPostErrorCode.FORBIDDEN.createError("auth user is not provided ownerId");
-    }
-
     postModel.setOwnerId(ownerId);
+
     if (request.media != null) {
       postModel.setMedia(request.media);
     }
     if (request.text != null) {
       postModel.setText(request.text);
     }
+
+    postModel.setCreatedAt(LocalDateTime.now());
+    postModel.setUpdatedAt(LocalDateTime.now());
+    postModel.setDeleted(false);
+    postModel.setIsReply(false);
 
     // Persist the new data
     postRepository.create(postModel);
@@ -64,8 +68,8 @@ public class PostService {
     return postModelToPostEntity.convertNotNull(postModel);
   }
 
-  @Transactional
-  public void editPost(EditPostRequest request, String postId) {
+  // @Transactional
+  public PostEntity editPost(EditPostRequest request, String postId) {
     PostModel postModel =
         postRepository
             .getById(postId)
@@ -82,11 +86,13 @@ public class PostService {
     if (request.media != null) {
       postModel.setMedia(request.media);
     }
+    postModel.setUpdatedAt(LocalDateTime.now());
 
     postRepository.update(postModel);
+    return postModelToPostEntity.convertNotNull(postModel);
   }
 
-  @Transactional
+  // @Transactional
   public void deletePost(String postId) {
     PostModel postModel =
         postRepository
@@ -99,25 +105,40 @@ public class PostService {
     postRepository.update(postModel);
   }
 
-  public void replyToPost(PostReplyRequest request, String postId) {
-    PostModel postModel =
+  public PostEntity replyToPost(PostReplyRequest request, String postId) {
+    if (request == null || (request.getMedia() == null && request.getText() == null)) {
+      throw RepoPostErrorCode.INVALID_POST_DATA.createError(
+          "request / ownerId / media / text is null");
+    }
+
+    // To check if the post we are replying to exists
+    PostModel og_post =
         postRepository
             .getById(postId)
             .orElseThrow(() -> RepoPostErrorCode.POST_NOT_FOUND.createError(postId));
-    postModel.setIsReply(true);
-    postModel.setReplyToPostId(postId);
-    postModel.setOwnerId(authService.getUserId());
+
+    // Create the reply
+    PostModel reply = new PostModel();
+    reply.setOwnerId(authService.getUserId());
+    reply.setText(request.getText());
+    reply.setIsReply(true);
+    reply.setReplyToPostId(postId);
+    reply.setCreatedAt(LocalDateTime.now());
+    reply.setUpdatedAt(LocalDateTime.now());
+
     if (request.getText() != null) {
-      postModel.setText(request.getText());
+      reply.setText(request.getText());
     }
 
-    postRepository.create(postModel);
+    postRepository.create(reply);
+    return postModelToPostEntity.convertNotNull(reply);
   }
 
   public AllRepliesResponse getAllRepliesForPost(String postId) {
     postRepository
         .getById(postId)
         .orElseThrow(() -> RepoPostErrorCode.POST_NOT_FOUND.createError(postId));
+
     List<PostModel> replies = postRepository.findAllReplies(postId);
     return new AllRepliesResponse()
         .withReplies(

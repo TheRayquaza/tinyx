@@ -1,6 +1,5 @@
 package com.epita.repo_post.controller.request;
 
-import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
 @AllArgsConstructor
@@ -9,5 +8,6 @@ import lombok.*;
 @Getter
 @Setter
 public class PostReplyRequest {
-  @NotNull String text;
+  String text;
+  String media;
 }
