@@ -1,0 +1,5 @@
+kind: Kustomize
+resources:
+  - statefulset.yml
+  - service.yml
+  - pvc.yml

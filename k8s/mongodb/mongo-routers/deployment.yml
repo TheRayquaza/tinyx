@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mongos
+  namespace: mongo
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      role: mongos
+  template:
+    metadata:
+      labels:
+        role: mongos
+    spec:
+      containers:
+        - name: mongos
+          image: mongo:6.0
+          command: ["mongos", "--configdb",
+                    "cfgReplicaSet/mongo-config-0.mongo-config:27017,mongo-config-1.mongo-config:27017,mongo-config-2.mongo-config:27017",
+                    "--bind_ip", "0.0.0.0"]

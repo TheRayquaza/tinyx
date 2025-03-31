@@ -1,0 +1,5 @@
+kind: Kustomize
+resources:
+  - mongo-shards
+  - mongo-config
+  - mongo-routers
