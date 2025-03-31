@@ -1,0 +1,53 @@
+services:
+  mongo:
+    image: mongo:8.0.6-noble
+    container_name: mongo
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: admin
+      MONGO_INITDB_DATABASE: SrvcUserTimeline
+    #command: ["mongod", "--replSet", "rs0", "--bind_ip_all", "--keyFile", "/etc/mongo/rsKeyFile"]
+    volumes:
+      - ./src/main/resources/init.js:/docker-entrypoint-initdb.d/init.js
+      #- ./src/main/resources/rsKeyFile:/etc/mongo/rsKeyFile:ro
+    ports:
+      - 27017:27017
+    expose:
+      - "27017"
+
+  redis:
+    image: redis:8.0-M04-alpine3.21
+    container_name: redis
+    command: redis-server --requirepass admin
+    ports:
+      - "6379:6379"
+    expose:
+      - "6379"
+
+  redisinsight:
+    image: redislabs/redisinsight:2.66
+    container_name: redisinsight
+    ports:
+      - "5540:5540"
+    environment:
+      - REDISINSIGHT_PASSWORD=admin
+    depends_on:
+      - redis
+    expose:
+      - "8001"
+
+  mongo-express:
+    image: mongo-express:1.0.2
+    container_name: mongo-express
+    restart: unless-stopped
+    ports:
+      - "8082:8081"
+    environment:
+      ME_CONFIG_MONGODB_ADMINUSERNAME: admin
+      ME_CONFIG_MONGODB_ADMINPASSWORD: admin
+      ME_CONFIG_MONGODB_SERVER: mongo
+    depends_on:
+      - mongo
+    expose:
+      - "8082"
