@@ -17,7 +17,7 @@ import org.eclipse.microprofile.openapi.annotations.parameters.RequestBody;
 
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
-@Path("/")
+@Path("/post")
 public class RepoPostController implements RepoPostControllerApi {
 
   @Inject AuthService authService;
@@ -25,7 +25,7 @@ public class RepoPostController implements RepoPostControllerApi {
   @Inject PostService postService;
 
   @POST
-  @Path("/create")
+  @Path("/")
   @Authenticated
   @Override
   public PostEntity createPost(
@@ -36,16 +36,16 @@ public class RepoPostController implements RepoPostControllerApi {
   }
 
   @GET
-  @Path("/post/{id}")
+  @Path("/{id}")
   @Override
-  public PostEntity getPostById(@PathParam("id") String id) {
+  public PostEntity getPostById(@PathParam("id") @Valid String id) {
     logger().info("GET /post/{} - Retrieve post n°{}", id, id);
     return postService.getPostById(id);
   }
 
   @PUT
   @Authenticated
-  @Path("/post/{id}")
+  @Path("/{id}")
   @Override
   public PostEntity editPost(
       @RequestBody(required = true) @NotNull @Valid EditPostRequest request,
@@ -57,7 +57,7 @@ public class RepoPostController implements RepoPostControllerApi {
 
   @DELETE
   @Authenticated
-  @Path("/post/{id}")
+  @Path("/{id}")
   @Override
   public void deletePost(@PathParam("id") String postId) {
     String userId = authService.getUserId();
@@ -69,10 +69,10 @@ public class RepoPostController implements RepoPostControllerApi {
   @POST
   @Authenticated
   @Override
-  @Path("/post/{id}/reply")
+  @Path("/{id}/reply")
   public PostEntity replyToPost(
       @RequestBody(required = true) @NotNull @Valid PostReplyRequest request,
-      @PathParam("id") String postId) {
+      @PathParam("id") @Valid String postId) {
     String userId = authService.getUserId();
     logger().info("POST /post/{}/reply - Reply to post {} with user {}", postId, userId);
     return postService.replyToPost(request, postId);
@@ -80,7 +80,7 @@ public class RepoPostController implements RepoPostControllerApi {
 
   @GET
   @Authenticated
-  @Path("/post/{id}/reply")
+  @Path("/{id}/reply")
   @Override
   public AllRepliesResponse getAllRepliesForPost(@PathParam("id") String postId) {
     String userId = authService.getUserId();

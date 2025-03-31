@@ -7,14 +7,15 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.bson.codecs.pojo.annotations.BsonId;
+import org.bson.types.ObjectId;
 
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-@MongoEntity(collection = "posts", database = "RepoPost")
+@MongoEntity(collection = "PostModel", database = "RepoPost")
 public class PostModel {
-  @BsonId private String id;
+  @BsonId private ObjectId id;
   private String ownerId;
   private String text;
   private String media;

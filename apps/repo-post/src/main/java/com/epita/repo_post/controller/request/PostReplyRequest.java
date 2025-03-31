@@ -8,6 +8,6 @@ import lombok.*;
 @Getter
 @Setter
 public class PostReplyRequest {
-  String text;
-  String media;
+  public String text;
+  public String media;
 }

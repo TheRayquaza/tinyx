@@ -37,7 +37,7 @@ public class PostService {
 
     PostModel postModel = new PostModel();
 
-    postModel.setId(new ObjectId().toString());
+    postModel.setId(new ObjectId());
 
     postModel.setOwnerId(ownerId);
 
@@ -60,11 +60,11 @@ public class PostService {
     return postModelToPostEntity.convertNotNull(postModel);
   }
 
-  public PostEntity getPostById(String id) {
+  public PostEntity getPostById(String postId) {
     PostModel postModel =
         postRepository
-            .getById(id)
-            .orElseThrow(() -> RepoPostErrorCode.POST_NOT_FOUND.createError(id));
+            .findByIdStringOptional(postId)
+            .orElseThrow(() -> RepoPostErrorCode.POST_NOT_FOUND.createError(postId));
     return postModelToPostEntity.convertNotNull(postModel);
   }
 
@@ -72,7 +72,7 @@ public class PostService {
   public PostEntity editPost(EditPostRequest request, String postId) {
     PostModel postModel =
         postRepository
-            .getById(postId)
+            .findByIdStringOptional(postId)
             .orElseThrow(() -> RepoPostErrorCode.POST_NOT_FOUND.createError(postId));
 
     if (!authService.getUserId().equals(postModel.getOwnerId())) {
@@ -96,7 +96,7 @@ public class PostService {
   public void deletePost(String postId) {
     PostModel postModel =
         postRepository
-            .getById(postId)
+            .findByIdStringOptional(postId)
             .orElseThrow(() -> RepoPostErrorCode.POST_NOT_FOUND.createError(postId));
     if (!authService.getUserId().equals(postModel.getOwnerId())) {
       throw RepoPostErrorCode.FORBIDDEN.createError("auth user is not the owner of the post");
@@ -114,7 +114,7 @@ public class PostService {
     // To check if the post we are replying to exists
     PostModel og_post =
         postRepository
-            .getById(postId)
+            .findByIdStringOptional(postId)
             .orElseThrow(() -> RepoPostErrorCode.POST_NOT_FOUND.createError(postId));
 
     // Create the reply
@@ -136,7 +136,7 @@ public class PostService {
 
   public AllRepliesResponse getAllRepliesForPost(String postId) {
     postRepository
-        .getById(postId)
+        .findByIdStringOptional(postId)
         .orElseThrow(() -> RepoPostErrorCode.POST_NOT_FOUND.createError(postId));
 
     List<PostModel> replies = postRepository.findAllReplies(postId);

@@ -10,7 +10,7 @@ public class PostModelToPostEntity implements Converter<PostModel, PostEntity> {
   @Override
   public PostEntity convertNotNull(PostModel input) {
     return new PostEntity()
-        .withId(input.getId())
+        .withId(input.getId().toString())
         .withOwnerId(input.getOwnerId())
         .withMedia(input.getMedia())
         .withText(input.getText())

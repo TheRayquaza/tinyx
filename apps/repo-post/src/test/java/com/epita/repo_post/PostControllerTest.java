@@ -56,13 +56,20 @@ class PostControllerTest {
             .header("Authorization", "Bearer " + token)
             .body(request)
             .when()
-            .post("/create")
+            .post("/")
             .then()
-            .statusCode(200)
-            .body("text", is("Test Post"))
-            .body("id", is(notNullValue()))
             .extract()
             .response();
+
+    System.out.println(response.body().prettyPrint());
+
+    response
+        .then()
+        .statusCode(200)
+        .body("text", is("Test Post"))
+        .body("id", is(notNullValue()))
+        .extract()
+        .response();
 
     postIds.add(response.jsonPath().getString("id"));
   }
@@ -79,7 +86,7 @@ class PostControllerTest {
         .contentType(ContentType.JSON)
         .header("Authorization", "Bearer " + token)
         .when()
-        .get("/post/" + postIds.get(0))
+        .get(postIds.get(0))
         .then()
         .statusCode(200)
         .extract()
@@ -95,15 +102,19 @@ class PostControllerTest {
     AuthEntity authEntity = new AuthEntity(TEST_ID, TEST_USERNAME);
     authContext.setAuthEntity(authEntity);
 
-    given()
-        .contentType(ContentType.JSON)
-        .header("Authorization", "Bearer " + token)
-        .when()
-        .get("/post/" + "non_existent_post_id")
-        .then()
-        .statusCode(404)
-        .extract()
-        .response();
+    Response response =
+        given()
+            .contentType(ContentType.JSON)
+            .header("Authorization", "Bearer " + token)
+            .when()
+            .get("15a1a660c293c91129883566")
+            .then()
+            .extract()
+            .response();
+
+    System.out.println(response.body().prettyPrint());
+
+    response.then().statusCode(404).extract().response();
   }
 
   @Test
@@ -118,16 +129,20 @@ class PostControllerTest {
     EditPostRequest request = new EditPostRequest();
     request.text = "Test Post Edited";
 
-    given()
-        .contentType(ContentType.JSON)
-        .header("Authorization", "Bearer " + token)
-        .body(request)
-        .when()
-        .put("/post/" + postIds.get(0))
-        .then()
-        .statusCode(200)
-        .extract()
-        .response();
+    Response response =
+        given()
+            .contentType(ContentType.JSON)
+            .header("Authorization", "Bearer " + token)
+            .body(request)
+            .when()
+            .put(postIds.get(0))
+            .then()
+            .extract()
+            .response();
+
+    System.out.println(response.body().prettyPrint());
+
+    response.then().statusCode(200).extract().response();
   }
 
   @Test
@@ -142,16 +157,20 @@ class PostControllerTest {
     ReplyPostRequest request = new ReplyPostRequest();
     request.text = "Test Reply";
 
-    given()
-        .contentType(ContentType.JSON)
-        .header("Authorization", "Bearer " + token)
-        .body(request)
-        .when()
-        .post("/post/" + postIds.get(0) + "/reply")
-        .then()
-        .statusCode(200)
-        .extract()
-        .response();
+    Response response =
+        given()
+            .contentType(ContentType.JSON)
+            .header("Authorization", "Bearer " + token)
+            .body(request)
+            .when()
+            .post(postIds.get(0) + "/reply")
+            .then()
+            .extract()
+            .response();
+
+    System.out.println(response.body().prettyPrint());
+
+    response.then().statusCode(200).extract().response();
   }
 
   @Test
@@ -162,16 +181,19 @@ class PostControllerTest {
     AuthEntity authEntity = new AuthEntity(TEST_ID, TEST_USERNAME);
     authContext.setAuthEntity(authEntity);
 
-    given()
-        .contentType(ContentType.JSON)
-        .header("Authorization", "Bearer " + token)
-        .when()
-        .get("/post/" + postIds.get(0) + "/reply")
-        .then()
-        .statusCode(200)
-        .body("size()", is(1))
-        .extract()
-        .response();
+    Response response =
+        given()
+            .contentType(ContentType.JSON)
+            .header("Authorization", "Bearer " + token)
+            .when()
+            .get(postIds.get(0) + "/reply")
+            .then()
+            .extract()
+            .response();
+
+    System.out.println(response.body().prettyPrint());
+
+    response.then().statusCode(200).body("size()", is(1));
   }
 
   @Test
@@ -181,14 +203,42 @@ class PostControllerTest {
     AuthEntity authEntity = new AuthEntity(TEST_ID, TEST_USERNAME);
     authContext.setAuthEntity(authEntity);
 
-    given()
-        .contentType(ContentType.JSON)
-        .header("Authorization", "Bearer " + token)
-        .when()
-        .delete("/post/" + postIds.get(0))
-        .then()
-        .statusCode(204)
-        .extract()
-        .response();
+    Response response =
+        given()
+            .contentType(ContentType.JSON)
+            .header("Authorization", "Bearer " + token)
+            .when()
+            .delete(postIds.get(0))
+            .then()
+            .extract()
+            .response();
+
+    System.out.println(response.body().prettyPrint());
+
+    response.then().statusCode(204).extract().response();
+  }
+
+  @Test
+  @Order(8)
+  void invalidGetPostDetails() {
+
+    String token = AuthService.generateToken(TEST_ID, TEST_USERNAME);
+
+    AuthEntity authEntity = new AuthEntity(TEST_ID, TEST_USERNAME);
+    authContext.setAuthEntity(authEntity);
+
+    Response response =
+        given()
+            .contentType(ContentType.JSON)
+            .header("Authorization", "Bearer " + token)
+            .when()
+            .get("non_existent_post_id")
+            .then()
+            .extract()
+            .response();
+
+    System.out.println(response.body().prettyPrint());
+
+    response.then().statusCode(404).extract().response();
   }
 }
