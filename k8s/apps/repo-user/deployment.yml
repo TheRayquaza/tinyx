@@ -1,0 +1,24 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: repo-user
+  labels:
+    app: repo-user
+spec:
+  selector:
+    matchLabels:
+      app: repo-user
+  template:
+    metadata:
+      labels:
+        app: repo-user
+    spec:
+      containers:
+        - name: repo-user
+          image: ing/majeures/tc/info/student/2026/2025-epitweet-tinyx-02/repo-user:latest
+          ports:
+            - containerPort: 8080
+          env:
+            - name: REPO_USER_QUARKUS_HTTP_PORT
+              value: "8080"
+            # Set other environment variables as needed
