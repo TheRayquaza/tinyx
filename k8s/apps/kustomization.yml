@@ -1,0 +1,21 @@
+---
+kind: Kustomization
+apiVersion: kustomize.config.k8s.io/v1beta1
+resources:
+  - repo-user
+  - repo-social
+  - repo-post
+  - srvc-search
+  - srvc-user-timeline
+  - srvc-home-timeline
+  - pull-secrets.yml
+configMapGenerator:
+  - name: apps-config
+    namespace: kube-public
+    literals:
+      - USER_AGGREGATE_CHANNEL=user_aggregate
+      - POST_AGGREGATE_CHANNEL=post_aggregate
+      - LIKE_COMMAND_CHANNEL=like_command
+      - BLOCK_COMMAND_CHANNEL=block_command
+      - FOLLOW_COMMAND_CHANNEL=follow_command
+      - USER_APP_PROFILE=prod

@@ -1,4 +1,9 @@
 kind: Kustomization
+
 apiVersion: kustomize.config.k8s.io/v1beta1
 resources:
-  - repo-user
+  - apps/
+  #- elastic
+  #- mongo
+  #- redis
+  #- neo4j
