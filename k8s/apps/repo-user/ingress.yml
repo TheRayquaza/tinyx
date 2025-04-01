@@ -1,0 +1,24 @@
+kind: Ingress
+apiVersion: networking.k8s.io/v1
+metadata:
+  name: repo-user
+  labels:
+    app: repo-user
+spec:
+  rules:
+    - http:
+        paths:
+          - path: /user
+            pathType: Prefix
+            backend:
+              service:
+                name: repo-user
+                port:
+                  number: 80
+          - path: /login
+            pathType: Prefix
+            backend:
+              service:
+                name: repo-user
+                port:
+                  number: 80
