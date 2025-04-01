@@ -6,7 +6,7 @@ services:
     environment:
       MONGO_INITDB_ROOT_USERNAME: admin
       MONGO_INITDB_ROOT_PASSWORD: admin
-      MONGO_INITDB_DATABASE: RepoUser
+      MONGO_INITDB_DATABASE: SrvcHomeTimeline
     #command: ["mongod", "--replSet", "rs0", "--bind_ip_all", "--keyFile", "/etc/mongo/rsKeyFile"]
     volumes:
       - ./src/main/resources/init.js:/docker-entrypoint-initdb.d/init.js
