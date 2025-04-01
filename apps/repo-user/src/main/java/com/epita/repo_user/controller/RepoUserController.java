@@ -55,7 +55,7 @@ public class RepoUserController implements RepoUserControllerApi {
     return userService.updateUser(new ObjectId(userId), request);
   }
 
-  @POST
+  @PUT
   @Path("/user/image")
   @Authenticated
   @Consumes(MediaType.MULTIPART_FORM_DATA)

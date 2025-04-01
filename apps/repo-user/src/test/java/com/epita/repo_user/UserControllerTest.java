@@ -29,7 +29,7 @@ public class UserControllerTest {
   @Inject AuthContext authContext;
 
   private static String userId;
-  private static final String TEST_USERNAME = "testuser5";
+  private static final String TEST_USERNAME = "testuser";
   private static final String TEST_ID = "15a1a100c293c91129883571";
   private static final String TEST_PASSWORD = "Password123!";
   private static final String TEST_EMAIL = "test@example.com";
@@ -123,7 +123,7 @@ public class UserControllerTest {
     authContext.setAuthEntity(authEntity);
     ModifyUserRequest request = new ModifyUserRequest();
     request.bio = "This is my updated bio";
-    request.username = "updateduser";
+    request.username = TEST_USERNAME + "updated";
 
     given()
         .contentType(ContentType.JSON)
@@ -134,7 +134,7 @@ public class UserControllerTest {
         .then()
         .statusCode(200)
         .body("bio", equalTo("This is my updated bio"))
-        .body("username", equalTo("updateduser"));
+        .body("username", equalTo(TEST_USERNAME + "updated"));
   }
 
   @Test
@@ -172,6 +172,7 @@ public class UserControllerTest {
         .then()
         .statusCode(204);
 
+    // Verify that the user is deleted
     given()
         .header("Authorization", "Bearer " + token)
         .pathParam("id", userId)
