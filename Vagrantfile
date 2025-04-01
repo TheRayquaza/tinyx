@@ -5,8 +5,6 @@ Vagrant.configure("2") do |config|
     libvirt.cpus = 2
   end
 
-  config.vm.network "private_network", type: "dhcp"
-
   config.vm.synced_folder "k8s", "/vagrant", type: "rsync"
 
   config.vm.provision "shell", inline: <<-SHELL
@@ -15,6 +13,6 @@ Vagrant.configure("2") do |config|
     curl -sfL https://get.k3s.io | sh -
     ln -s /usr/local/bin/kubectl /usr/bin/kubectl || true
     sleep 30
-    kubectl apply -k /vagrant/k8s/kustomize.yml
+    kubectl apply -k /vagrant/
   SHELL
 end
