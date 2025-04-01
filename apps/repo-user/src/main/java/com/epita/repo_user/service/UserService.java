@@ -18,7 +18,6 @@ import com.epita.repo_user.repository.model.UserModel;
 import com.epita.repo_user.service.entity.UserEntity;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
-import jakarta.transaction.Transactional;
 import java.time.LocalDateTime;
 import java.util.*;
 import org.bson.types.ObjectId;
@@ -160,8 +159,7 @@ public class UserService implements Logger {
     try {
       s3Service.uploadFile(
           objectKey, request.getFile(), request.getFile().available()); // TODO: fix size
-      if (userModel.getProfileImage() != null)
-      {
+      if (userModel.getProfileImage() != null) {
         s3Service.deleteFile(userModel.getProfileImage());
       }
       userModel.setProfileImage(objectKey);
