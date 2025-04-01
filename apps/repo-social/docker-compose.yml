@@ -1,21 +1,4 @@
 services:
-  mongo:
-    image: mongo:8.0.6-noble
-    container_name: mongo
-    restart: unless-stopped
-    environment:
-      MONGO_INITDB_ROOT_USERNAME: admin
-      MONGO_INITDB_ROOT_PASSWORD: admin
-      MONGO_INITDB_DATABASE: RepoUser
-    #command: ["mongod", "--replSet", "rs0", "--bind_ip_all", "--keyFile", "/etc/mongo/rsKeyFile"]
-    volumes:
-      - ./src/main/resources/init.js:/docker-entrypoint-initdb.d/init.js
-      #- ./src/main/resources/rsKeyFile:/etc/mongo/rsKeyFile:ro
-    ports:
-      - 27017:27017
-    expose:
-      - "27017"
-
   redis:
     image: redis:8.0-M04-alpine3.21
     container_name: redis
@@ -35,19 +18,14 @@ services:
     depends_on:
       - redis
     expose:
-      - "8001"
+      - "5540"
 
-  mongo-express:
-    image: mongo-express:1.0.2
-    container_name: mongo-express
+  neo4j:
+    image: neo4j:5.18
+    container_name: neo4j
     restart: unless-stopped
     ports:
-      - "8082:8081"
+      - "7474:7474"
+      - "7687:7687"
     environment:
-      ME_CONFIG_MONGODB_ADMINUSERNAME: admin
-      ME_CONFIG_MONGODB_ADMINPASSWORD: admin
-      ME_CONFIG_MONGODB_SERVER: mongo
-    depends_on:
-      - mongo
-    expose:
-      - "8082"
+      NEO4J_AUTH: neo4j/password
