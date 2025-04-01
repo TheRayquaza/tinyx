@@ -1,4 +1,4 @@
-# Creating my app
+# Creating a Service
 
 ## MVC pattern
 
@@ -69,7 +69,7 @@ pre-commit install
 
 Otherwise just use spotless for your java code:
 
-```
+```bash
 mvn spotless:apply
 ```
 
@@ -101,7 +101,6 @@ quarkus.resteasy-reactive.path=/api
 # Quarkus Redis Configuration
 quarkus.redis.devservices.enabled=false
 quarkus.redis.hosts=${repo.user.redis.host:localhost}:6379 # just here
-...
 ```
 
 ## Dockerfile
@@ -109,7 +108,7 @@ quarkus.redis.hosts=${repo.user.redis.host:localhost}:6379 # just here
 * Use explicit tag (not **latest**)
 * Use light image (**alpine** is nice)
 * Optimize your layers as much as possible
-* Use uber jar (mvn )
+* Use uber jar (`mvn package -Dquarkus.package.type=uber-jar`)
 
 ## Kubernetes
 
