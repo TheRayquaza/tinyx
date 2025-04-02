@@ -36,3 +36,5 @@ docker-compose.override.yml
 
 # Gitlab CI
 .gitlab-ci-local/
+
+.vagrant/
