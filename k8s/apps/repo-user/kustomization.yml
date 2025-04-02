@@ -15,4 +15,14 @@ configMapGenerator:
       - REPO_USER_REDIS_HOST=redis.redis-svc.cluster.local
       - REPO_USER_MINIO_ENDPOINT=http://minio-service.minio.svc.cluster.local:9000
       - REPO_USER_MINIO_BUCKET=RepoUser
+      - REPO_USER_MONGODB_DATABASE=RepoUser
       - REPO_USER_APP_PROFILE=prod
+  - name: apps-config
+    namespace: repo-user
+    literals:
+      - USER_AGGREGATE_CHANNEL=user_aggregate
+      - POST_AGGREGATE_CHANNEL=post_aggregate
+      - LIKE_COMMAND_CHANNEL=like_command
+      - BLOCK_COMMAND_CHANNEL=block_command
+      - FOLLOW_COMMAND_CHANNEL=follow_command
+      - USER_APP_PROFILE=prod
