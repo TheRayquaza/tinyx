@@ -18,7 +18,6 @@ import com.epita.repo_user.repository.model.UserModel;
 import com.epita.repo_user.service.entity.UserEntity;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
-import jakarta.transaction.Transactional;
 import java.time.LocalDateTime;
 import java.util.*;
 import org.bson.types.ObjectId;
@@ -64,7 +63,7 @@ public class UserService implements Logger {
         AuthService.generateToken(userModel.getId().toString(), userModel.getUsername()));
   }
 
-  @Transactional
+  // @Transactional
   public UserEntity updateUser(ObjectId id, ModifyUserRequest request) {
     if (request == null) throw RepoUserErrorCode.INVALID_USER_DATA.createError("request");
 
@@ -91,7 +90,7 @@ public class UserService implements Logger {
 
     userModel.setUpdatedAt(LocalDateTime.now());
 
-    userRepository.persist(userModel);
+    userRepository.update(userModel);
     logger().info("New User model registered: '{}'", userModel.getId());
 
     redisPublisher.publish(
@@ -137,7 +136,7 @@ public class UserService implements Logger {
     throw RepoUserErrorCode.USER_NOT_FOUND.createError();
   }
 
-  @Transactional
+  // @Transactional
   public void deleteUser(ObjectId id) {
     UserModel userModel =
         userRepository
@@ -145,11 +144,11 @@ public class UserService implements Logger {
             .orElseThrow(() -> RepoUserErrorCode.USER_NOT_FOUND.createError(id.toString()));
     userModel.setDeleted(true);
     UserAggregate userAggregate = userModelToUserAggregate.convertNotNull(userModel);
-    // userRepository.deleteById(id); // TODO: delete this ?
+    userRepository.deleteById(id);
     redisPublisher.publish(userAggregateChannel, userAggregate);
   }
 
-  @Transactional
+  // @Transactional
   public UserEntity uploadProfileImage(ObjectId userId, UploadImageRequest request) {
     String objectKey = "user/" + userId + "/image/" + UUID.randomUUID() + ".jpeg";
 
@@ -160,9 +159,11 @@ public class UserService implements Logger {
     try {
       s3Service.uploadFile(
           objectKey, request.getFile(), request.getFile().available()); // TODO: fix size
-      s3Service.deleteFile(userModel.getProfileImage());
+      if (userModel.getProfileImage() != null) {
+        s3Service.deleteFile(userModel.getProfileImage());
+      }
       userModel.setProfileImage(objectKey);
-      userRepository.persist(userModel);
+      userRepository.update(userModel);
       redisPublisher.publish(
           userAggregateChannel, userModelToUserAggregate.convertNotNull(userModel));
       return userModelToUserEntityConverter.convertNotNull(userModel);
