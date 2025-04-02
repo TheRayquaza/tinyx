@@ -10,4 +10,4 @@ db.createUser(
         ]
     }
 );
-db.createCollection("UserTimelineModel");
+db.createCollection("UserTimelinePost");
