@@ -3,10 +3,12 @@ package com.epita.srvc_user_timeline.service;
 import com.epita.srvc_user_timeline.repository.UserTimelineRepository;
 import com.epita.srvc_user_timeline.service.entity.UserTimelineEntity;
 import com.epita.srvc_user_timeline.service.entity.UserTimelinePostEntity;
+import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import java.util.List;
 
-class UserTimelineService {
+@ApplicationScoped
+public class UserTimelineService {
   @Inject UserTimelineRepository userTimelineRepository;
 
   private List<UserTimelinePostEntity> sortPosts(List<UserTimelinePostEntity> posts) {
@@ -26,7 +28,7 @@ class UserTimelineService {
     return posts;
   }
 
-  UserTimelineEntity getUserTimeline(String userId) {
+  public UserTimelineEntity getUserTimeline(String userId) {
     // TODO use repository to fetch all posts useful for this user
     return new UserTimelineEntity();
   }
