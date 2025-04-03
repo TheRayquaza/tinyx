@@ -2,4 +2,3 @@ kind: Kustomize
 resources:
   - deployment.yml
   - service.yml
-

@@ -1,0 +1,17 @@
+- op: replace
+  path: /metadata/name
+  value: mongo-config-repo-user
+- op: replace
+  path: /spec/serviceName
+  value: mongo-config-repo-user
+- op: replace
+  path: /spec/template/spec/containers/0/command
+  # mongod --shardsvr --replSet <shardReplicaSetNamereplSetname>  --dbpath <path> --port 27018 --bind_ip <cluster hostname(s)|ip address(es)>
+  value:
+    ["mongod", "--shardsvr", "--replSet", "cfgReplicaSetRepoUserShards", "--dbpath", "/data/db", "--port", "27018", "--bind_ip", "0.0.0.0"]
+- op: replace
+  path: /spec/template/spec/volumes/1/configMap/name
+  value: mongo-repo-user-init-script
+- op: replace
+  path: /spec/template/spec/containers/0/name
+  value: mongo-config-repo-user

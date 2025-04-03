@@ -1,0 +1,34 @@
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: mongo-config
+  namespace: mongo
+spec:
+  serviceName: mongo-config
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mongo-config
+  template:
+    metadata:
+      labels:
+        app: mongo-config
+    spec:
+      containers:
+        - name: mongo-config
+          image: mongo:6.0
+          # mongod --configsvr --replSet <configReplSetName> --dbpath <path> --port 27019 --bind_ip localhost,<hostname(s)|ip address(es)>
+          command: ["mongod", "--configsvr", "--replSet", "cfgReplicaSet", "--dbpath", "/data/db", "--port", "27017", "--bind_ip", "0.0.0.0"]
+          volumeMounts:
+            - name: mongo-data
+              mountPath: /data/db
+            - name: mongo-init-script
+              mountPath: /docker-entrypoint-initdb.d
+      volumes:
+        - name: mongo-data
+          persistentVolumeClaim:
+            claimName: mongo-config-pvc
+        - name: mongo-init-script
+          configMap:
+            name: mongo-init-script

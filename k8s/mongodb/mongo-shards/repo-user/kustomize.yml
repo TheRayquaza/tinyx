@@ -1,8 +1,0 @@
----
-kind: Kustomize
-resources:
-  - pvc.yml
-  - service.yml
-  - statefulset.yml
-
-# TODO: add secrets

@@ -1,0 +1,6 @@
+- op: replace
+  path: /metadata/name
+  value: mongo-config-repo-user
+- op: replace
+  path: /spec/selector/app
+  value: mongo-config-repo-user

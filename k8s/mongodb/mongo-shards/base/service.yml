@@ -5,7 +5,7 @@ metadata:
   name: mongo-config
   namespace: mongo
 spec:
+  selector:
+    app: mongo-config
   ports:
     - port: 27017
-  selector:
-    role: config
