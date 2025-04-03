@@ -5,7 +5,7 @@ import lombok.Getter;
 
 @Getter
 public enum RepoSocialErrorCode implements ErrorCode {
-  POST_NOT_FOUND(404, "Post with ID '%s' not found"),
+  ERROR_DURING_CYPHER_EXEC(404, "Error during the cypher script execution"),
   INVALID_USER_DATA(400, "Invalid user data: %s"),
   UNAUTHORIZED(401, "Unauthorized access"),
   FORBIDDEN(403, "Forbidden action"),
