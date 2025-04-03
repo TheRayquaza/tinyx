@@ -1,6 +1,6 @@
-package com.epita.srvc_home_timeline.controller;
+package com.epita.srvc_home_timeline.controller.subscribers;
 
-import com.epita.exchange.redis.command.BlockCommand;
+import com.epita.exchange.redis.command.FollowCommand;
 import io.quarkus.redis.datasource.RedisDataSource;
 import io.quarkus.redis.datasource.pubsub.PubSubCommands;
 import jakarta.annotation.PreDestroy;
@@ -12,16 +12,16 @@ import static io.quarkus.mongodb.runtime.dns.MongoDnsClientProvider.vertx;
 
 @Startup
 @ApplicationScoped
-public class BlockCommandSubscriber implements Consumer<BlockCommand> {
+public class FollowCommandSubscriber implements Consumer<FollowCommand> {
     private final PubSubCommands.RedisSubscriber subscriber;
 
-    public BlockCommandSubscriber(final RedisDataSource ds) {
-        subscriber = ds.pubsub(BlockCommand.class)
-                .subscribe("block-command", this);
+    public FollowCommandSubscriber(final RedisDataSource ds) {
+        subscriber = ds.pubsub(FollowCommand.class)
+                .subscribe("follow-command", this);
     }
 
     @Override
-    public void accept(final BlockCommand message) {
+    public void accept(final FollowCommand message) {
         vertx.executeBlocking(future -> {
             future.complete();
         }) ;
