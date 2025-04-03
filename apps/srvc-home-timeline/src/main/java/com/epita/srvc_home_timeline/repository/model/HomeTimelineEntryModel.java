@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.bson.codecs.pojo.annotations.BsonId;
+
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -13,11 +14,15 @@ import java.util.List;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-@MongoEntity(collection = "HomeTimelineModel", database = "SrvcHomeTimeline")
-public class HomeTimelineModel {
-    @BsonId private String id;
+@MongoEntity(collection = "HomeTimelineEntryModel", database = "SrvcHomeTimeline")
+public class HomeTimelineEntryModel {
+    @BsonId
+    private String id;
     private String userId;
-    private LocalDateTime createdAt;
-    // Array of HomeTimelineEntryModel
-    private List<String> entries;
+    private String authorId;
+    private String content;
+    // Array of HomeTimelineLikedByModel
+    private List<String> likedBy;
+    private String type;
+    private LocalDateTime timestamp;
 }
