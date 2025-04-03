@@ -14,7 +14,6 @@ import java.util.*;
 
 @ApplicationScoped
 public class ElasticSearchService {
-
     @ConfigProperty(name = "srvc.search.aggregate.channel", defaultValue = "post-aggregate")
     @Inject
     String searchAggregateChannel;

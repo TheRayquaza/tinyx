@@ -30,10 +30,11 @@ public class SrvcSearchController implements SrvcSearchControllerApi {
     @POST
     @Path("/search")
 //    @Authenticated
+    @Authenticated
     @Override
     public List<SearchEntity> searchPosts(@RequestBody(required = true) @NotNull @Valid SearchEntity request) {
         String userId = authService.getUserId();
-        logger().info("POST /search - User {} search for post: {}", userId, request.getText());
+        logger().info("POST /search - User {} search for posts", userId);
         return searchService.searchPosts(request);
     }
 }
