@@ -1,5 +1,10 @@
 package com.epita.srvc_user_timeline.service;
 
+import com.epita.exchange.redis.aggregate.PostAggregate;
+import com.epita.exchange.redis.aggregate.UserAggregate;
+import com.epita.exchange.redis.command.BlockCommand;
+import com.epita.exchange.redis.command.FollowCommand;
+import com.epita.exchange.redis.command.LikeCommand;
 import com.epita.srvc_user_timeline.repository.UserTimelineRepository;
 import com.epita.srvc_user_timeline.service.entity.UserTimelineEntity;
 import com.epita.srvc_user_timeline.service.entity.UserTimelinePostEntity;
@@ -32,4 +37,24 @@ public class UserTimelineService {
     // TODO use repository to fetch all posts useful for this user
     return new UserTimelineEntity();
   }
+
+  public void handlePostAggregate(PostAggregate postAggregate){
+      // TODO
+  }
+
+    public void handleUserAggregate(UserAggregate userAggregate) {
+        // TODO
+    }
+
+    public void handleFollowCommand(FollowCommand followCommand) {
+        // TODO
+    }
+
+    public void handleLikeCommand(LikeCommand likeCommand) {
+        // TODO
+    }
+
+    public void handleBlockCommand(BlockCommand blockCommand) {
+        // TODO
+    }
 }
