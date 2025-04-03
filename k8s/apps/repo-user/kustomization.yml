@@ -1,15 +1,15 @@
 ---
 kind: Kustomization
 apiVersion: kustomize.config.k8s.io/v1beta1
+namespace: apps
 resources:
-  - namespace.yml
   - secrets.yml
   - deployment.yml
   - service.yml
   - ingress.yml
 configMapGenerator:
   - name: repo-user-config
-    namespace: repo-user
+    namespace: apps
     literals:
       - REPO_USER_MONGODB_HOST=mongo-repo-user.mongo-svc.cluster.local
       - REPO_USER_REDIS_HOST=redis.redis-svc.cluster.local
@@ -18,7 +18,7 @@ configMapGenerator:
       - REPO_USER_MONGODB_DATABASE=RepoUser
       - REPO_USER_APP_PROFILE=prod
   - name: apps-config
-    namespace: repo-user
+    namespace: apps
     literals:
       - USER_AGGREGATE_CHANNEL=user_aggregate
       - POST_AGGREGATE_CHANNEL=post_aggregate

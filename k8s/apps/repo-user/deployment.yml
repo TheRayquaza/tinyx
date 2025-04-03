@@ -2,12 +2,11 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: repo-user
-  namespace: repo-user
+  namespace: apps
   labels:
     app: repo-user
-
 spec:
-  replicas: 1
+  replicas: 3
   strategy:
     type: RollingUpdate
     rollingUpdate:
@@ -31,14 +30,14 @@ spec:
             - containerPort: 8080
           resources:
             requests:
-              cpu: "125m"
               memory: "256Mi"
+              cpu: "125m"
             limits:
-              cpu: "1000m"
               memory: "512Mi"
+              cpu: "250m"
           livenessProbe:
             httpGet:
-              path: /q/health
+              path: /q/health/live
               port: 8080
             initialDelaySeconds: 5
             periodSeconds: 10
