@@ -3,10 +3,7 @@ package com.epita.repo_social.controller;
 import com.epita.exchange.auth.service.AuthService;
 import com.epita.repo_social.service.SocialService;
 import jakarta.inject.Inject;
-import jakarta.ws.rs.Consumes;
-import jakarta.ws.rs.POST;
-import jakarta.ws.rs.Path;
-import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 
 @Consumes(MediaType.APPLICATION_JSON)
@@ -25,4 +22,56 @@ public class RepoSocialController implements RepoSocialControllerApi {
     logger().info("POST /social/post/{}/like", postId);
     socialService.likePost(postId);
   }
+
+  @DELETE
+  @Path("/post/{postId}/like")
+  @Override
+  public void unlikePost(String postId) {
+    logger().info("DELETE /social/post/{}/like", postId);
+    socialService.unlikePost(postId);
+  }
+
+  @POST
+  @Path("/user/{userId}/follow")
+  @Override
+  public void followUser(String userId) {
+    logger().info("POST /social/user/{}/follow", userId);
+    socialService.followUser(userId);
+  }
+
+  @DELETE
+  @Path("/user/{userId}/follow")
+  @Override
+  public void unfollowUser(String userId) {
+    logger().info("DELETE /social/user/{}/follow", userId);
+    socialService.unfollowUser(userId);
+  }
+
+  @POST
+  @Path("/user/{userId}/block")
+  @Override
+  public void blockUser(String userId) {
+    logger().info("POST /social/user/{}/block", userId);
+    socialService.blockUser(userId);
+  }
+
+  @DELETE
+  @Path("/user/{userId}/block")
+  @Override
+  public void unblockUser(String userId) {
+    logger().info("DELETE /social/user/{}/block", userId);
+    socialService.unblockUser(userId);
+  }
+
+  /*
+
+  @GET
+  @Path("/social/post/{id}/like")
+  public ??? getUsersLike (String postId) {
+    // This one gets the list of users liking a post
+    logger().info("GET /social/post/{}/like", postId);
+    socialService.getUsersLike(postId);
+  }
+  */
+
 }
