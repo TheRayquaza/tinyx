@@ -15,7 +15,7 @@ import java.util.*;
 @ApplicationScoped
 public class ElasticSearchService {
 
-    @ConfigProperty(name = "srvc.search.aggregate.channel")
+    @ConfigProperty(name = "srvc.search.aggregate.channel", defaultValue = "post-aggregate")
     @Inject
     String searchAggregateChannel;
 
@@ -42,5 +42,37 @@ public class ElasticSearchService {
         return response.hits().hits().stream().map(Hit::source).toList();
     }
 
-    // TODO: Create a function to index a document in the search engine received by the Redis Subscriber
+    public void indexPost(SearchEntity searchEntity) {
+        try {
+            SearchEntity search = new SearchEntity();
+            search.setId(searchEntity.getId());
+            search.setText(searchEntity.getText());
+            search.setOwnerId(searchEntity.getOwnerId());
+            search.setCreatedAt(searchEntity.getCreatedAt());
+
+            // Index the document in Elasticsearch
+            elasticsearchClient.update(u -> u
+                            .index(searchAggregateChannel)
+                            .id(searchEntity.getId())
+                            .doc(search)
+                            .docAsUpsert(true), // Create the document if it doesn't exist
+                    SearchEntity.class
+            );
+
+        } catch (IOException e) {
+            System.err.println("Error indexing post: " + e.getMessage());
+        }
+    }
+
+    public void deleteIndex(SearchEntity searchEntity) {
+        try {
+            // Delete the document from Elasticsearch
+            elasticsearchClient.delete(d -> d
+                    .index(searchAggregateChannel)
+                    .id(searchEntity.getId())
+            );
+        } catch (IOException e) {
+            System.err.println("Error deleting document from Elasticsearch: " + e.getMessage());
+        }
+    }
 }

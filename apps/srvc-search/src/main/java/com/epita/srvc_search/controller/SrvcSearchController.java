@@ -7,12 +7,18 @@ import io.quarkus.security.Authenticated;
 import jakarta.inject.Inject;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
+import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.core.MediaType;
 import org.eclipse.microprofile.openapi.annotations.parameters.RequestBody;
 
 import java.util.List;
 
+@Produces(MediaType.APPLICATION_JSON)
+@Consumes(MediaType.APPLICATION_JSON)
+@Path("/")
 public class SrvcSearchController implements SrvcSearchControllerApi {
 
     @Inject
@@ -23,11 +29,11 @@ public class SrvcSearchController implements SrvcSearchControllerApi {
 
     @POST
     @Path("/search")
-    @Authenticated
+//    @Authenticated
     @Override
     public List<SearchEntity> searchPosts(@RequestBody(required = true) @NotNull @Valid SearchEntity request) {
         String userId = authService.getUserId();
-        logger().info("POST /search - User {} search for posts", userId);
+        logger().info("POST /search - User {} search for post: {}", userId, request.getText());
         return searchService.searchPosts(request);
     }
 }

@@ -1,6 +1,8 @@
 package com.epita.srvc_search.service;
 
+import com.epita.exchange.redis.aggregate.PostAggregate;
 import com.epita.srvc_search.SrvcSearchErrorCode;
+import com.epita.srvc_search.converter.PostAggregateToSearchEntity;
 import com.epita.srvc_search.service.entity.SearchEntity;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
@@ -14,6 +16,9 @@ public class SearchService {
     @Inject
     ElasticSearchService elasticSearchService;
 
+    @Inject
+    PostAggregateToSearchEntity postAggregateToSearchEntity;
+
     public List<SearchEntity> searchPosts(SearchEntity request) {
         if (request == null || request.getText() == null) {
             throw SrvcSearchErrorCode.INVALID_QUERY.createError("request / text");
@@ -25,15 +30,11 @@ public class SearchService {
         }
     }
 
-    public void indexPost(SearchEntity request) {
-        return;
+    public void indexPost(PostAggregate postAggregate) {
+        elasticSearchService.indexPost(postAggregateToSearchEntity.convertNotNull(postAggregate));
     }
 
-    public void updatePost(SearchEntity request) {
-        return;
-    }
-
-    public void deletePost(SearchEntity request) {
-        return;
+    public void deletePost(PostAggregate postAggregate) {
+        elasticSearchService.deleteIndex(postAggregateToSearchEntity.convertNotNull(postAggregate));
     }
 }
