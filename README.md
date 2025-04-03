@@ -9,7 +9,6 @@ mvn test
 
 ## Deploy
 
-
 ## Structure
 
 ```
@@ -36,20 +35,19 @@ mvn test
 ├── README.md
 ```
 
-## 
+##
 
-| Project                      | Members |
-|--------------------------------|---------|
-| **Repo-User / Exchange**       | Aurélien, Matéo, Khaled, Samy, Maxim |
-| **Infra Mongo**                | Matéo, Samy, Khaled |
-| **CI (lint, test, build, deploy)** | Samy, (Armand) |
-| **Repo-Post**                  | Khaled, Maxim, Armand, Baptiste, Aurélien |
-| **Repo-Social**                | Achille, Gab M, Matéo |
-| **Infra S3**                   | Équipe SRS (Alexis, Gab T, Tim, Noé) |
-| **Infra Neo4j**                | Achille, Matéo, Samy / Baptiste |
-| **Infra Redis**                | Matéo, Samy / Baptiste |
-| **Srvc-Search**                | Armand, Matéo, Gab M |
-| **Srvc-home-timeline**         | Anton, Baptiste |
-| **Srvc-user-timeline**         | Équipe SRS (Alexis, Gab T, Tim, Noé) |
-| **Authentification**           | Équipe SRS (Alexis, Gab T, Tim, Noé) |
-
+| Project                            | Members                                       |
+| ---------------------------------- | --------------------------------------------- |
+| **Repo-User / Exchange**           | Aurélien, Matéo, Khaled, Samy, Maxim, Mickael |
+| **Infra Mongo**                    | Matéo, Samy, Khaled                           |
+| **CI (lint, test, build, deploy)** | Samy, (Armand)                                |
+| **Repo-Post**                      | Khaled, Maxim, Armand, Baptiste, Aurélien     |
+| **Repo-Social**                    | Achille, Gab M, Matéo, Mickael                |
+| **Infra S3**                       | Équipe SRS (Alexis, Gab T, Tim, Noé)          |
+| **Infra Neo4j**                    | Achille, Matéo, Samy / Baptiste               |
+| **Infra Redis**                    | Matéo, Samy / Baptiste, Mickael               |
+| **Srvc-Search**                    | Armand, Matéo, Gab M                          |
+| **Srvc-home-timeline**             | Anton, Baptiste                               |
+| **Srvc-user-timeline**             | Équipe SRS (Alexis, Gab T, Tim, Noé)          |
+| **Authentification**               | Équipe SRS (Alexis, Gab T, Tim, Noé)          |
