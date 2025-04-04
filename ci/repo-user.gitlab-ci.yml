@@ -1,11 +1,9 @@
 repo-user:build:
-  extends: .rules_template_repo-user
+  extends: .rules_build_repo-user
   image:
     name: gcr.io/kaniko-project/executor:v1.23.2-debug
     entrypoint: [""]
   stage: build
-  only:
-    - /v.*/
   variables:
     DOCKER_REGISTRY: $CI_REGISTRY
     DOCKER_IMAGE: $DOCKER_REGISTRY/repo-user
