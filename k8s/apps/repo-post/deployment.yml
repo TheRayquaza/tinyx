@@ -67,8 +67,8 @@ spec:
                 key: REPO_POST_MONGODB_HOST                                                                 
           - name: REPO_POST_APP_PROFILE
             valueFrom:
-              secretKeyRef:
-                name: apps-config
+              configMapKeyRef:
+                name: apps-post-config
                 key: POST_AGGREGATE_CHANNEL             
           - name: REPO_POST_MINIO_ENDPOINT
             valueFrom:
@@ -94,5 +94,5 @@ spec:
             valueFrom:
                 configMapKeyRef:
                   name: repo-post-config
-                  key: REPO_post_MONGODB_DATABASE 
+                  key: REPO_POST_MONGODB_DATABASE 
             
