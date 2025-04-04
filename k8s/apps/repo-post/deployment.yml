@@ -48,43 +48,43 @@ spec:
             initialDelaySeconds: 5
             periodSeconds: 10
           env:
-          - name: REPO_POST_QUARKUS_HTTP_PORT   
+          - name: REPO_POST_QUARKUS_HTTP_PORT
             value: "8080"
           - name: REPO_POST_REDIS_HOST
             valueFrom:
               configMapKeyRef:
                 name: repo-post-config
-                key: REPO_POST_REDIS_HOST                                      
+                key: REPO_POST_REDIS_HOST
           - name: REPO_POST_REDIS_PASSWORD
             valueFrom:
               secretKeyRef:
                 name: repo-post-secret
-                key: REPO_POST_REDIS_PASSWORD                                 
+                key: REPO_POST_REDIS_PASSWORD
           - name: REPO_POST_MONGODB_HOST
             valueFrom:
               configMapKeyRef:
                 name: repo-post-config
-                key: REPO_POST_MONGODB_HOST                                                                 
+                key: REPO_POST_MONGODB_HOST
           - name: REPO_POST_APP_PROFILE
             valueFrom:
               configMapKeyRef:
                 name: apps-post-config
-                key: POST_AGGREGATE_CHANNEL             
+                key: POST_AGGREGATE_CHANNEL
           - name: REPO_POST_MINIO_ENDPOINT
             valueFrom:
                 configMapKeyRef:
                   name: repo-post-config
-                  key: REPO_POST_MINIO_ENDPOINT 
+                  key: REPO_POST_MINIO_ENDPOINT
           - name: REPO_POST_MINIO_BUCKET
             valueFrom:
                 configMapKeyRef:
                   name: repo-post-config
-                  key: REPO_POST_MINIO_BUCKET       
+                  key: REPO_POST_MINIO_BUCKET
           - name: REPO_POST_MINIO_ACCESS_KEY
             valueFrom:
                 secretKeyRef:
                   name: repo-post-secret
-                  key: REPO_POST_MINIO_ACCESS_KEY        
+                  key: REPO_POST_MINIO_ACCESS_KEY
           - name: REPO_POST_MINIO_SECRET_KEY
             valueFrom:
                 secretKeyRef:
@@ -94,5 +94,4 @@ spec:
             valueFrom:
                 configMapKeyRef:
                   name: repo-post-config
-                  key: REPO_POST_MONGODB_DATABASE 
-            
+                  key: REPO_POST_MONGODB_DATABASE
