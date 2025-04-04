@@ -7,7 +7,6 @@ import com.epita.repo_post.controller.request.PostReplyRequest;
 import com.epita.repo_post.controller.response.AllRepliesResponse;
 import com.epita.repo_post.service.PostService;
 import com.epita.repo_post.service.entity.PostEntity;
-import io.quarkus.security.Authenticated;
 import jakarta.inject.Inject;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
@@ -26,6 +25,7 @@ public class RepoPostController implements RepoPostControllerApi {
 
   @POST
   @Path("/")
+  @Consumes(MediaType.MULTIPART_FORM_DATA)
   @Override
   public PostEntity createPost(
       @RequestBody(required = true) @NotNull @Valid CreatePostRequest request) {
@@ -37,20 +37,21 @@ public class RepoPostController implements RepoPostControllerApi {
   @GET
   @Path("/{id}")
   @Override
-  public PostEntity getPostById(@PathParam("id") String id) {
+  public PostEntity getPostById(@PathParam("id") @Valid String id) {
     logger().info("GET /post/{} - Retrieve post n°{}", id, id);
     return postService.getPostById(id);
   }
 
   @PUT
+  @Consumes(MediaType.MULTIPART_FORM_DATA)
   @Path("/{id}")
   @Override
-  public void editPost(
+  public PostEntity editPost(
       @RequestBody(required = true) @NotNull @Valid EditPostRequest request,
       @PathParam("id") String postId) {
     String userId = authService.getUserId();
     logger().info("PUT /post/{} - Edit post {} with user {}", postId, postId, userId);
-    postService.editPost(request, postId);
+    return postService.editPost(request, postId);
   }
 
   @DELETE
@@ -64,14 +65,15 @@ public class RepoPostController implements RepoPostControllerApi {
   }
 
   @POST
+  @Consumes(MediaType.MULTIPART_FORM_DATA)
   @Override
   @Path("/{id}/reply")
-  public void replyToPost(
+  public PostEntity replyToPost(
       @RequestBody(required = true) @NotNull @Valid PostReplyRequest request,
-      @PathParam("id") String postId) {
+      @PathParam("id") @Valid String postId) {
     String userId = authService.getUserId();
-    logger().info("POST /post/{}/reply - Reply to post {} with user {}", postId, userId);
-    postService.replyToPost(request, postId);
+    logger().info("POST /post/{}/reply - Reply to post {} with user {}", postId, postId, userId);
+    return postService.replyToPost(request, postId);
   }
 
   @GET

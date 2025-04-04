@@ -2,6 +2,7 @@ package com.epita.exchange.error;
 
 import com.epita.exchange.error.controller.response.ErrorResponse;
 import jakarta.ws.rs.core.Response;
+import java.util.Arrays;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -19,7 +20,9 @@ public interface ErrorCode {
 
     public Response asResponse() {
       return Response.status(errorCode.getHttpCode())
-          .entity(new ErrorResponse(errorCode.getHttpCode(), getMessage()))
+          .entity(
+              new ErrorResponse(
+                  errorCode.getHttpCode(), getMessage(), Arrays.toString(getStackTrace())))
           .build();
     }
 
