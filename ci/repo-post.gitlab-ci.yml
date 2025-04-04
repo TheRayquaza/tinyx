@@ -32,23 +32,5 @@ repo-post:test:
     - name: mongo:8.0.6-noble
       alias: mongo
       command: ["mongod", "--bind_ip_all"]
-  before_script:
-    - echo 'http://dl-cdn.alpinelinux.org/alpine/v3.9/main' >> /etc/apk/repositories
-    - echo 'http://dl-cdn.alpinelinux.org/alpine/v3.9/community' >> /etc/apk/repositories
-    - apk update && apk add --no-cache mongodb yaml-cpp=0.6.2-r2
-    - export MONGOMS_SYSTEM_BINARY=/usr/bin/mongod
-    - |
-      mongo mongodb://${MONGO_INITDB_ROOT_USERNAME}:${MONGO_INITDB_ROOT_PASSWORD}@mongo:27017/RepoPost?authSource=admin --eval '
-      db.createUser({
-        user: ${MONGO_INITDB_ROOT_USERNAME},
-        pwd: ${MONGO_INITDB_ROOT_PASSWORD},
-        roles: [
-          {
-            role: "readWrite",
-            db: "RepoPost"
-          }
-        ]
-      });
-      db.createCollection("PostModel");'
   script:
     - echo "Running tests..." # TODO: Replace with actual test command
