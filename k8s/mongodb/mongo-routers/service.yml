@@ -5,8 +5,10 @@ metadata:
   name: mongos
   namespace: mongo
 spec:
-  type: LoadBalancer
-  ports:
-    - port: 27017
-  selector:
-    role: mongos
+    type: LoadBalancer
+    selector:
+      app: mongos
+    ports:
+      - protocol: TCP
+        port: 27017
+        targetPort: 27017

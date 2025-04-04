@@ -1,4 +1,14 @@
-kind: Kustomize
+---
+kind: Kustomization
+apiVersion: kustomize.config.k8s.io/v1beta1
+metadata:
+  name: mongo-routers
+  namespace: mongo
 resources:
   - deployment.yml
   - service.yml
+configMapGenerator:
+  - name: mongos-init
+    namespace: mongo
+    files:
+      - init.js

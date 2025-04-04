@@ -3,6 +3,6 @@ kind: Kustomization
 apiVersion: kustomize.config.k8s.io/v1beta1
 resources:
   - namespace.yml
-  - mongo-config
-  #- mongo-shards
-  #- mongo-routers
+  - mongo-configs
+  - mongo-shards
+  - mongo-routers
