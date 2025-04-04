@@ -23,7 +23,14 @@ repo-post:lint:
 repo-post:test:
   extends: .rules_template_repo-post
   image: maven:3.8.5-eclipse-temurin-17-alpine
+  variables:
+    MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME}
+    MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD}
+    MONGO_INITDB_DATABASE: RepoPost
   stage: test
+  services:
+    - name: mongo:8.0.6-noble
+      alias: mongo
+      command: ["mongod", "--bind_ip_all"]
   script:
-    - cd apps/repo-post
-    - echo "Testing..."  #mvn test ADD more configurations here when the tests are ready
+    - echo "Running tests..." # TODO: Replace with actual test command

@@ -24,6 +24,9 @@ repo-user:test:
   extends: .rules_template_repo-user
   image: maven:3.8.5-eclipse-temurin-17-alpine
   stage: test
+  services:
+    - name: mongo:8.0.6-noble
+      alias: mongo
+      command: ["mongod", "--bind_ip_all"]
   script:
-    - cd apps/repo-user
-    - echo "Testing..."  #mvn test ADD more configurations here when the tests are ready
+    - echo "Running tests..." # TODO: Replace with actual test command
