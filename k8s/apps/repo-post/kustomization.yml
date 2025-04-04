@@ -9,10 +9,10 @@ resources:
   - ingress.yml
 
 configMapGenerator:
-  - name: repo-user-config
+  - name: repo-post-config
     namespace: apps
     literals:
-      - REPO_POST_REDIS_HOST=mongo-repo-user.mongo-svc.cluster.local
+      - REPO_POST_REDIS_HOST=mongo-repo-post.mongo-svc.cluster.local
       - REPO_POST_REDIS_PASSWORD=redis.redis-svc.cluster.local
       - REPO_POST_MONGODB_HOST=http://minio-service.minio.svc.cluster.local:9000
       - REPO_POST_APP_PROFILE=prod
