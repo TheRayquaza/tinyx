@@ -1,15 +1,15 @@
 package com.epita.repo_post.converter;
 
+import com.epita.exchange.redis.aggregate.PostAggregate;
 import com.epita.exchange.utils.Converter;
 import com.epita.repo_post.repository.model.PostModel;
-import com.epita.repo_post.service.entity.PostEntity;
 import jakarta.enterprise.context.ApplicationScoped;
 
 @ApplicationScoped
-public class PostModelToPostEntity implements Converter<PostModel, PostEntity> {
+public class PostModelToPostAggregate implements Converter<PostModel, PostAggregate> {
   @Override
-  public PostEntity convertNotNull(PostModel input) {
-    return new PostEntity()
+  public PostAggregate convertNotNull(PostModel input) {
+    return new PostAggregate()
         .withId(input.getId().toString())
         .withOwnerId(input.getOwnerId())
         .withMedia(input.getMedia())

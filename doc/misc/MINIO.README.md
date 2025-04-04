@@ -28,4 +28,3 @@ public class UserService implements Logger {
 ## Debug
 
 Use minio console accessible via http://localhost:9000
-
