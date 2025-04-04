@@ -48,7 +48,7 @@ class PostControllerTest {
 
     CreatePostRequest request = new CreatePostRequest();
     request.text = "Test Post";
-    request.media = null;
+    request.media = "media";
 
     Response response =
         given()
@@ -74,8 +74,80 @@ class PostControllerTest {
     postIds.add(response.jsonPath().getString("id"));
   }
 
+
   @Test
   @Order(2)
+  void createPost_no_media() {
+
+    String token = AuthService.generateToken(TEST_ID, TEST_USERNAME);
+
+    AuthEntity authEntity = new AuthEntity(TEST_ID, TEST_USERNAME);
+    authContext.setAuthEntity(authEntity);
+
+    CreatePostRequest request = new CreatePostRequest();
+    request.text = "Test Post";
+    request.media = null;
+
+    Response response =
+            given()
+                    .contentType(ContentType.JSON)
+                    .header("Authorization", "Bearer " + token)
+                    .body(request)
+                    .when()
+                    .post("/")
+                    .then()
+                    .extract()
+                    .response();
+
+    System.out.println(response.body().prettyPrint());
+
+    response
+            .then()
+            .statusCode(200)
+            .body("text", is("Test Post"))
+            .body("id", is(notNullValue()))
+            .extract()
+            .response();
+
+    postIds.add(response.jsonPath().getString("id"));
+  }
+
+  @Test
+  @Order(3)
+  void createPost_no_details()
+  {
+    String token = AuthService.generateToken(TEST_ID, TEST_USERNAME);
+
+    AuthEntity authEntity = new AuthEntity(TEST_ID, TEST_USERNAME);
+    authContext.setAuthEntity(authEntity);
+
+    CreatePostRequest request = new CreatePostRequest();
+    request.text = null;
+    request.media = null;
+
+    Response response =
+            given()
+                    .contentType(ContentType.JSON)
+                    .header("Authorization", "Bearer " + token)
+                    .body(request)
+                    .when()
+                    .post("/")
+                    .then()
+                    .extract()
+                    .response();
+
+    System.out.println(response.body().prettyPrint());
+
+    response
+            .then()
+            .statusCode(RepoPostErrorCode.INVALID_POST_DATA.getHttpCode()) // 400
+            .extract()
+            .response();
+  }
+
+
+  @Test
+  @Order(4)
   void getPostDetails() {
 
     String token = AuthService.generateToken(TEST_ID, TEST_USERNAME);
@@ -94,8 +166,8 @@ class PostControllerTest {
   }
 
   @Test
-  @Order(3)
-  void notExistGetPostDetails() {
+  @Order(5)
+  void getPostDetails_not_found() {
 
     String token = AuthService.generateToken(TEST_ID, TEST_USERNAME);
 
@@ -114,11 +186,11 @@ class PostControllerTest {
 
     System.out.println(response.body().prettyPrint());
 
-    response.then().statusCode(404).extract().response();
+    response.then().statusCode(RepoPostErrorCode.POST_NOT_FOUND.getHttpCode()).extract().response();
   }
 
   @Test
-  @Order(4)
+  @Order(6)
   void editPost() {
 
     String token = AuthService.generateToken(TEST_ID, TEST_USERNAME);
@@ -128,7 +200,7 @@ class PostControllerTest {
 
     EditPostRequest request = new EditPostRequest();
     request.text = "Test Post Edited";
-
+    request.media = "media";
     Response response =
         given()
             .contentType(ContentType.JSON)
@@ -146,7 +218,35 @@ class PostControllerTest {
   }
 
   @Test
-  @Order(5)
+  @Order(7)
+  void editPost_not_found() {
+
+    String token = AuthService.generateToken(TEST_ID, TEST_USERNAME);
+
+    AuthEntity authEntity = new AuthEntity(TEST_ID, TEST_USERNAME);
+    authContext.setAuthEntity(authEntity);
+
+    EditPostRequest request = new EditPostRequest();
+    request.text = "Test Post Edited";
+    request.media = "media";
+    Response response =
+        given()
+            .contentType(ContentType.JSON)
+            .header("Authorization", "Bearer " + token)
+            .body(request)
+            .when()
+            .put("post_id_non_existent")
+            .then()
+            .extract()
+            .response();
+
+    System.out.println(response.body().prettyPrint());
+
+    response.then().statusCode(RepoPostErrorCode.POST_NOT_FOUND.getHttpCode()).extract().response();
+  }
+
+  @Test
+  @Order(8)
   void addReply() {
 
     String token = AuthService.generateToken(TEST_ID, TEST_USERNAME);
@@ -156,6 +256,35 @@ class PostControllerTest {
 
     ReplyPostRequest request = new ReplyPostRequest();
     request.text = "Test Reply";
+    request.media = "media";
+    Response response =
+        given()
+            .contentType(ContentType.JSON)
+            .header("Authorization", "Bearer " + token)
+            .body(request)
+            .when()
+            .post(postIds.get(0) + "/reply")
+            .then()
+            .extract()
+            .response();
+
+    System.out.println(response.body().prettyPrint());
+
+    response.then().statusCode(200).extract().response();
+  }
+
+  @Test
+  @Order(9)
+  void addReply_no_media_text() {
+
+    String token = AuthService.generateToken(TEST_ID, TEST_USERNAME);
+
+    AuthEntity authEntity = new AuthEntity(TEST_ID, TEST_USERNAME);
+    authContext.setAuthEntity(authEntity);
+
+    ReplyPostRequest request = new ReplyPostRequest();
+    request.text = null;
+    request.media = null;
 
     Response response =
         given()
@@ -174,7 +303,7 @@ class PostControllerTest {
   }
 
   @Test
-  @Order(6)
+  @Order(10)
   void testAllReplies() {
 
     String token = AuthService.generateToken(TEST_ID, TEST_USERNAME);
@@ -197,7 +326,7 @@ class PostControllerTest {
   }
 
   @Test
-  @Order(7)
+  @Order(11)
   void deletePost() {
     String token = AuthService.generateToken(TEST_ID, TEST_USERNAME);
     AuthEntity authEntity = new AuthEntity(TEST_ID, TEST_USERNAME);
@@ -219,26 +348,25 @@ class PostControllerTest {
   }
 
   @Test
-  @Order(8)
-  void invalidGetPostDetails() {
-
+  @Order(12)
+  void deletePost_notFound()
+  {
     String token = AuthService.generateToken(TEST_ID, TEST_USERNAME);
-
     AuthEntity authEntity = new AuthEntity(TEST_ID, TEST_USERNAME);
     authContext.setAuthEntity(authEntity);
 
     Response response =
-        given()
-            .contentType(ContentType.JSON)
-            .header("Authorization", "Bearer " + token)
-            .when()
-            .get("non_existent_post_id")
-            .then()
-            .extract()
-            .response();
+            given()
+                    .contentType(ContentType.JSON)
+                    .header("Authorization", "Bearer " + token)
+                    .when()
+                    .delete(postIds.get(0))
+                    .then()
+                    .extract()
+                    .response();
 
     System.out.println(response.body().prettyPrint());
 
-    response.then().statusCode(404).extract().response();
+    response.then().statusCode(RepoPostErrorCode.POST_NOT_FOUND.getHttpCode()).extract().response();
   }
 }

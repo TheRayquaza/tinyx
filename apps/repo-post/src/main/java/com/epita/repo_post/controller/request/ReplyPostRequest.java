@@ -9,5 +9,6 @@ import lombok.*;
 @Getter
 @Setter
 public class ReplyPostRequest {
-  @NotNull public String text;
+  public String text;
+  public String media;
 }
