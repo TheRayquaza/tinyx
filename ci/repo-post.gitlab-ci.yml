@@ -27,19 +27,32 @@ repo-post:test:
     MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME}
     MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD}
     MONGO_INITDB_DATABASE: RepoPost
+    REPO_POST_MONGO_HOST: mongo
+    REPO_POST_REDIS_HOST: redis
+    REPO_POST_REDIS_PASSWORD: admin
+    REPO_POST_MINIO_HOST: minio
+    MINIO_ROOT_USER: minioadmin
+    MINIO_ROOT_PASSWORD: minioadmin
+    REPO_POST_APP_PROFILE: prod
   stage: test
   services:
     - name: mongo:8.0.6-noble
       alias: mongo
-      command: ["mongod", "--bind_ip_all"]
-  before_script:
+    - name: redis:8.0-M04-alpine3.21
+      alias: redis
+      command: ["redis-server","--requirepass", "admin"]
+    - name: minio/minio:latest
+      alias: minio
+      command: ["server","/data", "--console-address",":9001"]
+  script:
     - apt-get update -y
     - apt-get install -y gnupg wget
     - wget -qO- https://www.mongodb.org/static/pgp/server-8.0.asc | tee /etc/apt/trusted.gpg.d/server-8.0.asc
     - echo "deb [ arch=amd64,arm64 ] https://repo.mongodb.org/apt/ubuntu noble/mongodb-org/8.0 multiverse" | tee /etc/apt/sources.list.d/mongodb-org-8.0.list
     - apt-get update -y
     - apt-get install -y mongodb-mongosh
-  script:
-    - cd apps/repo-post
-    - mongosh src/main/resources/init.js
-    - mvn test
+    - cd apps/
+    - mvn install -N && mvn install -pl exchange
+    - cd repo-post
+    - mongosh -u ${MONGO_INITDB_ROOT_USERNAME} -p ${MONGO_INITDB_ROOT_PASSWORD} --authenticationDatabase admin --host mongo src/main/resources/init.js
+    - mvn clean test -Dquarkus.profile=prod -Dquarkus.mongodb.connection-string=mongodb://${MONGO_INITDB_ROOT_USERNAME}:${MONGO_INITDB_ROOT_PASSWORD}@mongo:27017/RepoPost?authSource=admin
