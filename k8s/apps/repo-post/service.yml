@@ -1,0 +1,16 @@
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: repo-post
+  namespace: repo-post
+  labels:
+    app: repo-post
+spec:
+    type: ClusterIP
+    ports:
+      - protocol: TCP
+        port: 80
+        targetPort: 8080
+    selector:
+        app: repo-post
