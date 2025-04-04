@@ -1,4 +1,4 @@
-# Creating my app
+# Creating a Service
 
 ## MVC pattern
 
@@ -69,19 +69,19 @@ pre-commit install
 
 Otherwise just use spotless for your java code:
 
-```
+```bash
 mvn spotless:apply
 ```
 
 ## POM
 
-POM is just your java package manager (just like `npm`, `poetry`, `cargo`). 
+POM is just your java package manager (just like `npm`, `poetry`, `cargo`).
 
-There is a root pom that includes the basics: 
+There is a root pom that includes the basics:
 * Web framework: `quarkus`, `jackson`, `jakarta`, ...
 * Common frameworks: `redis`, `minio`, `mongo`
 * Utils: open api spec builder, jacoco for report, junit for testing
-* Shared Library: `exchange`  
+* Shared Library: `exchange`
 
 you can add your own dependencies in your `pom.xml` in  (I am thinking of `neo4j` for repo-social for instance)
 
@@ -101,7 +101,6 @@ quarkus.resteasy-reactive.path=/api
 # Quarkus Redis Configuration
 quarkus.redis.devservices.enabled=false
 quarkus.redis.hosts=${repo.user.redis.host:localhost}:6379 # just here
-...
 ```
 
 ## Dockerfile
@@ -109,7 +108,7 @@ quarkus.redis.hosts=${repo.user.redis.host:localhost}:6379 # just here
 * Use explicit tag (not **latest**)
 * Use light image (**alpine** is nice)
 * Optimize your layers as much as possible
-* Use uber jar (mvn )
+* Use uber jar (`mvn package -Dquarkus.package.type=uber-jar`)
 
 ## Kubernetes
 

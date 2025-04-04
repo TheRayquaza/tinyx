@@ -1,0 +1,12 @@
+---
+kind: Kustomization
+apiVersion: kustomize.config.k8s.io/v1beta1
+resources:
+  - namespace.yml
+  - pull-secrets.yml
+  - repo-user
+  - repo-social
+  - repo-post
+  - srvc-search
+  - srvc-user-timeline
+  - srvc-home-timeline
