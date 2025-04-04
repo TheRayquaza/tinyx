@@ -14,6 +14,9 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import org.eclipse.microprofile.openapi.annotations.parameters.RequestBody;
+import org.jboss.resteasy.reactive.RestForm;
+
+import java.io.File;
 
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
@@ -27,9 +30,10 @@ public class RepoPostController implements RepoPostControllerApi {
   @POST
   @Path("/")
   @Authenticated
+  @Consumes(MediaType.MULTIPART_FORM_DATA)
   @Override
   public PostEntity createPost(
-      @RequestBody(required = true) @NotNull @Valid CreatePostRequest request) {
+          @RequestBody(required = true) @NotNull @Valid CreatePostRequest request) {
     String ownerId = authService.getUserId();
     logger().info("POST /create - User {} creates a post", ownerId);
     return postService.createPost(request, ownerId);
@@ -45,6 +49,7 @@ public class RepoPostController implements RepoPostControllerApi {
 
   @PUT
   @Authenticated
+  @Consumes(MediaType.MULTIPART_FORM_DATA)
   @Path("/{id}")
   @Override
   public PostEntity editPost(
@@ -68,6 +73,7 @@ public class RepoPostController implements RepoPostControllerApi {
 
   @POST
   @Authenticated
+  @Consumes(MediaType.MULTIPART_FORM_DATA)
   @Override
   @Path("/{id}/reply")
   public PostEntity replyToPost(

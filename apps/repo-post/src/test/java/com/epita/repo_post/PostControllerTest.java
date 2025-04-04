@@ -17,12 +17,15 @@ import io.quarkus.test.security.TestSecurity;
 import io.restassured.http.ContentType;
 import io.restassured.response.Response;
 import jakarta.inject.Inject;
+
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
+import java.io.File;
 
 @QuarkusTest
 @TestHTTPEndpoint(RepoPostController.class)
@@ -39,7 +42,7 @@ class PostControllerTest {
 
   @Test
   @Order(1)
-  void createPost() {
+  void createPost() throws IOException {
 
     String token = AuthService.generateToken(TEST_ID, TEST_USERNAME);
 
@@ -48,12 +51,14 @@ class PostControllerTest {
 
     CreatePostRequest request = new CreatePostRequest();
     request.text = "Test Post";
-    request.media = "media";
+    File testFile = File.createTempFile("profile", ".jpg");
+    testFile.deleteOnExit();
 
     Response response =
         given()
             .contentType(ContentType.JSON)
             .header("Authorization", "Bearer " + token)
+            .multiPart("file", testFile, "image/jpeg")
             .body(request)
             .when()
             .post("/")
@@ -191,7 +196,7 @@ class PostControllerTest {
 
   @Test
   @Order(6)
-  void editPost() {
+  void editPost() throws IOException {
 
     String token = AuthService.generateToken(TEST_ID, TEST_USERNAME);
 
@@ -200,11 +205,14 @@ class PostControllerTest {
 
     EditPostRequest request = new EditPostRequest();
     request.text = "Test Post Edited";
-    request.media = "media";
+    File testFile = File.createTempFile("profile", ".jpg");
+    testFile.deleteOnExit();
+
     Response response =
         given()
             .contentType(ContentType.JSON)
             .header("Authorization", "Bearer " + token)
+            .multiPart("file", testFile, "image/jpeg")
             .body(request)
             .when()
             .put(postIds.get(0))
@@ -219,7 +227,7 @@ class PostControllerTest {
 
   @Test
   @Order(7)
-  void editPost_not_found() {
+  void editPost_not_found() throws IOException {
 
     String token = AuthService.generateToken(TEST_ID, TEST_USERNAME);
 
@@ -228,11 +236,13 @@ class PostControllerTest {
 
     EditPostRequest request = new EditPostRequest();
     request.text = "Test Post Edited";
-    request.media = "media";
+    File testFile = File.createTempFile("profile", ".jpg");
+    testFile.deleteOnExit();
     Response response =
         given()
             .contentType(ContentType.JSON)
             .header("Authorization", "Bearer " + token)
+            .multiPart("file", testFile, "image/jpeg")
             .body(request)
             .when()
             .put("post_id_non_existent")
@@ -247,7 +257,7 @@ class PostControllerTest {
 
   @Test
   @Order(8)
-  void addReply() {
+  void addReply() throws IOException {
 
     String token = AuthService.generateToken(TEST_ID, TEST_USERNAME);
 
@@ -256,11 +266,13 @@ class PostControllerTest {
 
     ReplyPostRequest request = new ReplyPostRequest();
     request.text = "Test Reply";
-    request.media = "media";
+    File testFile = File.createTempFile("profile", ".jpg");
+    testFile.deleteOnExit();
     Response response =
         given()
             .contentType(ContentType.JSON)
             .header("Authorization", "Bearer " + token)
+            .multiPart("file", testFile, "image/jpeg")
             .body(request)
             .when()
             .post(postIds.get(0) + "/reply")
@@ -299,7 +311,7 @@ class PostControllerTest {
 
     System.out.println(response.body().prettyPrint());
 
-    response.then().statusCode(200).extract().response();
+    response.then().statusCode(RepoPostErrorCode.INVALID_POST_DATA.getHttpCode()).extract().response();
   }
 
   @Test

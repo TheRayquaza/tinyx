@@ -14,14 +14,18 @@ import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import java.time.LocalDateTime;
 import java.util.List;
-import org.bson.types.ObjectId;
+import java.util.UUID;
 
+import org.bson.types.ObjectId;
+import com.epita.exchange.s3.service.S3Service;
 @ApplicationScoped
 public class PostService {
 
   @Inject PostRepository postRepository;
 
   @Inject PostModelToPostEntity postModelToPostEntity;
+
+  @Inject S3Service s3Service;
 
   @Inject AuthService authService;
 
@@ -36,14 +40,22 @@ public class PostService {
     }
 
     PostModel postModel = new PostModel();
-
-    postModel.setId(new ObjectId());
+    ObjectId post_id = new ObjectId();
+    postModel.setId(post_id);
 
     postModel.setOwnerId(ownerId);
 
     if (request.media != null) {
-      postModel.setMedia(request.media);
+      String objectKey = "post/" + post_id + "/image/" + UUID.randomUUID() + ".jpeg";
+      try {
+        s3Service.uploadFile(
+                objectKey, request.getMedia(), request.getMedia().available());
+      } catch (Exception e) {
+        throw RepoPostErrorCode.INTERNAL_SERVER_ERROR.createError();
+      }
+      postModel.setMedia(objectKey);
     }
+
     if (request.text != null) {
       postModel.setText(request.text);
     }
@@ -84,7 +96,18 @@ public class PostService {
     }
 
     if (request.media != null) {
-      postModel.setMedia(request.media);
+        String objectKey = "post/" + postId + "/image/" + UUID.randomUUID() + ".jpeg";
+        try {
+          if (postModel.getMedia() != null) {
+            s3Service.deleteFile(postModel.getMedia());
+          }
+
+          s3Service.uploadFile(
+                  objectKey, request.getMedia(), request.getMedia().available());
+        } catch (Exception e) {
+          throw RepoPostErrorCode.INTERNAL_SERVER_ERROR.createError();
+      }
+      postModel.setMedia(objectKey);
     }
     postModel.setUpdatedAt(LocalDateTime.now());
 
@@ -98,6 +121,13 @@ public class PostService {
         postRepository
             .findByIdStringOptional(postId)
             .orElseThrow(() -> RepoPostErrorCode.POST_NOT_FOUND.createError(postId));
+
+    if (postModel.getMedia() != null)
+    {
+      s3Service.deleteFile(postModel.getMedia());
+      postModel.setMedia(null);
+    }
+
     if (!authService.getUserId().equals(postModel.getOwnerId())) {
       throw RepoPostErrorCode.FORBIDDEN.createError("auth user is not the owner of the post");
     }
