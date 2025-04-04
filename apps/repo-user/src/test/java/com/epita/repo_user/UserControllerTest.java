@@ -68,16 +68,20 @@ public class UserControllerTest {
     request.username = TEST_USERNAME;
     request.password = TEST_PASSWORD;
 
-    Response response = given()
-        .contentType(ContentType.JSON)
-        .body(request)
-        .when()
-        .post("/login")
-        .then().extract().response();
+    Response response =
+        given()
+            .contentType(ContentType.JSON)
+            .body(request)
+            .when()
+            .post("/login")
+            .then()
+            .extract()
+            .response();
 
     System.out.println(response.body().prettyPrint());
 
-    response.then()
+    response
+        .then()
         .statusCode(200)
         .body("username", equalTo(TEST_USERNAME))
         .body("id", notNullValue());
@@ -90,15 +94,19 @@ public class UserControllerTest {
     String token = AuthService.generateToken(userId, TEST_USERNAME);
     AuthEntity authEntity = new AuthEntity(userId, TEST_USERNAME);
     authContext.setAuthEntity(authEntity);
-    Response response = given()
-        .header("Authorization", "Bearer " + token)
-        .when()
-        .get("/user")
-        .then().extract().response();
+    Response response =
+        given()
+            .header("Authorization", "Bearer " + token)
+            .when()
+            .get("/user")
+            .then()
+            .extract()
+            .response();
 
     System.out.println(response.body().prettyPrint());
 
-    response.then()
+    response
+        .then()
         .statusCode(200)
         .body("username", equalTo(TEST_USERNAME))
         .body("email", equalTo(TEST_EMAIL));
@@ -114,18 +122,18 @@ public class UserControllerTest {
     authContext.setAuthEntity(authEntity);
 
     Response response =
-    given()
-        .header("Authorization", "Bearer " + token)
-        .pathParam("id", userId)
-        .when()
-        .get("/user/{id}")
-        .then().extract().response();
+        given()
+            .header("Authorization", "Bearer " + token)
+            .pathParam("id", userId)
+            .when()
+            .get("/user/{id}")
+            .then()
+            .extract()
+            .response();
 
     System.out.println(response.body().prettyPrint());
 
-    response.then()
-        .statusCode(200)
-        .body("username", equalTo(TEST_USERNAME));
+    response.then().statusCode(200).body("username", equalTo(TEST_USERNAME));
   }
 
   @Test
@@ -139,17 +147,21 @@ public class UserControllerTest {
     request.bio = "This is my updated bio";
     request.username = TEST_USERNAME + "updated";
 
-    Response response = given()
-        .contentType(ContentType.JSON)
-        .header("Authorization", "Bearer " + token)
-        .body(request)
-        .when()
-        .put("/user")
-        .then().extract().response();
+    Response response =
+        given()
+            .contentType(ContentType.JSON)
+            .header("Authorization", "Bearer " + token)
+            .body(request)
+            .when()
+            .put("/user")
+            .then()
+            .extract()
+            .response();
 
     System.out.println(response.body().prettyPrint());
 
-    response.then()
+    response
+        .then()
         .statusCode(200)
         .body("bio", equalTo("This is my updated bio"))
         .body("username", equalTo(TEST_USERNAME + "updated"));
@@ -165,19 +177,20 @@ public class UserControllerTest {
     File testFile = File.createTempFile("profile", ".jpg");
     testFile.deleteOnExit();
 
-    Response response = given()
-        .header("Authorization", "Bearer " + token)
-        .contentType("multipart/form-data")
-        .multiPart("file", testFile, "image/jpeg")
-        .when()
-        .put("/user/image")
-        .then().extract().response();
+    Response response =
+        given()
+            .header("Authorization", "Bearer " + token)
+            .contentType("multipart/form-data")
+            .multiPart("file", testFile, "image/jpeg")
+            .when()
+            .put("/user/image")
+            .then()
+            .extract()
+            .response();
 
     System.out.println(response.body().prettyPrint());
 
-    response.then()
-        .statusCode(200)
-        .body("profileImage", notNullValue());
+    response.then().statusCode(200).body("profileImage", notNullValue());
   }
 
   @Test
@@ -187,16 +200,18 @@ public class UserControllerTest {
     String token = AuthService.generateToken(userId, TEST_USERNAME);
     AuthEntity authEntity = new AuthEntity(userId, TEST_USERNAME);
     authContext.setAuthEntity(authEntity);
-    Response response = given()
-        .header("Authorization", "Bearer " + token)
-        .when()
-        .delete("/user")
-        .then().extract().response();
+    Response response =
+        given()
+            .header("Authorization", "Bearer " + token)
+            .when()
+            .delete("/user")
+            .then()
+            .extract()
+            .response();
 
     System.out.println(response.body().prettyPrint());
 
-    response.then()
-        .statusCode(204);
+    response.then().statusCode(204);
 
     // Verify that the user is deleted
     given()
