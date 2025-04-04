@@ -77,7 +77,7 @@ public class RepoPostController implements RepoPostControllerApi {
       @RequestBody(required = true) @NotNull @Valid PostReplyRequest request,
       @PathParam("id") @Valid String postId) {
     String userId = authService.getUserId();
-    logger().info("POST /post/{}/reply - Reply to post {} with user {}", postId, userId);
+    logger().info("POST /post/{}/reply - Reply to post {} with user {}", postId, postId, userId);
     return postService.replyToPost(request, postId);
   }
 
