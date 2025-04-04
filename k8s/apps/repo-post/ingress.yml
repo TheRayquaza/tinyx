@@ -9,14 +9,14 @@ spec:
   rules:
     - http:
         paths: # FIXME: complete paths
-          - path: /user
+          - path: /create
             pathType: Prefix
             backend:
               service:
                 name: repo-post
                 port:
                   number: 80
-          - path: /login
+          - path: /post
             pathType: Prefix
             backend:
               service:
