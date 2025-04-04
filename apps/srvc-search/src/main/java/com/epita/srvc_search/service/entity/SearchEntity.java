@@ -15,7 +15,7 @@ public class SearchEntity implements Serializable {
     private String id;
     private String ownerId;
     private String text;
-    private List<String> media;
+    private String media;
     private String repostId;
     private String replyToPostId;
     private Boolean isReply;
