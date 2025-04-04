@@ -37,8 +37,6 @@ class PostControllerTest {
   private static List<String> postIds = new ArrayList<>();
   private static final String TEST_ID = "15a1a100c293c91129883571";
   private static final String TEST_USERNAME = "testuser";
-  private static final String TEST_PASSWORD = "Password123!";
-  private static final String TEST_EMAIL = "test@example.com";
 
   @Test
   @Order(1)

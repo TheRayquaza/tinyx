@@ -1,11 +1,13 @@
 package com.epita.repo_post.service;
 
 import com.epita.exchange.auth.service.AuthService;
+import com.epita.exchange.redis.service.RedisPublisher;
 import com.epita.repo_post.RepoPostErrorCode;
 import com.epita.repo_post.controller.request.CreatePostRequest;
 import com.epita.repo_post.controller.request.EditPostRequest;
 import com.epita.repo_post.controller.request.PostReplyRequest;
 import com.epita.repo_post.controller.response.AllRepliesResponse;
+import com.epita.repo_post.converter.PostModelToPostAggregate;
 import com.epita.repo_post.converter.PostModelToPostEntity;
 import com.epita.repo_post.repository.PostRepository;
 import com.epita.repo_post.repository.model.PostModel;
@@ -15,6 +17,8 @@ import jakarta.inject.Inject;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
+import org.bson.types.ObjectId;
+import org.eclipse.microprofile.config.inject.ConfigProperty;
 
 import org.bson.types.ObjectId;
 import com.epita.exchange.s3.service.S3Service;
@@ -28,6 +32,17 @@ public class PostService {
   @Inject S3Service s3Service;
 
   @Inject AuthService authService;
+
+  @Inject
+  RedisPublisher redisPublisher;
+
+  @Inject
+  PostModelToPostAggregate postModelToPostAggregate;
+
+  @ConfigProperty(name = "repo.post.aggregate.channel")
+  @Inject
+  String postAggregateChannel;
+
 
   public PostEntity createPost(CreatePostRequest request, String ownerId) {
     if (request == null || ownerId == null || (request.media == null && request.text == null)) {
@@ -67,6 +82,8 @@ public class PostService {
 
     // Persist the new data
     postRepository.create(postModel);
+
+    redisPublisher.publish(postAggregateChannel, postModelToPostAggregate.convertNotNull(postModel));
 
     // Return the entity
     return postModelToPostEntity.convertNotNull(postModel);
@@ -111,7 +128,10 @@ public class PostService {
     }
     postModel.setUpdatedAt(LocalDateTime.now());
 
+
     postRepository.update(postModel);
+
+    redisPublisher.publish(postAggregateChannel, postModelToPostAggregate.convertNotNull(postModel));
     return postModelToPostEntity.convertNotNull(postModel);
   }
 
@@ -122,17 +142,26 @@ public class PostService {
             .findByIdStringOptional(postId)
             .orElseThrow(() -> RepoPostErrorCode.POST_NOT_FOUND.createError(postId));
 
+    if (!authService.getUserId().equals(postModel.getOwnerId())) {
+      throw RepoPostErrorCode.FORBIDDEN.createError("auth user is not the owner of the post");
+    }
+
+    // Check post is not already deleted
+    if (postModel.isDeleted()) {
+      throw RepoPostErrorCode.POST_NOT_FOUND.createError(postId);
+    }
+
     if (postModel.getMedia() != null)
     {
       s3Service.deleteFile(postModel.getMedia());
       postModel.setMedia(null);
     }
 
-    if (!authService.getUserId().equals(postModel.getOwnerId())) {
-      throw RepoPostErrorCode.FORBIDDEN.createError("auth user is not the owner of the post");
-    }
     postModel.setDeleted(true);
+
     postRepository.update(postModel);
+
+    redisPublisher.publish(postAggregateChannel, postModelToPostAggregate.convertNotNull(postModel));
   }
 
   public PostEntity replyToPost(PostReplyRequest request, String postId) {
@@ -161,6 +190,9 @@ public class PostService {
     }
 
     postRepository.create(reply);
+
+    redisPublisher.publish(postAggregateChannel, postModelToPostAggregate.convertNotNull(reply));
+
     return postModelToPostEntity.convertNotNull(reply);
   }
 
