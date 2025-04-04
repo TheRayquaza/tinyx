@@ -53,7 +53,7 @@ class PostControllerTest {
 
     Response response =
         given()
-            .contentType(ContentType.JSON)
+            .contentType(ContentType.MULTIPART)
             .header("Authorization", "Bearer " + token)
             .multiPart("file", testFile, "image/jpeg")
             .body(request)
@@ -91,7 +91,7 @@ class PostControllerTest {
 
     Response response =
         given()
-            .contentType(ContentType.JSON)
+            .contentType(ContentType.MULTIPART)
             .header("Authorization", "Bearer " + token)
             .body(request)
             .when()
@@ -127,7 +127,7 @@ class PostControllerTest {
 
     Response response =
         given()
-            .contentType(ContentType.JSON)
+            .contentType(ContentType.MULTIPART)
             .header("Authorization", "Bearer " + token)
             .body(request)
             .when()
@@ -154,7 +154,7 @@ class PostControllerTest {
     AuthEntity authEntity = new AuthEntity(TEST_ID, TEST_USERNAME);
     authContext.setAuthEntity(authEntity);
     given()
-        .contentType(ContentType.JSON)
+        .contentType(ContentType.MULTIPART)
         .header("Authorization", "Bearer " + token)
         .when()
         .get(postIds.get(0))

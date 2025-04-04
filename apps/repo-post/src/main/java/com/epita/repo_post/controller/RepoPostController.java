@@ -7,7 +7,6 @@ import com.epita.repo_post.controller.request.PostReplyRequest;
 import com.epita.repo_post.controller.response.AllRepliesResponse;
 import com.epita.repo_post.service.PostService;
 import com.epita.repo_post.service.entity.PostEntity;
-import io.quarkus.security.Authenticated;
 import jakarta.inject.Inject;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
@@ -26,7 +25,6 @@ public class RepoPostController implements RepoPostControllerApi {
 
   @POST
   @Path("/")
-  @Authenticated
   @Consumes(MediaType.MULTIPART_FORM_DATA)
   @Override
   public PostEntity createPost(
@@ -45,7 +43,6 @@ public class RepoPostController implements RepoPostControllerApi {
   }
 
   @PUT
-  @Authenticated
   @Consumes(MediaType.MULTIPART_FORM_DATA)
   @Path("/{id}")
   @Override
@@ -58,7 +55,6 @@ public class RepoPostController implements RepoPostControllerApi {
   }
 
   @DELETE
-  @Authenticated
   @Path("/{id}")
   @Override
   public void deletePost(@PathParam("id") String postId) {
@@ -69,7 +65,6 @@ public class RepoPostController implements RepoPostControllerApi {
   }
 
   @POST
-  @Authenticated
   @Consumes(MediaType.MULTIPART_FORM_DATA)
   @Override
   @Path("/{id}/reply")
@@ -82,7 +77,6 @@ public class RepoPostController implements RepoPostControllerApi {
   }
 
   @GET
-  @Authenticated
   @Path("/{id}/reply")
   @Override
   public AllRepliesResponse getAllRepliesForPost(@PathParam("id") String postId) {
