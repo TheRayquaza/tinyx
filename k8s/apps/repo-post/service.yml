@@ -3,14 +3,14 @@ kind: Service
 apiVersion: v1
 metadata:
   name: repo-post
-  namespace: repo-post
+  namespace: apps
   labels:
     app: repo-post
 spec:
     type: ClusterIP
+    selector:
+      app: repo-post
     ports:
       - protocol: TCP
-        port: 80
+        port: 8080
         targetPort: 8080
-    selector:
-        app: repo-post
