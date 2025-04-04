@@ -75,13 +75,13 @@ mvn spotless:apply
 
 ## POM
 
-POM is just your java package manager (just like `npm`, `poetry`, `cargo`). 
+POM is just your java package manager (just like `npm`, `poetry`, `cargo`).
 
-There is a root pom that includes the basics: 
+There is a root pom that includes the basics:
 * Web framework: `quarkus`, `jackson`, `jakarta`, ...
 * Common frameworks: `redis`, `minio`, `mongo`
 * Utils: open api spec builder, jacoco for report, junit for testing
-* Shared Library: `exchange`  
+* Shared Library: `exchange`
 
 you can add your own dependencies in your `pom.xml` in  (I am thinking of `neo4j` for repo-social for instance)
 

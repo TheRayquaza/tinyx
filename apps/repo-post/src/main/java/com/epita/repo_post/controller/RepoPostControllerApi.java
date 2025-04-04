@@ -17,7 +17,7 @@ import org.eclipse.microprofile.openapi.annotations.parameters.RequestBody;
 import org.eclipse.microprofile.openapi.annotations.responses.APIResponse;
 import org.eclipse.microprofile.openapi.annotations.responses.APIResponses;
 
-@Path("/")
+@Path("/post")
 public interface RepoPostControllerApi extends Logger {
 
   @POST
