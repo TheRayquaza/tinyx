@@ -3,6 +3,7 @@ package com.epita.repo_post.service;
 import com.epita.exchange.auth.service.AuthService;
 import com.epita.exchange.redis.service.RedisPublisher;
 import com.epita.exchange.s3.service.S3Service;
+import com.epita.exchange.utils.Logger;
 import com.epita.repo_post.RepoPostErrorCode;
 import com.epita.repo_post.controller.request.CreatePostRequest;
 import com.epita.repo_post.controller.request.EditPostRequest;
@@ -22,7 +23,7 @@ import org.bson.types.ObjectId;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 
 @ApplicationScoped
-public class PostService {
+public class PostService implements Logger {
 
   @Inject PostRepository postRepository;
 
@@ -41,9 +42,11 @@ public class PostService {
   String postAggregateChannel;
 
   public PostEntity createPost(CreatePostRequest request, String ownerId) {
-    if (request == null || ownerId == null || (request.media == null && request.text == null)) {
+    if (request == null
+        || ((request.media == null || request.extension == null) && request.text == null)) {
+      logger().error("Invalid post data");
       throw RepoPostErrorCode.INVALID_POST_DATA.createError(
-          "request / ownerId / media / text is null");
+          "request / ownerId / media / text is null: {}", request.toString());
     }
 
     if (!authService.getUserId().equals(ownerId)) {
@@ -60,7 +63,9 @@ public class PostService {
       String objectKey = "post/" + post_id + "/image/" + UUID.randomUUID() + ".jpeg";
       try {
         s3Service.uploadFile(objectKey, request.getMedia(), request.getMedia().available());
+        logger().info("Uploaded media to S3: {}", objectKey);
       } catch (Exception e) {
+        logger().error("Failed to upload media to S3", e);
         throw RepoPostErrorCode.INTERNAL_SERVER_ERROR.createError();
       }
       postModel.setMedia(objectKey);
@@ -77,11 +82,13 @@ public class PostService {
 
     // Persist the new data
     postRepository.create(postModel);
+    logger().info("Post persisted with id: {}", post_id);
 
+    // Persist to Redis
     redisPublisher.publish(
         postAggregateChannel, postModelToPostAggregate.convertNotNull(postModel));
+    logger().info("Published post to Redis: {}", post_id);
 
-    // Return the entity
     return postModelToPostEntity.convertNotNull(postModel);
   }
 
@@ -95,12 +102,24 @@ public class PostService {
 
   // @Transactional
   public PostEntity editPost(EditPostRequest request, String postId) {
+    if (request == null
+        || ((request.media == null || request.extension == null) && request.text == null)) {
+      logger().error("Invalid post data");
+      throw RepoPostErrorCode.INVALID_POST_DATA.createError(
+          "request / ownerId / media / text is null");
+    }
+
     PostModel postModel =
         postRepository
             .findByIdStringOptional(postId)
             .orElseThrow(() -> RepoPostErrorCode.POST_NOT_FOUND.createError(postId));
 
     if (!authService.getUserId().equals(postModel.getOwnerId())) {
+      logger()
+          .error(
+              "Forbidden edit attempt: user={}, postOwner={}",
+              authService.getUserId(),
+              postModel.getOwnerId());
       throw RepoPostErrorCode.FORBIDDEN.createError("auth user is not the owner of the post");
     }
 
@@ -109,14 +128,16 @@ public class PostService {
     }
 
     if (request.media != null) {
-      String objectKey = "post/" + postId + "/image/" + UUID.randomUUID() + ".jpeg";
+      String objectKey = "post/" + postId + "/image/" + UUID.randomUUID() + "." + request.extension;
       try {
         if (postModel.getMedia() != null) {
           s3Service.deleteFile(postModel.getMedia());
+          logger().info("Deleted old media from S3: {}", postModel.getMedia());
         }
-
         s3Service.uploadFile(objectKey, request.getMedia(), request.getMedia().available());
+        logger().info("Uploaded new media to S3: {}", objectKey);
       } catch (Exception e) {
+        logger().error("Media update failed", e);
         throw RepoPostErrorCode.INTERNAL_SERVER_ERROR.createError();
       }
       postModel.setMedia(objectKey);
@@ -138,11 +159,17 @@ public class PostService {
             .orElseThrow(() -> RepoPostErrorCode.POST_NOT_FOUND.createError(postId));
 
     if (!authService.getUserId().equals(postModel.getOwnerId())) {
+      logger()
+          .error(
+              "Forbidden delete attempt: user={}, postOwner={}",
+              authService.getUserId(),
+              postModel.getOwnerId());
       throw RepoPostErrorCode.FORBIDDEN.createError("auth user is not the owner of the post");
     }
 
     // Check post is not already deleted
     if (postModel.isDeleted()) {
+      logger().warn("Post already deleted: {}", postId);
       throw RepoPostErrorCode.POST_NOT_FOUND.createError(postId);
     }
 
@@ -154,13 +181,18 @@ public class PostService {
     postModel.setDeleted(true);
 
     postRepository.update(postModel);
+    logger().info("Post marked as deleted in DB: {}", postId);
 
     redisPublisher.publish(
         postAggregateChannel, postModelToPostAggregate.convertNotNull(postModel));
+    logger().info("Published deleted post to Redis: {}", postId);
   }
 
   public PostEntity replyToPost(PostReplyRequest request, String postId) {
-    if (request == null || (request.getMedia() == null && request.getText() == null)) {
+    logger().info("Replying to postId: {}, with request: {}", postId, request);
+    if (request == null
+        || ((request.media == null || request.extension == null) && request.text == null)) {
+      logger().error("Invalid post data");
       throw RepoPostErrorCode.INVALID_POST_DATA.createError(
           "request / ownerId / media / text is null");
     }
@@ -187,6 +219,7 @@ public class PostService {
     postRepository.create(reply);
 
     redisPublisher.publish(postAggregateChannel, postModelToPostAggregate.convertNotNull(reply));
+    logger().info("Published reply to Redis for post: {}", postId);
 
     return postModelToPostEntity.convertNotNull(reply);
   }
@@ -197,6 +230,7 @@ public class PostService {
         .orElseThrow(() -> RepoPostErrorCode.POST_NOT_FOUND.createError(postId));
 
     List<PostModel> replies = postRepository.findAllReplies(postId);
+    logger().info("Found {} replies for postId: {}", replies.size(), postId);
     return new AllRepliesResponse()
         .withReplies(
             replies.stream()

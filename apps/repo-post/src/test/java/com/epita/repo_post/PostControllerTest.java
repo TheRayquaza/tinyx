@@ -8,9 +8,6 @@ import com.epita.exchange.auth.service.AuthContext;
 import com.epita.exchange.auth.service.AuthService;
 import com.epita.exchange.auth.service.entity.AuthEntity;
 import com.epita.repo_post.controller.RepoPostController;
-import com.epita.repo_post.controller.request.CreatePostRequest;
-import com.epita.repo_post.controller.request.EditPostRequest;
-import com.epita.repo_post.controller.request.ReplyPostRequest;
 import io.quarkus.test.common.http.TestHTTPEndpoint;
 import io.quarkus.test.junit.QuarkusTest;
 import io.quarkus.test.security.TestSecurity;
@@ -46,8 +43,6 @@ class PostControllerTest {
     AuthEntity authEntity = new AuthEntity(TEST_ID, TEST_USERNAME);
     authContext.setAuthEntity(authEntity);
 
-    CreatePostRequest request = new CreatePostRequest();
-    request.text = "Test Post";
     File testFile = File.createTempFile("profile", ".jpg");
     testFile.deleteOnExit();
 
@@ -55,8 +50,9 @@ class PostControllerTest {
         given()
             .contentType(ContentType.MULTIPART)
             .header("Authorization", "Bearer " + token)
-            .multiPart("file", testFile, "image/jpeg")
-            .body(request)
+            .multiPart("media", testFile, "application/octet-stream")
+            .multiPart("json", "Test Post", "application/json")
+            .multiPart("extensions", "jpeg", "application/json")
             .when()
             .post("/")
             .then()
@@ -85,15 +81,11 @@ class PostControllerTest {
     AuthEntity authEntity = new AuthEntity(TEST_ID, TEST_USERNAME);
     authContext.setAuthEntity(authEntity);
 
-    CreatePostRequest request = new CreatePostRequest();
-    request.text = "Test Post";
-    request.media = null;
-
     Response response =
         given()
             .contentType(ContentType.MULTIPART)
             .header("Authorization", "Bearer " + token)
-            .body(request)
+            .multiPart("json", "Test Post 2", "application/json")
             .when()
             .post("/")
             .then()
@@ -105,7 +97,7 @@ class PostControllerTest {
     response
         .then()
         .statusCode(200)
-        .body("text", is("Test Post"))
+        .body("text", is("Test Post 2"))
         .body("id", is(notNullValue()))
         .extract()
         .response();
@@ -121,15 +113,10 @@ class PostControllerTest {
     AuthEntity authEntity = new AuthEntity(TEST_ID, TEST_USERNAME);
     authContext.setAuthEntity(authEntity);
 
-    CreatePostRequest request = new CreatePostRequest();
-    request.text = null;
-    request.media = null;
-
     Response response =
         given()
             .contentType(ContentType.MULTIPART)
             .header("Authorization", "Bearer " + token)
-            .body(request)
             .when()
             .post("/")
             .then()
@@ -153,15 +140,19 @@ class PostControllerTest {
 
     AuthEntity authEntity = new AuthEntity(TEST_ID, TEST_USERNAME);
     authContext.setAuthEntity(authEntity);
-    given()
-        .contentType(ContentType.MULTIPART)
-        .header("Authorization", "Bearer " + token)
-        .when()
-        .get(postIds.get(0))
-        .then()
-        .statusCode(200)
-        .extract()
-        .response();
+    Response response =
+        given()
+            .contentType(ContentType.JSON)
+            .header("Authorization", "Bearer " + token)
+            .when()
+            .get(postIds.get(0))
+            .then()
+            .extract()
+            .response();
+
+    System.out.println(response.body().prettyPrint());
+
+    response.then().statusCode(200).extract().response();
   }
 
   @Test
@@ -197,17 +188,16 @@ class PostControllerTest {
     AuthEntity authEntity = new AuthEntity(TEST_ID, TEST_USERNAME);
     authContext.setAuthEntity(authEntity);
 
-    EditPostRequest request = new EditPostRequest();
-    request.text = "Test Post Edited";
     File testFile = File.createTempFile("profile", ".jpg");
     testFile.deleteOnExit();
 
     Response response =
         given()
-            .contentType(ContentType.JSON)
+            .contentType(ContentType.MULTIPART)
             .header("Authorization", "Bearer " + token)
-            .multiPart("file", testFile, "image/jpeg")
-            .body(request)
+            .multiPart("media", testFile, "application/octet-stream")
+            .multiPart("json", "Test Post Edited", "application/json")
+            .multiPart("extension", "jpg", "application/json")
             .when()
             .put(postIds.get(0))
             .then()
@@ -228,16 +218,15 @@ class PostControllerTest {
     AuthEntity authEntity = new AuthEntity(TEST_ID, TEST_USERNAME);
     authContext.setAuthEntity(authEntity);
 
-    EditPostRequest request = new EditPostRequest();
-    request.text = "Test Post Edited";
     File testFile = File.createTempFile("profile", ".jpg");
     testFile.deleteOnExit();
     Response response =
         given()
-            .contentType(ContentType.JSON)
+            .contentType(ContentType.MULTIPART)
             .header("Authorization", "Bearer " + token)
-            .multiPart("file", testFile, "image/jpeg")
-            .body(request)
+            .multiPart("json", "Test Post Edited", "application/json")
+            .multiPart("extension", "png", "application/json")
+            .multiPart("media", testFile, "application/octet-stream")
             .when()
             .put("post_id_non_existent")
             .then()
@@ -258,16 +247,16 @@ class PostControllerTest {
     AuthEntity authEntity = new AuthEntity(TEST_ID, TEST_USERNAME);
     authContext.setAuthEntity(authEntity);
 
-    ReplyPostRequest request = new ReplyPostRequest();
-    request.text = "Test Reply";
     File testFile = File.createTempFile("profile", ".jpg");
     testFile.deleteOnExit();
+
     Response response =
         given()
-            .contentType(ContentType.JSON)
+            .contentType(ContentType.MULTIPART)
             .header("Authorization", "Bearer " + token)
-            .multiPart("file", testFile, "image/jpeg")
-            .body(request)
+            .multiPart("media", testFile, "application/octet-stream")
+            .multiPart("json", "Test Reply", "application/json")
+            .multiPart("extension", "jpg", "application/json")
             .when()
             .post(postIds.get(0) + "/reply")
             .then()
@@ -288,15 +277,10 @@ class PostControllerTest {
     AuthEntity authEntity = new AuthEntity(TEST_ID, TEST_USERNAME);
     authContext.setAuthEntity(authEntity);
 
-    ReplyPostRequest request = new ReplyPostRequest();
-    request.text = null;
-    request.media = null;
-
     Response response =
         given()
-            .contentType(ContentType.JSON)
+            .contentType(ContentType.MULTIPART)
             .header("Authorization", "Bearer " + token)
-            .body(request)
             .when()
             .post(postIds.get(0) + "/reply")
             .then()
