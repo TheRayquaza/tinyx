@@ -57,12 +57,12 @@
 
 .rules_build_repo-user:
   rules:
-    - if: '$CI_COMMIT_MESSAGE =~ /repo-user/ && $CI_COMMIT_TAG=~ /^v.*/'
+    - if: '$CI_COMMIT_MESSAGE =~ /repo-user/ && $CI_COMMIT_TAG =~ /^v.*/'
       when: always
     - when: never
 
 .rules_build_repo-post:
   rules:
-    - if: '$CI_COMMIT_MESSAGE =~ /repo-post/ && $CI_COMMIT_TAG=~ /^v.*/'
+    - if: '$CI_COMMIT_MESSAGE =~ /repo-post/ && $CI_COMMIT_TAG =~ /^v.*/'
       when: always
     - when: never
