@@ -7,6 +7,7 @@ import com.epita.repo_post.controller.request.PostReplyRequest;
 import com.epita.repo_post.controller.response.AllRepliesResponse;
 import com.epita.repo_post.service.PostService;
 import com.epita.repo_post.service.entity.PostEntity;
+import io.quarkus.security.Authenticated;
 import jakarta.inject.Inject;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;

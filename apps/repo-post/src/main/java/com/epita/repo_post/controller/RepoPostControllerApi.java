@@ -16,14 +16,11 @@ import org.eclipse.microprofile.openapi.annotations.media.Schema;
 import org.eclipse.microprofile.openapi.annotations.parameters.RequestBody;
 import org.eclipse.microprofile.openapi.annotations.responses.APIResponse;
 import org.eclipse.microprofile.openapi.annotations.responses.APIResponses;
-import org.eclipse.microprofile.openapi.annotations.tags.Tag;
 
 @Path("/post")
-@Tag(name = "RepoPost", description = "Repo-post API")
 public interface RepoPostControllerApi extends Logger {
 
   @POST
-  @Path("/")
   @Consumes(MediaType.APPLICATION_JSON)
   @Produces(MediaType.APPLICATION_JSON)
   @Operation(summary = "Create a new post")
@@ -40,7 +37,6 @@ public interface RepoPostControllerApi extends Logger {
   PostEntity createPost(@RequestBody(required = true) @NotNull @Valid CreatePostRequest request);
 
   @GET
-  @Path("/{id}")
   @Consumes(MediaType.APPLICATION_JSON)
   @Produces(MediaType.APPLICATION_JSON)
   @Operation(summary = "Get a specific post")
@@ -57,7 +53,6 @@ public interface RepoPostControllerApi extends Logger {
   PostEntity getPostById(@PathParam("id") String id);
 
   @PUT
-  @Path("/{id}")
   @Consumes(MediaType.APPLICATION_JSON)
   @Produces(MediaType.APPLICATION_JSON)
   @Operation(summary = "Edit a post")
@@ -76,7 +71,6 @@ public interface RepoPostControllerApi extends Logger {
       @PathParam("id") String id);
 
   @DELETE
-  @Path("/{id}")
   @Consumes(MediaType.APPLICATION_JSON)
   @Produces(MediaType.APPLICATION_JSON)
   @Operation(summary = "Delete a post")
@@ -93,7 +87,6 @@ public interface RepoPostControllerApi extends Logger {
   void deletePost(@PathParam("id") String id);
 
   @POST
-  @Path("/{id}/reply")
   @Consumes(MediaType.APPLICATION_JSON)
   @Produces(MediaType.APPLICATION_JSON)
   @Operation(summary = "Reply to a post")
@@ -112,7 +105,6 @@ public interface RepoPostControllerApi extends Logger {
       @PathParam("id") String id);
 
   @GET
-  @Path("/{id}/reply")
   @Consumes(MediaType.APPLICATION_JSON)
   @Produces(MediaType.APPLICATION_JSON)
   @Operation(summary = "Get all replies for a post")
