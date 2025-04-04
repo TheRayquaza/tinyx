@@ -23,9 +23,6 @@ repo-post:lint:
 repo-post:test:
   extends: .rules_template_repo-post
   image: maven:3.8.5-eclipse-temurin-17-alpine
-  services:
-    - name: "${CI_REGISTRY}/mongodb-repo-post:3.0.0"
-      alias: mongo
   variables:
     MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME}
     MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD}
@@ -35,4 +32,6 @@ repo-post:test:
     - cd apps/
     - mvn install -N && mvn install -pl exchange
     - cd repo-post
+    - docker compose -f docker-compose.yml up -d mongo
     - mvn test
+    - docker compose -f docker-compose.yml down mongo

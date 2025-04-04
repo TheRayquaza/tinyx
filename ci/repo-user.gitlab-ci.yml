@@ -25,5 +25,9 @@ repo-user:test:
   image: maven:3.8.5-eclipse-temurin-17-alpine
   stage: test
   script:
-    - cd apps/repo-user
-    - echo "Testing..."  #mvn test ADD more configurations here when the tests are ready
+    - cd apps/
+    - mvn install -N && mvn install -pl exchange
+    - cd repo-user
+    - docker compose -f docker-compose.yml up -d mongo
+    - mvn test
+    - docker compose -f docker-compose.yml down mongo
