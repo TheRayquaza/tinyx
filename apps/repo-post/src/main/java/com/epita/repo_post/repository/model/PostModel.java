@@ -2,8 +2,6 @@ package com.epita.repo_post.repository.model;
 
 import io.quarkus.mongodb.panache.common.MongoEntity;
 import java.time.LocalDateTime;
-import java.util.List;
-
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

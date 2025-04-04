@@ -1,11 +1,10 @@
 package com.epita.repo_post.controller.request;
 
-import lombok.*;
 import jakarta.ws.rs.FormParam;
+import java.io.InputStream;
+import lombok.*;
 import org.eclipse.microprofile.openapi.annotations.media.Schema;
 import org.jboss.resteasy.reactive.PartType;
-
-import java.io.InputStream;
 
 @AllArgsConstructor
 @With

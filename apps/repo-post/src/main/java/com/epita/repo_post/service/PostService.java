@@ -2,6 +2,7 @@ package com.epita.repo_post.service;
 
 import com.epita.exchange.auth.service.AuthService;
 import com.epita.exchange.redis.service.RedisPublisher;
+import com.epita.exchange.s3.service.S3Service;
 import com.epita.repo_post.RepoPostErrorCode;
 import com.epita.repo_post.controller.request.CreatePostRequest;
 import com.epita.repo_post.controller.request.EditPostRequest;
@@ -20,8 +21,6 @@ import java.util.UUID;
 import org.bson.types.ObjectId;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 
-import org.bson.types.ObjectId;
-import com.epita.exchange.s3.service.S3Service;
 @ApplicationScoped
 public class PostService {
 
@@ -33,16 +32,13 @@ public class PostService {
 
   @Inject AuthService authService;
 
-  @Inject
-  RedisPublisher redisPublisher;
+  @Inject RedisPublisher redisPublisher;
 
-  @Inject
-  PostModelToPostAggregate postModelToPostAggregate;
+  @Inject PostModelToPostAggregate postModelToPostAggregate;
 
   @ConfigProperty(name = "repo.post.aggregate.channel")
   @Inject
   String postAggregateChannel;
-
 
   public PostEntity createPost(CreatePostRequest request, String ownerId) {
     if (request == null || ownerId == null || (request.media == null && request.text == null)) {
@@ -63,8 +59,7 @@ public class PostService {
     if (request.media != null) {
       String objectKey = "post/" + post_id + "/image/" + UUID.randomUUID() + ".jpeg";
       try {
-        s3Service.uploadFile(
-                objectKey, request.getMedia(), request.getMedia().available());
+        s3Service.uploadFile(objectKey, request.getMedia(), request.getMedia().available());
       } catch (Exception e) {
         throw RepoPostErrorCode.INTERNAL_SERVER_ERROR.createError();
       }
@@ -83,7 +78,8 @@ public class PostService {
     // Persist the new data
     postRepository.create(postModel);
 
-    redisPublisher.publish(postAggregateChannel, postModelToPostAggregate.convertNotNull(postModel));
+    redisPublisher.publish(
+        postAggregateChannel, postModelToPostAggregate.convertNotNull(postModel));
 
     // Return the entity
     return postModelToPostEntity.convertNotNull(postModel);
@@ -113,25 +109,24 @@ public class PostService {
     }
 
     if (request.media != null) {
-        String objectKey = "post/" + postId + "/image/" + UUID.randomUUID() + ".jpeg";
-        try {
-          if (postModel.getMedia() != null) {
-            s3Service.deleteFile(postModel.getMedia());
-          }
+      String objectKey = "post/" + postId + "/image/" + UUID.randomUUID() + ".jpeg";
+      try {
+        if (postModel.getMedia() != null) {
+          s3Service.deleteFile(postModel.getMedia());
+        }
 
-          s3Service.uploadFile(
-                  objectKey, request.getMedia(), request.getMedia().available());
-        } catch (Exception e) {
-          throw RepoPostErrorCode.INTERNAL_SERVER_ERROR.createError();
+        s3Service.uploadFile(objectKey, request.getMedia(), request.getMedia().available());
+      } catch (Exception e) {
+        throw RepoPostErrorCode.INTERNAL_SERVER_ERROR.createError();
       }
       postModel.setMedia(objectKey);
     }
     postModel.setUpdatedAt(LocalDateTime.now());
 
-
     postRepository.update(postModel);
 
-    redisPublisher.publish(postAggregateChannel, postModelToPostAggregate.convertNotNull(postModel));
+    redisPublisher.publish(
+        postAggregateChannel, postModelToPostAggregate.convertNotNull(postModel));
     return postModelToPostEntity.convertNotNull(postModel);
   }
 
@@ -151,8 +146,7 @@ public class PostService {
       throw RepoPostErrorCode.POST_NOT_FOUND.createError(postId);
     }
 
-    if (postModel.getMedia() != null)
-    {
+    if (postModel.getMedia() != null) {
       s3Service.deleteFile(postModel.getMedia());
       postModel.setMedia(null);
     }
@@ -161,7 +155,8 @@ public class PostService {
 
     postRepository.update(postModel);
 
-    redisPublisher.publish(postAggregateChannel, postModelToPostAggregate.convertNotNull(postModel));
+    redisPublisher.publish(
+        postAggregateChannel, postModelToPostAggregate.convertNotNull(postModel));
   }
 
   public PostEntity replyToPost(PostReplyRequest request, String postId) {

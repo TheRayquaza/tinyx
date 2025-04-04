@@ -17,7 +17,7 @@ import io.quarkus.test.security.TestSecurity;
 import io.restassured.http.ContentType;
 import io.restassured.response.Response;
 import jakarta.inject.Inject;
-
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -25,7 +25,6 @@ import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
-import java.io.File;
 
 @QuarkusTest
 @TestHTTPEndpoint(RepoPostController.class)
@@ -77,7 +76,6 @@ class PostControllerTest {
     postIds.add(response.jsonPath().getString("id"));
   }
 
-
   @Test
   @Order(2)
   void createPost_no_media() {
@@ -92,33 +90,32 @@ class PostControllerTest {
     request.media = null;
 
     Response response =
-            given()
-                    .contentType(ContentType.JSON)
-                    .header("Authorization", "Bearer " + token)
-                    .body(request)
-                    .when()
-                    .post("/")
-                    .then()
-                    .extract()
-                    .response();
+        given()
+            .contentType(ContentType.JSON)
+            .header("Authorization", "Bearer " + token)
+            .body(request)
+            .when()
+            .post("/")
+            .then()
+            .extract()
+            .response();
 
     System.out.println(response.body().prettyPrint());
 
     response
-            .then()
-            .statusCode(200)
-            .body("text", is("Test Post"))
-            .body("id", is(notNullValue()))
-            .extract()
-            .response();
+        .then()
+        .statusCode(200)
+        .body("text", is("Test Post"))
+        .body("id", is(notNullValue()))
+        .extract()
+        .response();
 
     postIds.add(response.jsonPath().getString("id"));
   }
 
   @Test
   @Order(3)
-  void createPost_no_details()
-  {
+  void createPost_no_details() {
     String token = AuthService.generateToken(TEST_ID, TEST_USERNAME);
 
     AuthEntity authEntity = new AuthEntity(TEST_ID, TEST_USERNAME);
@@ -129,25 +126,24 @@ class PostControllerTest {
     request.media = null;
 
     Response response =
-            given()
-                    .contentType(ContentType.JSON)
-                    .header("Authorization", "Bearer " + token)
-                    .body(request)
-                    .when()
-                    .post("/")
-                    .then()
-                    .extract()
-                    .response();
+        given()
+            .contentType(ContentType.JSON)
+            .header("Authorization", "Bearer " + token)
+            .body(request)
+            .when()
+            .post("/")
+            .then()
+            .extract()
+            .response();
 
     System.out.println(response.body().prettyPrint());
 
     response
-            .then()
-            .statusCode(RepoPostErrorCode.INVALID_POST_DATA.getHttpCode()) // 400
-            .extract()
-            .response();
+        .then()
+        .statusCode(RepoPostErrorCode.INVALID_POST_DATA.getHttpCode()) // 400
+        .extract()
+        .response();
   }
-
 
   @Test
   @Order(4)
@@ -309,7 +305,11 @@ class PostControllerTest {
 
     System.out.println(response.body().prettyPrint());
 
-    response.then().statusCode(RepoPostErrorCode.INVALID_POST_DATA.getHttpCode()).extract().response();
+    response
+        .then()
+        .statusCode(RepoPostErrorCode.INVALID_POST_DATA.getHttpCode())
+        .extract()
+        .response();
   }
 
   @Test
@@ -359,21 +359,20 @@ class PostControllerTest {
 
   @Test
   @Order(12)
-  void deletePost_notFound()
-  {
+  void deletePost_notFound() {
     String token = AuthService.generateToken(TEST_ID, TEST_USERNAME);
     AuthEntity authEntity = new AuthEntity(TEST_ID, TEST_USERNAME);
     authContext.setAuthEntity(authEntity);
 
     Response response =
-            given()
-                    .contentType(ContentType.JSON)
-                    .header("Authorization", "Bearer " + token)
-                    .when()
-                    .delete(postIds.get(0))
-                    .then()
-                    .extract()
-                    .response();
+        given()
+            .contentType(ContentType.JSON)
+            .header("Authorization", "Bearer " + token)
+            .when()
+            .delete(postIds.get(0))
+            .then()
+            .extract()
+            .response();
 
     System.out.println(response.body().prettyPrint());
 
