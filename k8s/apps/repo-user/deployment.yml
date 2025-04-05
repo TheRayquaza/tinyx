@@ -6,7 +6,7 @@ metadata:
   labels:
     app: repo-user
 spec:
-  replicas: 1
+  replicas: 1 # TODO: make it 3
   strategy:
     type: RollingUpdate
     rollingUpdate:
@@ -25,7 +25,6 @@ spec:
       containers:
         - name: repo-user
           image: registry.cri.epita.fr/ing/majeures/tc/info/student/2026/2025-epitweet-tinyx-02/repo-user:v1.0.5
-          # TODO: use explicit tag
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 8080
@@ -36,20 +35,18 @@ spec:
             limits:
               memory: "512Mi"
               cpu: "250m"
-          # livenessProbe:
-          #   httpGet:
-          #     path: /q/health/live
-          #     port: 8080
-          #   initialDelaySeconds: 5
-          #   periodSeconds: 10
-          #   failureThreshold: 3
-          # readinessProbe:
-          #   httpGet:
-          #     path: /q/health/ready
-          #     port: 8080
-          #   initialDelaySeconds: 5
-          #   periodSeconds: 10
-          #   failureThreshold: 5
+          livenessProbe:
+            httpGet:
+              path: /q/health/live
+              port: 8080
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /q/health/ready
+              port: 8080
+            initialDelaySeconds: 5
+            periodSeconds: 10
           env:
             - name: QUARKUS_HTTP_PORT
               value: "8080"

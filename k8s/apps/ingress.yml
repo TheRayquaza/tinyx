@@ -13,8 +13,8 @@ spec:
   rules:
   - http:
       paths:
-      - path: /repo-user
-        pathType: Prefix
+      - path: /repo-user/q/swagger-ui
+        pathType: Exact
         backend:
           service:
             name: repo-user
