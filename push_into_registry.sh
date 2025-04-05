@@ -17,7 +17,24 @@ usage_check() {
   fi
 }
 
+check_service_name()
+{
+    local service_name=$1
+    local valid_services=("repo-post" "repo-user" "repo-social" "srvc-search" "srvc-home-timeline" "srvc-user-timeline")
+    for service in "${valid_services[@]}"; do
+        if [ "$service_name" == "$service" ]; then
+        return 0
+        fi
+    done
+    return 1
+}
+
 usage_check "$@"
+if ! check_service_name "$2"; then
+  echo "Error: Invalid service name '$2'"
+  display_guide
+  exit 1
+fi
 
 DOCKER_TAG=$1
 SERVICE=$2
