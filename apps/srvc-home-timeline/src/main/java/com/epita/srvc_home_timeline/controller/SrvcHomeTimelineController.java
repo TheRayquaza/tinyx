@@ -12,14 +12,14 @@ import jakarta.ws.rs.core.MediaType;
 @Consumes(MediaType.APPLICATION_JSON)
 @Path("/home-timeline")
 public class SrvcHomeTimelineController implements SrvcHomeTimelineControllerApi {
-    @Inject AuthService authService;
+  @Inject AuthService authService;
 
-    @GET
-    @Path("/{id}")
-    @Authenticated
-    @Override
-    public HomeTimelineResponse getHomeTimelineById(@PathParam("id") @Valid String id) {
-        logger().info("GET /home-timeline/{} - Retrieve Home Timeline for user {}", id, id);
-        return new HomeTimelineResponse();
-    }
+  @GET
+  @Path("/{id}")
+  @Authenticated
+  @Override
+  public HomeTimelineResponse getHomeTimelineById(@PathParam("id") @Valid String id) {
+    logger().info("GET /home-timeline/{} - Retrieve Home Timeline for user {}", id, id);
+    return new HomeTimelineResponse();
+  }
 }

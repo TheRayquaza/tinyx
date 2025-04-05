@@ -1,13 +1,13 @@
 package com.epita.srvc_home_timeline.repository.model;
 
 import io.quarkus.mongodb.panache.common.MongoEntity;
+import java.time.LocalDateTime;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.bson.codecs.pojo.annotations.BsonId;
-import java.time.LocalDateTime;
-import java.util.List;
 
 @Getter
 @Setter
@@ -15,31 +15,31 @@ import java.util.List;
 @NoArgsConstructor
 @MongoEntity(collection = "HomeTimelineModel", database = "SrvcHomeTimeline")
 public class HomeTimelineModel {
-    @BsonId private String id;
+  @BsonId private String id;
+  private String userId;
+  private LocalDateTime createdAt;
+  private List<HomeTimelineEntryModel> entries;
+  private List<String> followersId;
+
+  @Getter
+  @Setter
+  @AllArgsConstructor
+  @NoArgsConstructor
+  public static class HomeTimelineEntryModel {
+    private String postId;
+    private String authorId;
+    private String content;
+    private List<HomeTimelineLikedByModel> likedBy;
+    private String type;
+    private LocalDateTime timestamp;
+  }
+
+  @Getter
+  @Setter
+  @AllArgsConstructor
+  @NoArgsConstructor
+  public static class HomeTimelineLikedByModel {
     private String userId;
-    private LocalDateTime createdAt;
-    private List<HomeTimelineEntryModel> entries;
-    private List<String> followersId;
-
-    @Getter
-    @Setter
-    @AllArgsConstructor
-    @NoArgsConstructor
-    public static class HomeTimelineEntryModel {
-        private String postId;
-        private String authorId;
-        private String content;
-        private List<HomeTimelineLikedByModel> likedBy;
-        private String type;
-        private LocalDateTime timestamp;
-    }
-
-    @Getter
-    @Setter
-    @AllArgsConstructor
-    @NoArgsConstructor
-    public static class HomeTimelineLikedByModel {
-        private String userId;
-        private LocalDateTime likedAt;
-    }
+    private LocalDateTime likedAt;
+  }
 }

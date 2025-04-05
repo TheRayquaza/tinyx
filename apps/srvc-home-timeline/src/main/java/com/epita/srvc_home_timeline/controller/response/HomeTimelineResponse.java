@@ -1,11 +1,11 @@
 package com.epita.srvc_home_timeline.controller.response;
 
+import com.epita.srvc_home_timeline.service.entity.HomeTimelineEntity;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.With;
-import com.epita.srvc_home_timeline.service.entity.HomeTimelineEntity;
 
 @Getter
 @Setter
@@ -13,5 +13,5 @@ import com.epita.srvc_home_timeline.service.entity.HomeTimelineEntity;
 @NoArgsConstructor
 @With
 public class HomeTimelineResponse {
-    private HomeTimelineEntity hometimeline;
+  private HomeTimelineEntity hometimeline;
 }
