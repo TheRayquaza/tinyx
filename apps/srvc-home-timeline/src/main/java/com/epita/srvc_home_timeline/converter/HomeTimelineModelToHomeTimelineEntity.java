@@ -13,6 +13,6 @@ public class HomeTimelineModelToHomeTimelineEntity implements Converter<HomeTime
                 .withId(input.getId())
                 .withUserId(input.getUserId())
                 .withEntries(input.getEntries())
-                .withFollowersId(intput.getFollowersId())
+                .withFollowersId(intput.getFollowersId());
     }
 }

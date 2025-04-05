@@ -1,7 +1,7 @@
 package com.epita.srvc_home_timeline.controller;
 
 import com.epita.exchange.auth.service.AuthService;
-import com.epita.srvc_home_timeline.service.entity.HomeTimelineEntity;
+import com.epita.srvc_home_timeline.controller.response.HomeTimelineResponse;
 import io.quarkus.security.Authenticated;
 import jakarta.inject.Inject;
 import jakarta.validation.Valid;
@@ -18,8 +18,8 @@ public class SrvcHomeTimelineController implements SrvcHomeTimelineControllerApi
     @Path("/{id}")
     @Authenticated
     @Override
-    public HomeTimelineEntity getHomeTimelineById(@PathParam("id") @Valid String id) {
+    public HomeTimelineResponse getHomeTimelineById(@PathParam("id") @Valid String id) {
         logger().info("GET /home-timeline/{} - Retrieve Home Timeline for user {}", id, id);
-        return new HomeTimelineEntity();
+        return new HomeTimelineResponse();
     }
 }

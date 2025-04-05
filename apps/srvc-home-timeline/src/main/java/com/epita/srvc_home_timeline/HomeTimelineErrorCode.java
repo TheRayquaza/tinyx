@@ -1,7 +1,6 @@
 package com.epita.srvc_home_timeline;
 
 import com.epita.exchange.error.ErrorCode;
-import com.epita.srvc_home_timeline.controller.contract.HomeTimelineResponse;
 import lombok.Getter;
 
 @Getter
