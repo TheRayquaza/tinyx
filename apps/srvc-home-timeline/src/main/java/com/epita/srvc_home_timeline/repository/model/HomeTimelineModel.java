@@ -18,6 +18,27 @@ public class HomeTimelineModel {
     @BsonId private String id;
     private String userId;
     private LocalDateTime createdAt;
-    // Array of HomeTimelineEntryModel
-    private List<String> entries;
+    private List<HomeTimelineEntryModel> entries;
+
+    @Getter
+    @Setter
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class HomeTimelineEntryModel {
+        private String postId;
+        private String authorId;
+        private String content;
+        private List<HomeTimelineLikedByModel> likedBy;
+        private String type;
+        private LocalDateTime timestamp;
+    }
+
+    @Getter
+    @Setter
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class HomeTimelineLikedByModel {
+        private String userId;
+        private LocalDateTime likedAt;
+    }
 }
