@@ -19,6 +19,7 @@ public class HomeTimelineModel {
     private String userId;
     private LocalDateTime createdAt;
     private List<HomeTimelineEntryModel> entries;
+    private List<String> followersId;
 
     @Getter
     @Setter
