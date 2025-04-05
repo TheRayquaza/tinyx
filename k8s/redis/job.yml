@@ -1,0 +1,40 @@
+kind: Job
+apiVersion: batch/v1
+metadata:
+  name: redis-cluster
+  namespace: redis
+spec:
+  template:
+    spec:
+      initContainers:
+        - name: init
+          image: redis:8.0-M04-alpine3.21
+          command: ["sh", "-c"]
+          args:
+          - |
+            until redis-cli -h redis-0.redis.redis.svc.cluster.local ping do
+              echo "Waiting for redis-0 to be ready..."
+              sleep 5
+            done
+            until redis-cli -h redis-1.redis.redis.svc.cluster.local ping do
+              echo "Waiting for redis-1 to be ready..."
+              sleep 5
+            done
+            until redis-cli -h redis-2.redis.redis.svc.cluster.local ping do
+              echo "Waiting for redis-2 to be ready..."
+              sleep 5
+            done
+      containers:
+        - name: redis
+          image: redis:8.0-M04-alpine3.21
+          command: ["sh", "-c"]
+          args:
+          - |
+            redis-cli --cluster create redis-0.redis.redis.svc.cluster.local redis-1.redis.redis.svc.cluster.local redis-2.redis.redis.svc.cluster.local --cluster-replicas 1
+      restartPolicy: OnFailure
+  backoffLimit: 4
+  ttlSecondsAfterFinished: 60
+  activeDeadlineSeconds: 300
+  completionMode: Indexed
+  parallelism: 1
+  completions: 1

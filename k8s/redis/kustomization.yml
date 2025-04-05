@@ -1,0 +1,21 @@
+kind: Kustomization
+apiVersion: kustomize.config.k8s.io/v1beta1
+namespace: redis
+resources:
+  - namespace.yml
+  - statefulset.yml
+  - service.yml
+  - job.yml
+configMapGenerator:
+  - name: redis-config
+    namespace: redis
+    literals:
+      - |-
+        redis.conf=port 6379
+        cluster-enabled yes
+        cluster-config-file nodes.conf
+        cluster-node-timeout 5000
+        appendonly yes
+        protected-mode no
+        bind 0.0.0.0
+        cluster-port 16379

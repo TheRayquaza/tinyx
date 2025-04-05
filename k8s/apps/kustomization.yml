@@ -5,8 +5,8 @@ resources:
   - namespace.yml
   - pull-secrets.yml
   - repo-user
-  - repo-social
-  - repo-post
-  - srvc-search
-  - srvc-user-timeline
-  - srvc-home-timeline
+  #- repo-social
+  #- repo-post
+  #- srvc-search
+  #- srvc-user-timeline
+  #- srvc-home-timeline

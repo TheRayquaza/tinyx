@@ -5,5 +5,5 @@ resources:
   - apps/
   #- elastic
   #- mongo
-  #- redis
+  - redis
   #- neo4j
