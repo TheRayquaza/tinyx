@@ -1,11 +1,9 @@
-package com.epita.srvc_home_timeline.controller.response;
+package com.epita.srvc_home_timeline.converter;
 
 import com.epita.exchange.utils.Converter;
 import jakarta.enterprise.context.ApplicationScoped;
 import com.epita.srvc_home_timeline.service.entity.HomeTimelineEntity;
 import com.epita.srvc_home_timeline.repository.model.HomeTimelineModel;
-
-import java.io.Serializable;
 
 @ApplicationScoped
 public class HomeTimelineModelToHomeTimelineEntity implements Converter<HomeTimelineModel, HomeTimelineEntity> {
