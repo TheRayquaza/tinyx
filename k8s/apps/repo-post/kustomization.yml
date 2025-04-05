@@ -7,21 +7,17 @@ resources:
   - deployment.yml
   - service.yml
   - ingress.yml
-
 configMapGenerator:
   - name: repo-post-config
     namespace: apps
     literals:
-      - REPO_POST_REDIS_HOST=mongo-repo-post.mongo-svc.cluster.local
-      - REPO_POST_REDIS_PASSWORD=redis.redis-svc.cluster.local
-      - REPO_POST_MONGODB_HOST=mongo-repo-post.mongo-svc.cluster.local
-      - REPO_POST_APP_PROFILE=prod
-      - REPO_POST_MINIO_ACCESS_KEY=minioadmin
-      - REPO_POST_MINIO_SECRET_KEY=minioadmin
+      - REPO_POST_MONGODB_HOST=mongos.mongo.svc.cluster.local
+      - REPO_POST_REDIS_HOST=redis.redis-0.svc.cluster.local,redis-1.redis.svc.cluster.local
+      - REPO_POST_MINIO_ENDPOINT=http://minio-service.minio.svc.cluster.local:9000
       - REPO_POST_MINIO_BUCKET=RepoPost
       - REPO_POST_MONGODB_DATABASE=RepoPost
-      - REPO_POST_MINIO_ENDPOINT=http://minio-service.minio.svc.cluster.local:9000
-  - name: apps-post-config
+      - REPO_POST_APP_PROFILE=prod
+  - name: apps-config
     namespace: apps
     literals:
       - USER_AGGREGATE_CHANNEL=user_aggregate

@@ -6,16 +6,10 @@ metadata:
   labels:
     app: repo-post
 spec:
+  ingressClassName: traefik
   rules:
     - http:
-        paths: # FIXME: complete paths
-          - path: /create
-            pathType: Prefix
-            backend:
-              service:
-                name: repo-post
-                port:
-                  number: 80
+        paths:
           - path: /post
             pathType: Prefix
             backend:

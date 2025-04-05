@@ -6,7 +6,7 @@ metadata:
   labels:
     app: repo-user
 spec:
-  replicas: 3
+  replicas: 1 # TODO: make it 3
   strategy:
     type: RollingUpdate
     rollingUpdate:
@@ -24,13 +24,13 @@ spec:
         - name: pull-secret
       containers:
         - name: repo-user
-          image: registry.cri.epita.fr/ing/majeures/tc/info/student/2026/2025-epitweet-tinyx-02/repo-user:07c2dc43bd47413cfa18b53dbe7faffa46e6e795 # TODO: use explicit tag
+          image: registry.cri.epita.fr/ing/majeures/tc/info/student/2026/2025-epitweet-tinyx-02/repo-user:v1.0.5
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 8080
           resources:
             requests:
-              memory: "256Mi"
+              memory: "128Mi"
               cpu: "125m"
             limits:
               memory: "512Mi"
@@ -48,8 +48,10 @@ spec:
             initialDelaySeconds: 5
             periodSeconds: 10
           env:
-            - name: REPO_USER_QUARKUS_HTTP_PORT
+            - name: QUARKUS_HTTP_PORT
               value: "8080"
+            - name: QUARKUS_HTTP_HOST
+              value: "0.0.0.0"
             - name: REPO_USER_REDIS_HOST
               valueFrom:
                 configMapKeyRef:
@@ -71,10 +73,11 @@ spec:
                   name: repo-user-config
                   key: REPO_USER_MONGODB_HOST
             - name: REPO_USER_APP_PROFILE
-              valueFrom:
-                configMapKeyRef:
-                  name: apps-config
-                  key: USER_APP_PROFILE
+              value: "prod"
+              #valueFrom:
+              #  configMapKeyRef:
+              #    name: apps-config
+              #    key: USER_APP_PROFILE
             - name: REPO_USER_MINIO_ENDPOINT
               valueFrom:
                 configMapKeyRef:
