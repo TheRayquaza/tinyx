@@ -7,10 +7,10 @@ metadata:
   labels:
     app: mongo-shard
 spec:
-    type: ClusterIP
-    selector:
-      app: mongo-shard
-    ports:
-      - protocol: TCP
-        port: 27018
-        targetPort: 27018
+  type: ClusterIP
+  selector:
+    app: mongo-shard
+  ports:
+    - protocol: TCP
+      port: 27018
+      targetPort: 27018

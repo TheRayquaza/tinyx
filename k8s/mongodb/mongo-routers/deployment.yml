@@ -13,17 +13,49 @@ spec:
       labels:
         app: mongos
     spec:
+      initContainers:
+      - name: wait-for-configs
+        image: mongo:8.0.6
+        command:
+        - /bin/bash
+        - -c
+        - |
+          until mongosh --port 27019 --host mongo-config-0.mongo-config.mongo.svc.cluster.local --eval "db.adminCommand('ping')" &>/dev/null; do
+            echo "Waiting for config server to be ready..."
+            sleep 5
+          done
+      - name: wait-for-shards
+        image: mongo:8.0.6
+        command:
+        - /bin/bash
+        - -c
+        - |
+          until mongosh --host mongo-shard-2.mongo-shard.mongo.svc.cluster.local:27018 --eval "rs.status().ok" | grep -q 1; do
+            echo "Waiting for shard replica set to be ready..."
+            sleep 5
+          done
+          until mongosh --host mongo-shard-1.mongo-shard.mongo.svc.cluster.local:27018 --eval "rs.status().ok" | grep -q 1; do
+            echo "Waiting for shard replica set to be ready..."
+            sleep 5
+          done
+          until mongosh --host mongo-shard-0.mongo-shard.mongo.svc.cluster.local:27018 --eval "rs.status().ok" | grep -q 1; do
+            echo "Waiting for shard replica set to be ready..."
+            sleep 5
+          done
       containers:
         - name: mongos
           image: mongo:8.0.6
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 27017
-          command: [
-            "/bin/sh",
-            "-c",
-            "mongos --configdb configReplSet/mongo-config-0.mongo-config.mongo.svc.cluster.local:27019,mongo-config-1.mongo-config.mongo.svc.cluster.local:27019 --bind_ip 0.0.0.0"
-          ]
+          command: ["/bin/bash", "-c"]
+          args:
+            - |
+              mongos --configdb configReplSet/mongo-config-0.mongo-config.mongo.svc.cluster.local:27019 --bind_ip "0.0.0.0" &
+              mongos_pid=$!
+              sleep 5;
+              mongosh /docker-entrypoint-initdb.d/init.js;
+              wait $mongos_pid;
           resources:
             requests:
               cpu: "125m"

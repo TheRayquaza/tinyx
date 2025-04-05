@@ -24,7 +24,7 @@ spec:
         - name: pull-secret
       containers:
         - name: repo-user
-          image: registry.cri.epita.fr/ing/majeures/tc/info/student/2026/2025-epitweet-tinyx-02/repo-user:07c2dc43bd47413cfa18b53dbe7faffa46e6e795
+          image: registry.cri.epita.fr/ing/majeures/tc/info/student/2026/2025-epitweet-tinyx-02/repo-user:v1.0.5
           # TODO: use explicit tag
           imagePullPolicy: IfNotPresent
           ports:
@@ -36,23 +36,25 @@ spec:
             limits:
               memory: "512Mi"
               cpu: "250m"
-          livenessProbe:
-            httpGet:
-              path: /q/health/live
-              port: 8080
-            initialDelaySeconds: 5
-            periodSeconds: 10
-            failureThreshold: 3
-          readinessProbe:
-            httpGet:
-              path: /q/health/ready
-              port: 8080
-            initialDelaySeconds: 5
-            periodSeconds: 10
-            failureThreshold: 5
+          # livenessProbe:
+          #   httpGet:
+          #     path: /q/health/live
+          #     port: 8080
+          #   initialDelaySeconds: 5
+          #   periodSeconds: 10
+          #   failureThreshold: 3
+          # readinessProbe:
+          #   httpGet:
+          #     path: /q/health/ready
+          #     port: 8080
+          #   initialDelaySeconds: 5
+          #   periodSeconds: 10
+          #   failureThreshold: 5
           env:
-            - name: REPO_USER_QUARKUS_HTTP_PORT
+            - name: QUARKUS_HTTP_PORT
               value: "8080"
+            - name: QUARKUS_HTTP_HOST
+              value: "0.0.0.0"
             - name: REPO_USER_REDIS_HOST
               valueFrom:
                 configMapKeyRef:

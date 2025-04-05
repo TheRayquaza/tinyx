@@ -7,10 +7,10 @@ metadata:
   labels:
     app: mongo-config
 spec:
-    type: ClusterIP
-    selector:
-      app: mongo-config
-    ports:
-      - protocol: TCP
-        port: 27019
-        targetPort: 27019
+  type: ClusterIP
+  selector:
+    app: mongo-config
+  ports:
+    - protocol: TCP
+      port: 27019
+      targetPort: 27019

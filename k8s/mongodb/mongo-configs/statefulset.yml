@@ -5,7 +5,7 @@ metadata:
   namespace: mongo
 spec:
   serviceName: mongo-config
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
       app: mongo-config
@@ -23,7 +23,7 @@ spec:
           command: ["/bin/bash", "-c"]
           args:
             - |
-              mongod --configsvr --replSet configReplSet --dbpath /data/db --port 27019 --bind_ip 0.0.0.0 &
+              mongod --configsvr --replSet configReplSet --dbpath /data/db --port 27019 --bind_ip "0.0.0.0" &
               mongod_pid=$!
               sleep 5;
 
