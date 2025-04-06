@@ -103,7 +103,7 @@ public class PostService implements Logger {
             .findByIdStringOptional(postId)
             .orElseThrow(() -> RepoPostErrorCode.POST_NOT_FOUND.createError(postId));
 
-    // check if we can access the post
+    // Check if user authorized to access post
     String userId = authService.getUserId();
     String ownerId = postModel.getOwnerId();
     List<BlockedModel> blocked = blockedRepository.findIfBlocked(ownerId, userId);
@@ -218,8 +218,8 @@ public class PostService implements Logger {
             .findByIdStringOptional(postId)
             .orElseThrow(() -> RepoPostErrorCode.POST_NOT_FOUND.createError(postId));
 
+    // Check if user authorized to access post
     String userId = authService.getUserId();
-    // check if the user is blocked
     String ownerId = og_post.getOwnerId();
     List<BlockedModel> blocked = blockedRepository.findIfBlocked(ownerId, userId);
     if (!blocked.isEmpty()) {
@@ -255,7 +255,7 @@ public class PostService implements Logger {
             .findByIdStringOptional(postId)
             .orElseThrow(() -> RepoPostErrorCode.POST_NOT_FOUND.createError(postId));
 
-    // check if user is blocked
+    // Check if user authorized to access post
     String userId = authService.getUserId();
     String ownerId = og_post.getOwnerId();
     List<BlockedModel> blocked = blockedRepository.findIfBlocked(ownerId, userId);
