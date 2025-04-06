@@ -1,6 +1,7 @@
 package com.epita.repo_post.service;
 
 import com.epita.exchange.auth.service.AuthService;
+import com.epita.exchange.redis.command.BlockCommand;
 import com.epita.exchange.redis.service.RedisPublisher;
 import com.epita.exchange.s3.service.S3Service;
 import com.epita.exchange.utils.Logger;
@@ -11,7 +12,9 @@ import com.epita.repo_post.controller.request.PostReplyRequest;
 import com.epita.repo_post.controller.response.AllRepliesResponse;
 import com.epita.repo_post.converter.PostModelToPostAggregate;
 import com.epita.repo_post.converter.PostModelToPostEntity;
+import com.epita.repo_post.repository.BlockedRepository;
 import com.epita.repo_post.repository.PostRepository;
+import com.epita.repo_post.repository.model.BlockedModel;
 import com.epita.repo_post.repository.model.PostModel;
 import com.epita.repo_post.service.entity.PostEntity;
 import jakarta.enterprise.context.ApplicationScoped;
@@ -26,6 +29,8 @@ import org.eclipse.microprofile.config.inject.ConfigProperty;
 public class PostService implements Logger {
 
   @Inject PostRepository postRepository;
+
+  @Inject BlockedRepository blockedRepository;
 
   @Inject PostModelToPostEntity postModelToPostEntity;
 
@@ -97,6 +102,16 @@ public class PostService implements Logger {
         postRepository
             .findByIdStringOptional(postId)
             .orElseThrow(() -> RepoPostErrorCode.POST_NOT_FOUND.createError(postId));
+
+    // check if we can access the post
+    String userId = authService.getUserId();
+    String ownerId = postModel.getOwnerId();
+    List<BlockedModel> blocked = blockedRepository.findIfBlocked(ownerId, userId);
+    if (!blocked.isEmpty()) {
+      throw RepoPostErrorCode.FORBIDDEN.createError(
+          "User {} was blocked by the User {} - Cannot access post {}", userId, ownerId, postId);
+    }
+
     return postModelToPostEntity.convertNotNull(postModel);
   }
 
@@ -203,9 +218,18 @@ public class PostService implements Logger {
             .findByIdStringOptional(postId)
             .orElseThrow(() -> RepoPostErrorCode.POST_NOT_FOUND.createError(postId));
 
+    String userId = authService.getUserId();
+    // check if the user is blocked
+    String ownerId = og_post.getOwnerId();
+    List<BlockedModel> blocked = blockedRepository.findIfBlocked(ownerId, userId);
+    if (!blocked.isEmpty()) {
+      throw RepoPostErrorCode.FORBIDDEN.createError(
+          "User {} was blocked by the User {} - Cannot access post {}", userId, ownerId, postId);
+    }
+
     // Create the reply
     PostModel reply = new PostModel();
-    reply.setOwnerId(authService.getUserId());
+    reply.setOwnerId(userId);
     reply.setText(request.getText());
     reply.setIsReply(true);
     reply.setReplyToPostId(postId);
@@ -225,9 +249,20 @@ public class PostService implements Logger {
   }
 
   public AllRepliesResponse getAllRepliesForPost(String postId) {
-    postRepository
-        .findByIdStringOptional(postId)
-        .orElseThrow(() -> RepoPostErrorCode.POST_NOT_FOUND.createError(postId));
+
+    PostModel og_post =
+        postRepository
+            .findByIdStringOptional(postId)
+            .orElseThrow(() -> RepoPostErrorCode.POST_NOT_FOUND.createError(postId));
+
+    // check if user is blocked
+    String userId = authService.getUserId();
+    String ownerId = og_post.getOwnerId();
+    List<BlockedModel> blocked = blockedRepository.findIfBlocked(ownerId, userId);
+    if (!blocked.isEmpty()) {
+      throw RepoPostErrorCode.FORBIDDEN.createError(
+          "User {} was blocked by the User {} - Cannot access post {}", userId, ownerId, postId);
+    }
 
     List<PostModel> replies = postRepository.findAllReplies(postId);
     logger().info("Found {} replies for postId: {}", replies.size(), postId);
@@ -236,5 +271,13 @@ public class PostService implements Logger {
             replies.stream()
                 .map((postModel) -> postModelToPostEntity.convertNotNull(postModel))
                 .toList());
+  }
+
+  public void updateBlockedPeople(BlockCommand message) {
+    BlockedModel model = new BlockedModel();
+    model.setBlocked(message.isBlocked());
+    model.setTargetId(message.getTargetId());
+    model.setUserId(message.getUserId());
+    blockedRepository.create(model);
   }
 }
