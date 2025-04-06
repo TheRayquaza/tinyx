@@ -15,7 +15,6 @@ public class HomeTimelineService {
   @Inject HomeTimelineRepository homeTimelineRepository;
   @Inject HomeTimelineModelToHomeTimelineEntity converter;
 
-  // handle the subscription to the follow redis
   public void follow(String UserId, String followerId) {
     Optional<HomeTimelineModel> homeTimeline = homeTimelineRepository.findByUserId(UserId);
     if (homeTimeline.isPresent()) {
@@ -55,4 +54,7 @@ public class HomeTimelineService {
       homeTimelineRepository.create(newModel);
     }
   }
+
+  public void like(String UserId, String followerId, String postId) {}
+  public void unlike(String UserId, String followerId, String postId) {}
 }
