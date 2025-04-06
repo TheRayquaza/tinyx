@@ -8,5 +8,5 @@ import lombok.*;
 @Getter
 @Setter
 public class SearchRequest {
-    public String query;
+  public String query;
 }

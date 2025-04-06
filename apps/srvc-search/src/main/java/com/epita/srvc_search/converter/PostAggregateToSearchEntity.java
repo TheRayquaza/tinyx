@@ -7,15 +7,15 @@ import jakarta.enterprise.context.ApplicationScoped;
 
 @ApplicationScoped
 public class PostAggregateToSearchEntity implements Converter<PostAggregate, SearchEntity> {
-    @Override
-    public SearchEntity convertNotNull(PostAggregate input) {
-        return new SearchEntity()
-                .withId(input.getId())
-                .withOwnerId(input.getOwnerId())
-                .withMedia(input.getMedia())
-                .withText(input.getText())
-                .withCreatedAt(input.getCreatedAt())
-                .withUpdatedAt(input.getUpdatedAt())
-                .withDeleted(input.isDeleted());
-    }
+  @Override
+  public SearchEntity convertNotNull(PostAggregate input) {
+    return new SearchEntity()
+        .withId(input.getId())
+        .withOwnerId(input.getOwnerId())
+        .withMedia(input.getMedia())
+        .withText(input.getText())
+        .withCreatedAt(input.getCreatedAt())
+        .withUpdatedAt(input.getUpdatedAt())
+        .withDeleted(input.isDeleted());
+  }
 }
