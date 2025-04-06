@@ -24,10 +24,12 @@ spec:
         - name: pull-secret
       containers:
         - name: repo-user
-          image: registry.cri.epita.fr/ing/majeures/tc/info/student/2026/2025-epitweet-tinyx-02/repo-user:v1.0.5
+          image: registry.cri.epita.fr/ing/majeures/tc/info/student/2026/2025-epitweet-tinyx-02/repo-user:v1.0.7
           imagePullPolicy: IfNotPresent
           ports:
-            - containerPort: 8080
+            - name: http
+              containerPort: 8080 # the port of the container awx_web
+              protocol: TCP
           resources:
             requests:
               memory: "128Mi"
@@ -35,28 +37,44 @@ spec:
             limits:
               memory: "512Mi"
               cpu: "250m"
-          livenessProbe:
-            httpGet:
-              path: /q/health/live
-              port: 8080
-            initialDelaySeconds: 5
-            periodSeconds: 10
-          readinessProbe:
-            httpGet:
-              path: /q/health/ready
-              port: 8080
-            initialDelaySeconds: 5
-            periodSeconds: 10
+          # livenessProbe:
+          #   tcpSocket:
+          #     port: 8080
+          #   initialDelaySeconds: 10
+          #   periodSeconds: 10
+          # readinessProbe:
+          #   tcpSocket:
+          #     port: 8080
+          #   initialDelaySeconds: 10
+          #   periodSeconds: 10
           env:
-            - name: QUARKUS_HTTP_PORT
-              value: "8080"
-            - name: QUARKUS_HTTP_HOST
-              value: "0.0.0.0"
-            - name: REPO_USER_REDIS_HOST
+            ## QUARKUS
+            - name: REPO_USER_LOG_LEVEL
+              valueFrom:
+                configMapKeyRef:
+                  name: apps-config
+                  key: LOG_LEVEL
+            - name: REPO_USER_QUARKUS_HTTP_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: apps-config
+                  key: QUARKUS_HTTP_PORT
+            - name: REPO_USER_QUARKUS_HTTP_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: apps-config
+                  key: QUARKUS_HTTP_HOST
+            - name: REPO_USER_APP_PROFILE
+              valueFrom:
+                configMapKeyRef:
+                  name: apps-config
+                  key: USER_APP_PROFILE
+            ## REDIS
+            - name: REPO_USER_REDIS_HOSTS
               valueFrom:
                 configMapKeyRef:
                   name: repo-user-config
-                  key: REPO_USER_REDIS_HOST
+                  key: REPO_USER_REDIS_HOSTS
             - name: REPO_USER_REDIS_PASSWORD
               valueFrom:
                 secretKeyRef:
@@ -67,24 +85,23 @@ spec:
                 configMapKeyRef:
                   name: apps-config
                   key: USER_AGGREGATE_CHANNEL
-            - name: REPO_USER_MONGODB_HOST
+            ## MONGODB
+            - name: REPO_USER_MONGODB_ENDPOINT
               valueFrom:
-                configMapKeyRef:
-                  name: repo-user-config
-                  key: REPO_USER_MONGODB_HOST
-            - name: REPO_USER_APP_PROFILE
-              value: "prod"
-              #valueFrom:
-              #  configMapKeyRef:
-              #    name: apps-config
-              #    key: USER_APP_PROFILE
+                secretKeyRef:
+                  name: repo-user-secret
+                  key: REPO_USER_MONGODB_ENDPOINT
+            ## MINIO
             - name: REPO_USER_MINIO_ENDPOINT
               valueFrom:
                 configMapKeyRef:
                   name: repo-user-config
                   key: REPO_USER_MINIO_ENDPOINT
             - name: REPO_USER_MINIO_BUCKET
-              value: "RepoUser"
+              valueFrom:
+                configMapKeyRef:
+                  name: repo-user-config
+                  key: REPO_USER_MINIO_BUCKET
             - name: REPO_USER_MINIO_ACCESS_KEY
               valueFrom:
                 secretKeyRef:
@@ -95,8 +112,3 @@ spec:
                 secretKeyRef:
                   name: repo-user-secret
                   key: REPO_USER_MINIO_SECRET_KEY
-            - name: REPO_USER_MONGODB_DATABASE
-              valueFrom:
-                configMapKeyRef:
-                  name: repo-user-config
-                  key: REPO_USER_MONGODB_DATABASE
