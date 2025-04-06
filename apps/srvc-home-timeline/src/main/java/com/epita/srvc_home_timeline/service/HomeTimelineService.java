@@ -16,7 +16,7 @@ public class HomeTimelineService {
   @Inject HomeTimelineModelToHomeTimelineEntity converter;
 
   // handle the subscription to the follow redis
-  public void newFollower(String UserId, String followerId) {
+  public void follow(String UserId, String followerId) {
     Optional<HomeTimelineModel> homeTimeline = homeTimelineRepository.findByUserId(UserId);
     if (homeTimeline.isPresent()) {
       HomeTimelineModel homeTimelineModel = homeTimeline.get();
@@ -25,6 +25,7 @@ public class HomeTimelineService {
         followers.add(followerId);
       }
       homeTimelineModel.setFollowersId(followers);
+      homeTimelineRepository.updateModel(homeTimelineModel);
     } else {
       HomeTimelineModel newModel = new HomeTimelineModel();
       newModel.setUserId(UserId);
@@ -32,6 +33,25 @@ public class HomeTimelineService {
       List<String> followers = new ArrayList<>();
       followers.add(followerId);
       newModel.setFollowersId(followers);
+      homeTimelineRepository.create(newModel);
+    }
+  }
+
+  public void unfollow(String UserId, String followerId) {
+    Optional<HomeTimelineModel> homeTimeline = homeTimelineRepository.findByUserId(UserId);
+    if (homeTimeline.isPresent()) {
+      HomeTimelineModel homeTimelineModel = homeTimeline.get();
+      List<String> followers = homeTimelineModel.getFollowersId();
+      if (followers.contains(followerId)) {
+        followers.remove(followerId);
+      }
+      homeTimelineModel.setFollowersId(followers);
+      homeTimelineRepository.updateModel(homeTimelineModel);
+    }
+    else {
+      HomeTimelineModel newModel = new HomeTimelineModel();
+      newModel.setUserId(UserId);
+      newModel.setCreatedAt(LocalDateTime.now());
       homeTimelineRepository.create(newModel);
     }
   }

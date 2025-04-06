@@ -27,7 +27,10 @@ public class FollowCommandSubscriber implements Consumer<FollowCommand> {
     vertx.executeBlocking(
         future -> {
           if (message.isFollowing()) {
-            homeTimelineService.newFollower(message.getUserId(), message.getFollowerId());
+            homeTimelineService.follow(message.getUserId(), message.getFollowerId());
+          }
+          else {
+            homeTimelineService.unfollow(message.getUserId(), message.getFollowerId());
           }
           future.complete();
         });
