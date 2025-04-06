@@ -7,8 +7,8 @@ import java.util.List;
 
 @ApplicationScoped
 public class BlockedRepository implements PanacheMongoRepository<BlockedModel> {
-  public List<BlockedModel> findIfBlocked(String OwnerId, String IsHeBlockedId) {
-    return find("userId", OwnerId, "targetId", IsHeBlockedId).list();
+  public List<BlockedModel> findIfBlocked(String ownerId, String targetId) {
+    return find("userId = ?1 and targetId = ?2 and blocked = ?3", ownerId, targetId, true).list();
   }
 
   public void create(BlockedModel model) {
