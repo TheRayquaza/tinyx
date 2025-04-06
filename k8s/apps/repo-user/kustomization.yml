@@ -11,7 +11,7 @@ configMapGenerator:
   - name: repo-user-config
     namespace: apps
     literals:
-      - REPO_USER_MONGODB_HOST=mongo-repo-user.mongo-svc.cluster.local
+      - REPO_USER_MONGODB_HOST=mongos.mongo.svc.cluster.local
       - REPO_USER_REDIS_HOST=redis.redis-svc.cluster.local
       - REPO_USER_MINIO_ENDPOINT=http://minio-service.minio.svc.cluster.local:9000
       - REPO_USER_MINIO_BUCKET=RepoUser

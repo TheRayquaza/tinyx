@@ -1,0 +1,74 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: mongo-config
+  namespace: mongo
+spec:
+  serviceName: mongo-config
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mongo-config
+  template:
+    metadata:
+      labels:
+        app: mongo-config
+    spec:
+      containers:
+        - name: mongo-config
+          image: mongo:8.0.6
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 27019
+          command: ["/bin/bash", "-c"]
+          args:
+            - |
+              mongod --configsvr --replSet configReplSet --dbpath /data/db --port 27019 --bind_ip "0.0.0.0" &
+              mongod_pid=$!
+              sleep 5;
+
+              if mongosh --port 27019 --quiet --eval "rs.status().ok" | grep -q "1"; then
+                echo "Replica set already initialized."
+              else
+                mongosh --port 27019 /docker-entrypoint-initdb.d/init.js;
+              fi
+
+              wait $mongod_pid;
+          volumeMounts:
+            - name: mongo-config-data
+              mountPath: /data/db
+            - name: mongo-config-init
+              mountPath: /docker-entrypoint-initdb.d
+          resources:
+            requests:
+              cpu: "125m"
+              memory: "256Mi"
+            limits:
+              cpu: "250m"
+              memory: "512Mi"
+          livenessProbe:
+            exec:
+              command: ["/bin/sh", "-c", "mongosh --port 27019 --quiet --eval 'db.runCommand({ping: 1})'"]
+            initialDelaySeconds: 15
+            periodSeconds: 10
+            timeoutSeconds: 10
+            failureThreshold: 3
+          readinessProbe:
+            exec:
+              command: ["/bin/sh", "-c", "mongosh --port 27019 --quiet --eval 'db.runCommand({ping: 1})'"]
+            initialDelaySeconds: 15
+            periodSeconds: 10
+            timeoutSeconds: 10
+            failureThreshold: 5
+      volumes:
+        - name: mongo-config-init
+          configMap:
+            name: mongo-config-init
+  volumeClaimTemplates:
+    - metadata:
+        name: mongo-config-data
+      spec:
+        accessModes: ["ReadWriteOnce"]
+        resources:
+          requests:
+            storage: 10Gi

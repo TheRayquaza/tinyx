@@ -1,0 +1,86 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mongos
+  namespace: mongo
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mongos
+  template:
+    metadata:
+      labels:
+        app: mongos
+    spec:
+      initContainers:
+      - name: wait-for-configs
+        image: mongo:8.0.6
+        command:
+        - /bin/bash
+        - -c
+        - |
+          until mongosh --port 27019 --host mongo-config-0.mongo-config.mongo.svc.cluster.local --eval "db.adminCommand('ping')" &>/dev/null; do
+            echo "Waiting for config server to be ready..."
+            sleep 5
+          done
+      - name: wait-for-shards
+        image: mongo:8.0.6
+        command:
+        - /bin/bash
+        - -c
+        - |
+          until mongosh --host mongo-shard-2.mongo-shard.mongo.svc.cluster.local:27018 --eval "rs.status().ok" | grep -q 1; do
+            echo "Waiting for shard replica set to be ready..."
+            sleep 5
+          done
+          until mongosh --host mongo-shard-1.mongo-shard.mongo.svc.cluster.local:27018 --eval "rs.status().ok" | grep -q 1; do
+            echo "Waiting for shard replica set to be ready..."
+            sleep 5
+          done
+          until mongosh --host mongo-shard-0.mongo-shard.mongo.svc.cluster.local:27018 --eval "rs.status().ok" | grep -q 1; do
+            echo "Waiting for shard replica set to be ready..."
+            sleep 5
+          done
+      containers:
+        - name: mongos
+          image: mongo:8.0.6
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 27017
+          command: ["/bin/bash", "-c"]
+          args:
+            - |
+              mongos --configdb configReplSet/mongo-config-0.mongo-config.mongo.svc.cluster.local:27019 --bind_ip "0.0.0.0" &
+              mongos_pid=$!
+              sleep 5;
+              mongosh /docker-entrypoint-initdb.d/init.js;
+              wait $mongos_pid;
+          resources:
+            requests:
+              cpu: "125m"
+              memory: "256Mi"
+            limits:
+              cpu: "250m"
+              memory: "512Mi"
+          livenessProbe:
+            exec:
+              command: ["/bin/sh", "-c", "mongosh --quiet --eval 'db.runCommand({ping: 1})'"]
+            initialDelaySeconds: 15
+            periodSeconds: 10
+            timeoutSeconds: 10
+            failureThreshold: 3
+          readinessProbe:
+            exec:
+              command: ["/bin/sh", "-c", "mongosh --quiet --eval 'db.runCommand({ping: 1})'"]
+            initialDelaySeconds: 15
+            periodSeconds: 10
+            timeoutSeconds: 10
+            failureThreshold: 5
+          volumeMounts:
+            - name: mongos-init
+              mountPath: /docker-entrypoint-initdb.d
+      volumes:
+        - name: mongos-init
+          configMap:
+            name: mongos-init

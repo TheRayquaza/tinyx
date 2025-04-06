@@ -6,7 +6,7 @@ metadata:
   labels:
     app: repo-post
 spec:
-  replicas: 3
+  replicas: 1 # TODO: make it 3
   strategy:
     type: RollingUpdate
     rollingUpdate:
@@ -24,7 +24,7 @@ spec:
         - name: pull-secret
       containers:
         - name: repo-post
-          image: registry.cri.epita.fr/ing/majeures/tc/info/student/2026/2025-epitweet-tinyx-02/repo-post:91e0ba19a76ee08810f8325f23ff0e7080d3d409 # TODO: use explicit tag
+          image: registry.cri.epita.fr/ing/majeures/tc/info/student/2026/2025-epitweet-tinyx-02/repo-post:v1.0.0
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 8080
@@ -66,10 +66,7 @@ spec:
                 name: repo-post-config
                 key: REPO_POST_MONGODB_HOST
           - name: REPO_POST_APP_PROFILE
-            valueFrom:
-              configMapKeyRef:
-                name: apps-post-config
-                key: POST_AGGREGATE_CHANNEL
+            value: "prod"
           - name: REPO_POST_MINIO_ENDPOINT
             valueFrom:
                 configMapKeyRef:

@@ -1,0 +1,72 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: mongo-shard
+  namespace: mongo
+spec:
+  serviceName: mongo-shard
+  replicas: 3 # TODO: add more replicate if needed
+  selector:
+    matchLabels:
+      app: mongo-shard
+  template:
+    metadata:
+      labels:
+        app: mongo-shard
+    spec:
+      containers:
+        - name: mongo-shard
+          image: mongo:8.0.6
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 27018
+          command: ["/bin/bash", "-c"]
+          args:
+            - |
+              mongod --shardsvr --replSet shardReplSet --dbpath /data/db --port 27018 --bind_ip 0.0.0.0 &
+              mongod_pid=$!
+              sleep 5;
+              if mongosh --port 27018 --quiet --eval "rs.status().ok" | grep -q "1"; then
+                echo "Replica set already initialized."
+              else
+                mongosh --port 27018 /docker-entrypoint-initdb.d/init.js;
+              fi
+              wait $mongod_pid;
+          volumeMounts:
+            - name: mongo-shard-data
+              mountPath: /data/db
+            - name: mongo-shard-init
+              mountPath: /docker-entrypoint-initdb.d
+          resources:
+            requests:
+              cpu: "250m"
+              memory: "512Mi"
+            limits:
+              cpu: "500m"
+              memory: "1Gi"
+          livenessProbe:
+            exec:
+              command: ["/bin/sh", "-c", "mongosh --port 27018 --quiet --eval 'db.runCommand({ping: 1})'"]
+            initialDelaySeconds: 15
+            periodSeconds: 10
+            timeoutSeconds: 10
+            failureThreshold: 3
+          readinessProbe:
+            exec:
+              command: ["/bin/sh", "-c", "mongosh --port 27018 --quiet --eval 'db.runCommand({ping: 1})'"]
+            initialDelaySeconds: 15
+            periodSeconds: 10
+            timeoutSeconds: 10
+            failureThreshold: 5
+      volumes:
+        - name: mongo-shard-init
+          configMap:
+            name: mongo-shard-init
+  volumeClaimTemplates:
+    - metadata:
+        name: mongo-shard-data
+      spec:
+        accessModes: ["ReadWriteOnce"]
+        resources:
+          requests:
+            storage: 10Gi

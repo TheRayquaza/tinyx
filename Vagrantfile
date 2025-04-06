@@ -1,8 +1,8 @@
 Vagrant.configure("2") do |config|
   config.vm.box = "generic/ubuntu2204"
   config.vm.provider "libvirt" do |libvirt|
-    libvirt.memory = 2048
-    libvirt.cpus = 2
+    libvirt.memory = 7000
+    libvirt.cpus = 6
   end
 
   config.vm.synced_folder "k8s", "/vagrant", type: "rsync"
