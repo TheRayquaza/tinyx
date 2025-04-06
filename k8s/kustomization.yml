@@ -6,4 +6,4 @@ resources:
   - mongodb
   #- elastic
   #- redis
-  #- neo4j
+  - neo4j
