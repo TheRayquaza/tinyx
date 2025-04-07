@@ -8,6 +8,7 @@ import jakarta.inject.Inject;
 import java.io.File;
 import java.io.InputStream;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
+import java.util.concurrent.ThreadLocalRandom;
 
 @ApplicationScoped
 public class S3Service implements Logger {
@@ -60,11 +61,13 @@ public class S3Service implements Logger {
 
   public void uploadFile(String key, InputStream inputStream, long size) {
     try {
+      int n = ThreadLocalRandom.current().nextInt(0, 5);
+      String prefixedKey = "minio-" + n + "/" + key;
       minioClient.putObject(
-          PutObjectArgs.builder().bucket(bucketName).object(key).stream(inputStream, size, -1)
+          PutObjectArgs.builder().bucket(bucketName).object(prefixedKey).stream(inputStream, size, -1)
               .contentType("application/octet-stream")
               .build());
-      logger().info("File uploaded: {}", key);
+      logger().info("File uploaded : {}", prefixedKey);
     } catch (Exception e) {
       logger().error("Failed to upload file to MinIO");
       throw new RuntimeException("Failed to upload file to MinIO", e);
