@@ -41,7 +41,7 @@ public class S3Service implements Logger {
 
   @Inject
   @ConfigProperty(name = "s3.minio_number", defaultValue = "1")
-  Integer minio_number;
+  int minio_number;
 
   @PostConstruct
   public void init() {
@@ -81,12 +81,11 @@ public class S3Service implements Logger {
   public void uploadFile(String key, InputStream inputStream, long size) {
     try {
       int n = ThreadLocalRandom.current().nextInt(0, minio_number);
-      String prefixedKey = "minio-" + n + "/" + key;
       minioClientList.get(n).putObject(
-          PutObjectArgs.builder().bucket(bucketName).object(prefixedKey).stream(inputStream, size, -1)
+          PutObjectArgs.builder().bucket(bucketName).object(key).stream(inputStream, size, -1)
               .contentType("application/octet-stream")
               .build());
-      logger().info("File uploaded : {}", prefixedKey);
+      logger().info("File uploaded : {}", key);
     } catch (Exception e) {
       logger().error("Failed to upload file to MinIO");
       throw new RuntimeException("Failed to upload file to MinIO", e);
@@ -117,7 +116,7 @@ public class S3Service implements Logger {
               .object(values.getValue())
               .filename(downloadPath)
               .build());
-      logger().info("File downloaded: {}", key);
+      logger().info("File downloaded: {}", values.getValue());
       return new File(downloadPath);
     } catch (Exception e) {
       logger().error("Failed to download file from MinIO");
@@ -131,7 +130,7 @@ public class S3Service implements Logger {
       if (values.getKey() < 0 || values.getKey() >= minio_number)
         throw new InvalidParameterException("");
       minioClientList.get(values.getKey()).removeObject(RemoveObjectArgs.builder().bucket(bucketName).object(values.getValue()).build());
-      logger().info("File deleted: {}", key);
+      logger().info("File deleted: {}", values.getValue());
     } catch (Exception e) {
       logger().error("Failed to delete file from MinIO");
       throw new RuntimeException("Failed to delete file from MinIO", e);
