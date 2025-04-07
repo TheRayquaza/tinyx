@@ -25,4 +25,10 @@ public record PostNode(String postId) {
                 "Create (n:User {postId: \"%s\"}) Return n",
                 this.postId);
     }
+
+    public String getLikesCypher() {
+        return String.format(
+                "MATCH (n:Post {postId:\"%s\"})<-[:HAS_LIKED]-(u:User) RETURN u",
+                this.postId);
+    }
 }
