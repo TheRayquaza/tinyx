@@ -39,7 +39,7 @@ services:
 
   minio:
     image: quay.io/minio/minio:RELEASE.2025-03-12T18-04-18Z
-    container_name: minio
+    container_name: minio-0
     ports:
       - "9000:9000"
       - "9090:9090"
@@ -50,6 +50,19 @@ services:
     expose:
       - "9000"
       - "9090"
+  minio2:
+    image: quay.io/minio/minio:RELEASE.2025-03-12T18-04-18Z
+    container_name: minio-1
+    ports:
+      - "9001:9000"
+      - "9091:9090"
+    environment:
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadmin
+    command: server /data --console-address ":9091"
+    expose:
+      - "9001"
+      - "9091"
 
   mongo-express:
     image: mongo-express:1.0.2
