@@ -1,7 +1,6 @@
 package com.epita.repo_social.repository.model;
 
 import io.smallrye.common.constraint.NotNull;
-import lombok.Builder;
 import lombok.NonNull;
 import java.time.LocalDateTime;
 
@@ -60,5 +59,23 @@ public record UserNode(
                 "MATCH (n:User {userId: \"%s\"}) SET n.deleted = true RETURN n",
                 this.userId
         );
+    }
+
+    public String getFollowersCypher() {
+        return String.format(
+                "MATCH (n:User {userId:\"%s\"})<-[:HAS_FOLLOWED]-(u:User) RETURN u",
+                this.userId);
+    }
+
+    public String getFollowingsCypher() {
+        return String.format(
+                "MATCH (n:User {userId:\"%s\"})-[:HAS_FOLLOWED]->(u:User) RETURN u",
+                this.userId);
+    }
+
+    public String getBlocksCypher() {
+        return String.format(
+                "MATCH (n:User {userId:\"%s\"})<-[:HAS_BLOCKED]-(u:User) RETURN u",
+                this.userId);
     }
 }

@@ -12,7 +12,7 @@ public record LikeRelationship(UserNode source, PostNode target) {
 
     public String findCypher() {
         String query = """
-                Match (n1:User {userId:"%s"})-[l:LIKED]->(n2:Post {postId:"%s"})
+                Match (n1:User {userId:"%s"})-[l:HAS_LIKED]->(n2:Post {postId:"%s"})
                 Return l
                 """;
         return String.format(query, this.source.userId(), this.target.postId());
@@ -21,7 +21,7 @@ public record LikeRelationship(UserNode source, PostNode target) {
     public String createCypher() {
         String query = """
                 Match (n1:User {userId:"%s"}), (n2:Post {postId:"%s"})
-                Merge (n1)-[l:LIKED]->(n2)
+                Merge (n1)-[l:HAS_LIKED]->(n2)
                 Return l
                 """;
         return String.format(query, this.source.userId(), this.target.postId());
@@ -29,7 +29,7 @@ public record LikeRelationship(UserNode source, PostNode target) {
 
     public String deleteCypher() {
         String query = """
-                Match (n1:User {userId:"%s"})-[l:LIKED]->(n2:Post {postId:"%s"})
+                Match (n1:User {userId:"%s"})-[l:HAS_LIKED]->(n2:Post {postId:"%s"})
                 Delete l
                 """;
         return String.format(query, this.source.userId(), this.target.postId());

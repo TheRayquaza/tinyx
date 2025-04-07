@@ -12,7 +12,7 @@ public record FollowRelationship(UserNode source, UserNode target) {
 
     public String findCypher() {
         String query = """
-                Match (n1:User {userId:"%s"})-[f:FOLLOWED]->(n2:User {userId:"%s"})
+                Match (n1:User {userId:"%s"})-[f:HAS_FOLLOWED]->(n2:User {userId:"%s"})
                 Return f
                 """;
         return String.format(query, this.source.userId(), this.target.userId());
@@ -21,7 +21,7 @@ public record FollowRelationship(UserNode source, UserNode target) {
     public String createCypher() {
         String query = """
                 Match (n1:User {userId:"%s"}), (n2:User {userId:"%s"})
-                Merge (n1)-[f:FOLLOWED]->(n2)
+                Merge (n1)-[f:HAS_FOLLOWED]->(n2)
                 Return f
                 """;
         return String.format(query, this.source.userId(), this.target.userId());
@@ -29,7 +29,7 @@ public record FollowRelationship(UserNode source, UserNode target) {
 
     public String deleteCypher() {
         String query = """
-                Match (n1:User {userId:"%s"})-[f:FOLLOWED]->(n2:User {userId:"%s"})
+                Match (n1:User {userId:"%s"})-[f:HAS_FOLLOWED]->(n2:User {userId:"%s"})
                 Delete f
                 """;
         return String.format(query, this.source.userId(), this.target.userId());
