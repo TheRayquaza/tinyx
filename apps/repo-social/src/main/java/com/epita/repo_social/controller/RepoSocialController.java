@@ -18,7 +18,7 @@ public class RepoSocialController implements RepoSocialControllerApi {
   @POST
   @Path("/post/{postId}/like")
   @Override
-  public void likePost(String postId) {
+  public void likePost(@PathParam("postId") String postId) {
     logger().info("POST /social/post/{}/like", postId);
     socialService.likePost(postId);
   }
@@ -26,7 +26,7 @@ public class RepoSocialController implements RepoSocialControllerApi {
   @DELETE
   @Path("/post/{postId}/like")
   @Override
-  public void unlikePost(String postId) {
+  public void unlikePost(@PathParam("postId") String postId) {
     logger().info("DELETE /social/post/{}/like", postId);
     socialService.unlikePost(postId);
   }
@@ -34,7 +34,7 @@ public class RepoSocialController implements RepoSocialControllerApi {
   @POST
   @Path("/user/{userId}/follow")
   @Override
-  public void followUser(String userId) {
+  public void followUser(@PathParam("userId") String userId) {
     logger().info("POST /social/user/{}/follow", userId);
     socialService.followUser(userId);
   }
@@ -42,7 +42,7 @@ public class RepoSocialController implements RepoSocialControllerApi {
   @DELETE
   @Path("/user/{userId}/follow")
   @Override
-  public void unfollowUser(String userId) {
+  public void unfollowUser(@PathParam("userId") String userId) {
     logger().info("DELETE /social/user/{}/follow", userId);
     socialService.unfollowUser(userId);
   }
@@ -50,7 +50,7 @@ public class RepoSocialController implements RepoSocialControllerApi {
   @POST
   @Path("/user/{userId}/block")
   @Override
-  public void blockUser(String userId) {
+  public void blockUser(@PathParam("userId") String userId) {
     logger().info("POST /social/user/{}/block", userId);
     socialService.blockUser(userId);
   }
@@ -58,7 +58,7 @@ public class RepoSocialController implements RepoSocialControllerApi {
   @DELETE
   @Path("/user/{userId}/block")
   @Override
-  public void unblockUser(String userId) {
+  public void unblockUser(@PathParam("userId") String userId) {
     logger().info("DELETE /social/user/{}/block", userId);
     socialService.unblockUser(userId);
   }
