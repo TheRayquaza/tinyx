@@ -7,25 +7,24 @@ import com.epita.exchange.redis.command.BlockCommand;
 import com.epita.exchange.redis.command.FollowCommand;
 import com.epita.exchange.redis.command.LikeCommand;
 import com.epita.exchange.redis.service.RedisPublisher;
-import com.epita.exchange.s3.service.S3Service;
 import com.epita.exchange.utils.Logger;
-import com.epita.repo_social.RepoSocialErrorCode;
+import com.epita.repo_social.repository.Neo4jRepository;
+import com.epita.repo_social.repository.model.*;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import java.util.*;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
-import org.neo4j.driver.Driver;
 
 @ApplicationScoped
 public class SocialService implements Logger {
 
   @Inject AuthService authService;
 
-  @Inject S3Service s3Service;
+  @Inject
+  Neo4jRepository neo4jRepository;
 
-  @Inject RedisPublisher redisPublisher;
-
-  @Inject Driver neo4jDriver;
+  @Inject
+  RedisPublisher redisPublisher;
 
   @ConfigProperty(name = "repo.social.like.command.channel")
   @Inject
@@ -40,22 +39,16 @@ public class SocialService implements Logger {
   String followCommandChannel;
 
   public void likePost(String postId) {
-    // Update Neo4j
-    final var session = neo4jDriver.session();
-    // socialRepository...
-    final var cypher =
-        "MATCH (u:UserModel {user_id: $userId}), (p:PostModel {post_id: $postId})\n"
-            + "MERGE (u)-[:LIKES]->(p);\n";
     logger().info("Running like cypher script with : \n userId: {}\n", authService.getUserId());
     logger().info("postId: {}\n", postId);
 
-    if (!session.executeWrite(
-        tx ->
-            tx.run(cypher, parameters("userId", authService.getUserId(), "postId", postId))
-                .consume()
-                .counters()
-                .containsUpdates()))
-      throw RepoSocialErrorCode.ERROR_DURING_CYPHER_EXEC.createError(postId);
+    UserNode userNode = new UserNode(authService.getUserId());
+    PostNode postNode = new PostNode(postId);
+
+    LikeRelationship likeRelationship = new LikeRelationship(userNode, postNode);
+
+    neo4jRepository.createRelation(likeRelationship.createCypher());
+
     // Redis
     redisPublisher.publish(
         likeCommandChannel,
@@ -63,22 +56,16 @@ public class SocialService implements Logger {
   }
 
   public void unlikePost(String postId) {
-    // Update Neo4j
-    final var session = neo4jDriver.session();
-    // socialRepository...
-    final var cypher =
-        "MATCH (u:UserModel {user_id: $userId})-[r:LIKES]->(p:PostModel {post_id: $postId})\n"
-            + "DELETE r;\n";
     logger().info("Running unlike cypher script with : \n userId: {}\n", authService.getUserId());
     logger().info("postId: {}\n", postId);
 
-    if (!session.executeWrite(
-        tx ->
-            tx.run(cypher, parameters("userId", authService.getUserId(), "postId", postId))
-                .consume()
-                .counters()
-                .containsUpdates()))
-      throw RepoSocialErrorCode.ERROR_DURING_CYPHER_EXEC.createError(postId);
+    UserNode userNode = new UserNode(authService.getUserId());
+    PostNode postNode = new PostNode(postId);
+
+    LikeRelationship likeRelationship = new LikeRelationship(userNode, postNode);
+
+    neo4jRepository.deleteRelation(likeRelationship.deleteCypher());
+
     // Redis
     redisPublisher.publish(
         likeCommandChannel,
@@ -86,22 +73,16 @@ public class SocialService implements Logger {
   }
 
   public void followUser(String userId) {
-    // Update Neo4jUserModel
-    final var session = neo4jDriver.session();
-    // socialRepository...
-    final var cypher =
-        "MATCH (u1:UserModel {user_id: $userId}), (u2:UserModel {user_id: $userIdFollowed})\n"
-            + "MERGE (u1)-[:FOLLOWS]->(u2);\n";
     logger().info("Running follow cypher script with : \n userId: {}\n", authService.getUserId());
-    logger().info("userIdFollowed: {}\n", userId);
+    logger().info("userId Followed: {}\n", userId);
 
-    if (!session.executeWrite(
-        tx ->
-            tx.run(cypher, parameters("userId", authService.getUserId(), "userIdFollowed", userId))
-                .consume()
-                .counters()
-                .containsUpdates()))
-      throw RepoSocialErrorCode.ERROR_DURING_CYPHER_EXEC.createError(userId);
+    UserNode followerNode = new UserNode(authService.getUserId());
+    UserNode followedNode = new UserNode(userId);
+
+    FollowRelationship followRelationship = new FollowRelationship(followerNode, followedNode);
+
+    neo4jRepository.createRelation(followRelationship.createCypher());
+
     // Redis
     redisPublisher.publish(
         followCommandChannel,
@@ -109,22 +90,16 @@ public class SocialService implements Logger {
   }
 
   public void unfollowUser(String userId) {
-    // Update Neo4jUserModel
-    final var session = neo4jDriver.session();
-    // socialRepository...
-    final var cypher =
-        "MATCH (u1:UserModel {user_id: $userId})-[r:FOLLOWS]->(u2:UserModel {user_id: $userIdFollowed})\n"
-            + "DELETE r;\n";
     logger().info("Running unfollow cypher script with : \n userId: {}\n", authService.getUserId());
-    logger().info("userIdFollowed: {}\n", userId);
+    logger().info("userId Followed: {}\n", userId);
 
-    if (!session.executeWrite(
-        tx ->
-            tx.run(cypher, parameters("userId", authService.getUserId(), "userIdFollowed", userId))
-                .consume()
-                .counters()
-                .containsUpdates()))
-      throw RepoSocialErrorCode.ERROR_DURING_CYPHER_EXEC.createError(userId);
+    UserNode followerNode = new UserNode(authService.getUserId());
+    UserNode followedNode = new UserNode(userId);
+
+    FollowRelationship followRelationship = new FollowRelationship(followerNode, followedNode);
+
+    neo4jRepository.deleteRelation(followRelationship.deleteCypher());
+
     // Redis
     redisPublisher.publish(
         followCommandChannel,
@@ -132,22 +107,16 @@ public class SocialService implements Logger {
   }
 
   public void blockUser(String userId) {
-    // Update Neo4jUserModel
-    final var session = neo4jDriver.session();
-    // socialRepository...
-    final var cypher =
-        "MATCH (u1:UserModel {user_id: $userId}), (u2:UserModel {user_id: $userIdBlocked})\n"
-            + "MERGE (u1)-[:BLOCKS]->(u2);\n";
     logger().info("Running block cypher script with : \n userId: {}\n", authService.getUserId());
-    logger().info("userIdBlockeded: {}\n", userId);
+    logger().info("userId Blocked: {}\n", userId);
 
-    if (!session.executeWrite(
-        tx ->
-            tx.run(cypher, parameters("userId", authService.getUserId(), "userIdBlocked", userId))
-                .consume()
-                .counters()
-                .containsUpdates()))
-      throw RepoSocialErrorCode.ERROR_DURING_CYPHER_EXEC.createError(userId);
+    UserNode blockerNode = new UserNode(authService.getUserId());
+    UserNode blockedNode = new UserNode(userId);
+
+    BlockRelationship blockRelationship = new BlockRelationship(blockerNode, blockedNode);
+
+    neo4jRepository.createRelation(blockRelationship.createCypher());
+
     // Redis
     redisPublisher.publish(
         blockCommandChannel,
@@ -155,36 +124,20 @@ public class SocialService implements Logger {
   }
 
   public void unblockUser(String userId) {
-    // Update Neo4jUserModel
-    final var session = neo4jDriver.session();
-    // socialRepository...
-
-    final var cypher =
-        "MATCH (u1:UserModel {user_id: $userId})-[r:BLOCKS]->(u2:UserModel {user_id: $userIdBlocked})\n"
-            + "DELETE r\n";
     logger().info("Running unblock cypher script with : \n userId: {}\n", authService.getUserId());
-    logger().info("userIdBlockeded: {}\n", userId);
+    logger().info("userId Blocked: {}\n", userId);
 
-    if (!session.executeWrite(
-        tx ->
-            tx.run(cypher, parameters("userId", authService.getUserId(), "userIdBlocked", userId))
-                .consume()
-                .counters()
-                .containsUpdates()))
-      throw RepoSocialErrorCode.ERROR_DURING_CYPHER_EXEC.createError(userId);
+    UserNode blockerNode = new UserNode(authService.getUserId());
+    UserNode blockedNode = new UserNode(userId);
+
+    BlockRelationship blockRelationship = new BlockRelationship(blockerNode, blockedNode);
+
+    neo4jRepository.deleteRelation(blockRelationship.deleteCypher());
+
     // Redis
     redisPublisher.publish(
         blockCommandChannel,
         new BlockCommand(UUID.randomUUID(), authService.getUserId(), userId, false));
   }
-
-  /*
-  public List<userId> getUsersLike (String postId) {
-    final var session = neo4jDriver.session();
-
-    final var cypher = "MATCH (u:UserModel)-[:LIKES]->(p:PostModel {post_id: $postId})\n})"
-          + "RETURN u.user_id;";
-  }
-  */
 
 }
