@@ -24,6 +24,7 @@ public class HomeTimelineModelToHomeTimelineEntity
             .withId(input.getId())
             .withUserId(input.getUserId())
             .withFollowersId(input.getFollowersId())
+            .withBlockedUsersId(input.getBlockedUsersId())
             .withEntries(convertedEntries);
     return res;
   }

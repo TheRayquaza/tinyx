@@ -18,6 +18,7 @@ public class HomeTimelineModel {
   private LocalDateTime createdAt;
   private List<HomeTimelineEntryModel> entries;
   private List<String> followersId;
+  private List<String> blockedUsersId;
 
   @Getter
   @Setter

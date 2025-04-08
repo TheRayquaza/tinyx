@@ -3,16 +3,19 @@ package com.epita.srvc_home_timeline.controller.subscribers;
 import static io.quarkus.mongodb.runtime.dns.MongoDnsClientProvider.vertx;
 
 import com.epita.exchange.redis.command.BlockCommand;
+import com.epita.srvc_home_timeline.service.HomeTimelineService;
 import io.quarkus.redis.datasource.RedisDataSource;
 import io.quarkus.redis.datasource.pubsub.PubSubCommands;
 import jakarta.annotation.PreDestroy;
 import jakarta.ejb.Startup;
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
 import java.util.function.Consumer;
 
 @Startup
 @ApplicationScoped
 public class BlockCommandSubscriber implements Consumer<BlockCommand> {
+  @Inject HomeTimelineService homeTimelineService;
   private final PubSubCommands.RedisSubscriber subscriber;
 
   public BlockCommandSubscriber(final RedisDataSource ds) {
@@ -23,6 +26,11 @@ public class BlockCommandSubscriber implements Consumer<BlockCommand> {
   public void accept(final BlockCommand message) {
     vertx.executeBlocking(
         future -> {
+          if (message.isBlocked()) {
+            homeTimelineService.handleBlock(message.getUserId(), message.getTargetId());
+          } else {
+            homeTimelineService.handleUnblock(message.getUserId(), message.getTargetId());
+          }
           future.complete();
         });
   }
