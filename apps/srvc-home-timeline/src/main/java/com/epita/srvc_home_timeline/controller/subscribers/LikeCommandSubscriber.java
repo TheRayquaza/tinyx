@@ -28,10 +28,9 @@ public class LikeCommandSubscriber implements Consumer<LikeCommand> {
         future -> {
           if (message.isLiked()) {
             homeTimelineService.handleLike(
-                message.getUserId(), message.getUuid().toString());
+                message.getUserId(), message.getUuid().toString(), message.getFollowerId());
           } else {
-            homeTimelineService.handleUnlike(
-                message.getUserId(), message.getUuid().toString());
+            homeTimelineService.handleUnlike(message.getUserId(), message.getUuid().toString());
           }
           future.complete();
         });

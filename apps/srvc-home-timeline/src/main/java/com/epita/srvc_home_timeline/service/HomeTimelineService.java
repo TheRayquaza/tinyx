@@ -10,8 +10,8 @@ import com.epita.srvc_home_timeline.converter.HomeTimelinePostModelToHomeTimelin
 import com.epita.srvc_home_timeline.repository.HomeTimelinePostRepository;
 import com.epita.srvc_home_timeline.repository.HomeTimelineRepository;
 import com.epita.srvc_home_timeline.repository.model.HomeTimelineModel;
-import com.epita.srvc_home_timeline.service.entity.HomeTimelineEntity;
 import com.epita.srvc_home_timeline.repository.model.HomeTimelinePostModel;
+import com.epita.srvc_home_timeline.service.entity.HomeTimelineEntity;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import java.time.LocalDateTime;
@@ -27,8 +27,7 @@ public class HomeTimelineService {
   @Inject HomeTimelineModelToHomeTimelineEntity homeTimelineModelToEntity;
   @Inject HomeTimelinePostModelToHomeTimelinePostEntity homeTimelinePostModelToEntity;
   @Inject HomeTimelineEntityToHomeTimelineModel homeTimelineEnityToModel;
-    @Inject
-    HomeTimelinePostRepository homeTimelinePostRepository;
+  @Inject HomeTimelinePostRepository homeTimelinePostRepository;
 
   public HomeTimelineResponse getHomeTimelineById(String userId) {
     Optional<HomeTimelineModel> homeTimeline = homeTimelineRepository.findByUserId(userId);
@@ -120,6 +119,7 @@ public class HomeTimelineService {
       List<String> followers = new ArrayList<>();
       followers.add(followerId);
       newModel.setFollowersId(followers);
+      newModel.setBlockedUsersId(new ArrayList<>());
       homeTimelineRepository.create(newModel);
     }
   }
@@ -181,23 +181,28 @@ public class HomeTimelineService {
     }
   }
 
-  public void handleLike(String UserId, String postId) {
-    List<HomeTimelineModel> hometimelinesModel = homeTimelineRepository.getHomeTimelineContainingUserId(UserId);
-    Optional<HomeTimelinePostModel> homeTimelinePostModel = homeTimelinePostRepository.findByPostId(postId);
+  public void handleLike(String UserId, String postId, String followerId) {
+    List<HomeTimelineModel> hometimelinesModel =
+        homeTimelineRepository.getHomeTimelineContainingUserId(UserId, followerId);
+    Optional<HomeTimelinePostModel> homeTimelinePostModel =
+        homeTimelinePostRepository.findByPostId(postId);
     if (homeTimelinePostModel.isEmpty()) {
       // maybe error because there is a like of a post that doesn't exist
       return;
     }
     HomeTimelinePostModel PostModel = homeTimelinePostModel.get();
     for (HomeTimelineModel homeTimelineModel : hometimelinesModel) {
-      HomeTimelineEntity homeTimelineEntity = homeTimelineModelToEntity.convertNotNull(homeTimelineModel);
+      HomeTimelineEntity homeTimelineEntity =
+          homeTimelineModelToEntity.convertNotNull(homeTimelineModel);
       List<HomeTimelineEntity.HomeTimelineEntryEntity> entries = homeTimelineEntity.getEntries();
       List<HomeTimelineEntity.HomeTimelineLikedByEntity> likedBy = new ArrayList<>();
-      HomeTimelineEntity.HomeTimelineLikedByEntity likedByEntity = new HomeTimelineEntity.HomeTimelineLikedByEntity()
+      HomeTimelineEntity.HomeTimelineLikedByEntity likedByEntity =
+          new HomeTimelineEntity.HomeTimelineLikedByEntity()
               .withUserId(UserId)
               .withLikedAt(LocalDateTime.now());
       likedBy.add(likedByEntity);
-      HomeTimelineEntity.HomeTimelineEntryEntity toAdd = new HomeTimelineEntity.HomeTimelineEntryEntity()
+      HomeTimelineEntity.HomeTimelineEntryEntity toAdd =
+          new HomeTimelineEntity.HomeTimelineEntryEntity()
               .withPostId(postId)
               .withAuthorId(PostModel.getOwnerId())
               .withContent(PostModel.getText())
@@ -206,11 +211,10 @@ public class HomeTimelineService {
               .withTimestamp(LocalDateTime.now());
       entries.add(toAdd);
       homeTimelineEntity.setEntries(entries);
-      homeTimelineRepository.updateModel(homeTimelineEnityToModel.convertNotNull(homeTimelineEntity));
+      homeTimelineRepository.updateModel(
+          homeTimelineEnityToModel.convertNotNull(homeTimelineEntity));
     }
   }
 
-  public void handleUnlike(String UserId, String postId) {
-
-  }
+  public void handleUnlike(String UserId, String postId) {}
 }
