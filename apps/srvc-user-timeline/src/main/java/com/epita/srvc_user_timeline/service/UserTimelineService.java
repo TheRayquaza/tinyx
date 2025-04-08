@@ -3,11 +3,7 @@ package com.epita.srvc_user_timeline.service;
 import com.epita.exchange.redis.aggregate.PostAggregate;
 import com.epita.exchange.redis.aggregate.UserAggregate;
 import com.epita.exchange.redis.command.BlockCommand;
-import com.epita.exchange.redis.command.FollowCommand;
 import com.epita.exchange.redis.command.LikeCommand;
-import com.epita.srvc_user_timeline.UserTimelineErrorCode;
-import com.epita.srvc_user_timeline.converter.UserTimelinePostEntityToUserTimelinePostModel;
-import com.epita.srvc_user_timeline.converter.UserTimelinePostEntityToUserTimelinePostResponse;
 import com.epita.srvc_user_timeline.converter.UserTimelinePostModelToUserTimelinePostEntity;
 import com.epita.srvc_user_timeline.repository.UserTimelineRepository;
 import com.epita.srvc_user_timeline.repository.model.UserTimelinePostModel;
@@ -20,6 +16,7 @@ import org.jboss.logging.Logger;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @ApplicationScoped
 public class UserTimelineService {
@@ -28,9 +25,6 @@ public class UserTimelineService {
     @Inject
     UserTimelinePostModelToUserTimelinePostEntity
             userTimelinePostModelToUserTimelinePostEntity;
-    @Inject
-    UserTimelinePostEntityToUserTimelinePostModel
-            userTimelinePostEntityToUserTimelinePostModel;
     @Inject
     Logger logger;
 
@@ -52,31 +46,29 @@ public class UserTimelineService {
     }
 
     public UserTimelineEntity getUserTimeline(String userId) {
-        // TODO use repository to fetch all posts useful for this user
         List<UserTimelinePostModel> posts = userTimelineRepository
                 .find("userId", userId)
                 .stream()
                 .toList();
 
-        if (posts == null || posts.isEmpty()) {
-            throw UserTimelineErrorCode.USER_NOT_FOUND.createError(userId);
-        }
         List<UserTimelinePostEntity> postsEntity = posts.stream()
                 .map(userTimelinePostModelToUserTimelinePostEntity::convertNotNull)
-                .toList();
+                .collect(Collectors.toList());
+
         return new UserTimelineEntity()
                 .withPosts(sortPosts(postsEntity));
     }
 
     public void handlePostAggregate(PostAggregate postAggregate) {
         if (postAggregate.isDeleted()) {
-            userTimelineRepository.deleteById(new ObjectId(postAggregate.getId()));
+            userTimelineRepository.delete("postId", postAggregate.getId());
             return;
         }
 
 
-        UserTimelinePostEntity userTimelinePostEntity = new UserTimelinePostEntity()
-                .withId(postAggregate.getId())
+        UserTimelinePostModel userTimelinePostModel = new UserTimelinePostModel()
+                .withId(new ObjectId())
+                .withPostId(postAggregate.getId())
                 .withUserId(postAggregate.getOwnerId())
                 .withOwnerId(postAggregate.getOwnerId())
                 .withText(postAggregate.getText())
@@ -88,9 +80,7 @@ public class UserTimelineService {
                 .withUpdatedAt(postAggregate.getUpdatedAt())
                 .withDeleted(postAggregate.isDeleted());
 
-        userTimelineRepository.persist(
-                userTimelinePostEntityToUserTimelinePostModel
-                        .convertNotNull(userTimelinePostEntity));
+        userTimelineRepository.persist(userTimelinePostModel);
     }
 
     public void handleUserAggregate(UserAggregate userAggregate) {
@@ -102,18 +92,22 @@ public class UserTimelineService {
     }
 
     public void handleLikeCommand(LikeCommand likeCommand) {
-
         UserTimelinePostModel likedPost = userTimelineRepository
-                .findById(new ObjectId(likeCommand.getPostId()));
+                .find("postId = ?1", likeCommand.getPostId())
+                .firstResult();
+
         if (likedPost == null) {
+            logger.error("Post not found: " + likeCommand.getPostId());
             return;
         }
 
+
         if (!likeCommand.isLiked()) {
-            userTimelineRepository.delete(likedPost);
+            userTimelineRepository.delete("postId = ?1 and userId = ?2", likeCommand.getPostId(), likeCommand.getUserId());
         } else {
             UserTimelinePostModel newTimelinePost = new UserTimelinePostModel()
-                    .withId(likeCommand.getPostId())
+                    .withId(new ObjectId())
+                    .withPostId(likedPost.getPostId())
                     .withUserId(likeCommand.getUserId())
                     .withOwnerId(likedPost.getOwnerId())
                     .withText(likedPost.getText())
@@ -124,9 +118,7 @@ public class UserTimelineService {
                     .withLikedAt(LocalDateTime.now());
 
             userTimelineRepository.persist(newTimelinePost);
-
         }
-
     }
 
     public void handleBlockCommand(BlockCommand blockCommand) {

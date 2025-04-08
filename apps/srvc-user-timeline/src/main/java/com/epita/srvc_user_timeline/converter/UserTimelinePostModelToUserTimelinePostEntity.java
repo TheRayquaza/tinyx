@@ -11,6 +11,7 @@ public class UserTimelinePostModelToUserTimelinePostEntity implements Converter<
     public UserTimelinePostEntity convertNotNull(UserTimelinePostModel input) {
             return new UserTimelinePostEntity()
                     .withId(input.getId())
+                    .withPostId(input.getPostId())
                     .withUserId(input.getUserId())
                     .withText(input.getText())
                     .withMedia(input.getMedia())

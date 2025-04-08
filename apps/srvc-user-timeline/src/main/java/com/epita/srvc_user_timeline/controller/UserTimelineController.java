@@ -18,7 +18,6 @@ public class UserTimelineController implements UserTimelineControllerAPI {
 
   @GET
   @Path("/user-timeline/{id}")
-  @Authenticated
   @Override
   public UserTimelineResponse getUserTimeline(@PathParam("id") String id) {
     logger().info("GET /user-timeline/{}", id);
