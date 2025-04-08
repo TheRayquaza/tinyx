@@ -6,6 +6,7 @@ import lombok.Getter;
 @Getter
 public enum UserTimelineErrorCode implements ErrorCode {
   USER_NOT_FOUND(404, "User with ID %s not found"),
+  POST_NOT_FOUND(404, "Post with ID %s not found"),
   UNAUTHORIZED(401, "Unauthorized access"),
   INTERNAL_SERVER_ERROR(500, "Internal server error");
 

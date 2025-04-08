@@ -18,7 +18,7 @@ public class UserTimelinePostResponse implements Serializable {
   // which this post belongs
   private String ownerId;
   private String text;
-  private List<String> media;
+  private String media;
   private String repostId;
   private String replyToPostId;
   private Boolean isReply;
