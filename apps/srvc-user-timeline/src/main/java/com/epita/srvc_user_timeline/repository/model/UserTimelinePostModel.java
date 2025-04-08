@@ -2,8 +2,6 @@ package com.epita.srvc_user_timeline.repository.model;
 
 import io.quarkus.mongodb.panache.common.MongoEntity;
 import java.time.LocalDateTime;
-import java.util.List;
-
 import lombok.*;
 import org.bson.codecs.pojo.annotations.BsonId;
 import org.bson.types.ObjectId;
