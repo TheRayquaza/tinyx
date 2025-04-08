@@ -78,7 +78,7 @@ public class S3Service implements Logger {
     }
   }
 
-  public void uploadFile(String key, InputStream inputStream, long size) {
+  public String uploadFile(String key, InputStream inputStream, long size) {
     try {
       int n = ThreadLocalRandom.current().nextInt(0, minio_number);
       minioClientList.get(n).putObject(
@@ -86,6 +86,7 @@ public class S3Service implements Logger {
               .contentType("application/octet-stream")
               .build());
       logger().info("File uploaded : {} in minio {}", key, n);
+      return String.format("/minio-{}" + key, n);
     } catch (Exception e) {
       logger().error("Failed to upload file to MinIO");
       throw new RuntimeException("Failed to upload file to MinIO", e);
@@ -93,7 +94,7 @@ public class S3Service implements Logger {
   }
 
   private Map.Entry<Integer, String> extractMinioData(String input) {
-    Pattern pattern = Pattern.compile("minio-(\\d+)/(user/[^/]+/image/.+)");
+    Pattern pattern = Pattern.compile("minio-(\\d+)/(.*)");
     Matcher matcher = pattern.matcher(input);
 
     if (matcher.matches()) {
