@@ -24,7 +24,7 @@ spec:
         - name: pull-secret
       containers:
         - name: repo-user
-          image: registry.cri.epita.fr/ing/majeures/tc/info/student/2026/2025-epitweet-tinyx-02/repo-user:v1.0.5
+          image: registry.cri.epita.fr/ing/majeures/tc/info/student/2026/2025-epitweet-tinyx-02/repo-user:v2.0.0
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 8080
@@ -39,13 +39,13 @@ spec:
             httpGet:
               path: /q/health/live
               port: 8080
-            initialDelaySeconds: 5
+            initialDelaySeconds: 20
             periodSeconds: 10
           readinessProbe:
             httpGet:
               path: /q/health/ready
               port: 8080
-            initialDelaySeconds: 5
+            initialDelaySeconds: 20
             periodSeconds: 10
           env:
             - name: QUARKUS_HTTP_PORT
@@ -78,11 +78,21 @@ spec:
               #  configMapKeyRef:
               #    name: apps-config
               #    key: USER_APP_PROFILE
-            - name: REPO_USER_MINIO_ENDPOINT
+            - name: REPO_USER_MINIO_ENDPOINT1
               valueFrom:
                 configMapKeyRef:
                   name: repo-user-config
-                  key: REPO_USER_MINIO_ENDPOINT
+                  key: REPO_USER_MINIO_ENDPOINT1
+            - name: REPO_USER_MINIO_ENDPOINT2
+              valueFrom:
+                configMapKeyRef:
+                  name: repo-user-config
+                  key: REPO_USER_MINIO_ENDPOINT2
+            - name: REPO_USER_MINIO_ENDPOINT3
+              valueFrom:
+                configMapKeyRef:
+                  name: repo-user-config
+                  key: REPO_USER_MINIO_ENDPOINT3
             - name: REPO_USER_MINIO_BUCKET
               value: "RepoUser"
             - name: REPO_USER_MINIO_ACCESS_KEY
