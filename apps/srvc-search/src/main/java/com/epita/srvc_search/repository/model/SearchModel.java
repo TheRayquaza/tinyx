@@ -13,7 +13,7 @@ import org.bson.types.ObjectId;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-@MongoEntity(collection = "search", database = "SrvcSearch")
+@MongoEntity(collection = "SearchModel", database = "SrvcSearch")
 public class SearchModel {
   @BsonId private ObjectId id;
   private String userId;

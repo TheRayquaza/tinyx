@@ -10,4 +10,4 @@ db.createUser(
         ]
     }
 );
-db.createCollection("search");
+db.createCollection("SearchModel");
