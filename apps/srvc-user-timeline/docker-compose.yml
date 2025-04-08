@@ -51,3 +51,4 @@ services:
       - mongo
     expose:
       - "8082"
+
