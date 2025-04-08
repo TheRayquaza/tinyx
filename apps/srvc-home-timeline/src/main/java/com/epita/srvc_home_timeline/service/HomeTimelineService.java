@@ -1,5 +1,6 @@
 package com.epita.srvc_home_timeline.service;
 
+import com.epita.exchange.auth.service.AuthService;
 import com.epita.exchange.redis.aggregate.PostAggregate;
 import com.epita.srvc_home_timeline.HomeTimelineErrorCode;
 import com.epita.srvc_home_timeline.controller.response.HomeTimelineResponse;
@@ -19,6 +20,7 @@ import java.util.Optional;
 
 @ApplicationScoped
 public class HomeTimelineService {
+  @Inject AuthService authService;
   @Inject HomeTimelineRepository homeTimelineRepository;
   @Inject HomeTimelinePostRepository postRepository;
   @Inject HomeTimelineModelToHomeTimelineEntity homeTimelineModelToEntity;
@@ -27,6 +29,10 @@ public class HomeTimelineService {
 
   public HomeTimelineResponse getHomeTimelineById(String userId) {
     Optional<HomeTimelineModel> homeTimeline = homeTimelineRepository.findByUserId(userId);
+    if (authService.getUserId() != userId) {
+      throw HomeTimelineErrorCode.UNAUTHORIZED.createError(userId);
+    }
+
     if (homeTimeline.isPresent()) {
       HomeTimelineModel homeTimelineModel = homeTimeline.get();
       homeTimelineModel.setEntries(
@@ -43,9 +49,9 @@ public class HomeTimelineService {
     if (postAggregate.isDeleted()) {
       homeTimelineRepository.delete("postId", postAggregate.getId());
       homeTimelineDelete(postAggregate.getId());
-      return;
+    } else {
+      homeTimelineAdd(postAggregate);
     }
-    homeTimelineAdd(postAggregate);
   }
 
   public void homeTimelineDelete(String postId) {
@@ -73,6 +79,10 @@ public class HomeTimelineService {
     List<HomeTimelineModel> hometimelinesModel =
         homeTimelineRepository.getHomeTimelineContainingUserId(postAggregate.getOwnerId());
     for (HomeTimelineModel homeTimelineModel : hometimelinesModel) {
+      if (homeTimelineModel.getBlockedUsersId().contains(postAggregate.getOwnerId())) {
+        continue;
+      }
+
       HomeTimelineEntity homeTimelineEntity =
           homeTimelineModelToEntity.convertNotNull(homeTimelineModel);
       List<HomeTimelineEntity.HomeTimelineEntryEntity> entries = homeTimelineEntity.getEntries();
@@ -90,8 +100,8 @@ public class HomeTimelineService {
     }
   }
 
-  public void handleFollow(String UserId, String followerId) {
-    Optional<HomeTimelineModel> homeTimeline = homeTimelineRepository.findByUserId(UserId);
+  public void handleFollow(String userId, String followerId) {
+    Optional<HomeTimelineModel> homeTimeline = homeTimelineRepository.findByUserId(userId);
     if (homeTimeline.isPresent()) {
       HomeTimelineModel homeTimelineModel = homeTimeline.get();
       List<String> followers = homeTimelineModel.getFollowersId();
@@ -102,7 +112,7 @@ public class HomeTimelineService {
       homeTimelineRepository.updateModel(homeTimelineModel);
     } else {
       HomeTimelineModel newModel = new HomeTimelineModel();
-      newModel.setUserId(UserId);
+      newModel.setUserId(userId);
       newModel.setCreatedAt(LocalDateTime.now());
       List<String> followers = new ArrayList<>();
       followers.add(followerId);
@@ -111,8 +121,8 @@ public class HomeTimelineService {
     }
   }
 
-  public void handleUnfollow(String UserId, String followerId) {
-    Optional<HomeTimelineModel> homeTimeline = homeTimelineRepository.findByUserId(UserId);
+  public void handleUnfollow(String userId, String followerId) {
+    Optional<HomeTimelineModel> homeTimeline = homeTimelineRepository.findByUserId(userId);
     if (homeTimeline.isPresent()) {
       HomeTimelineModel homeTimelineModel = homeTimeline.get();
       List<String> followers = homeTimelineModel.getFollowersId();
@@ -123,7 +133,46 @@ public class HomeTimelineService {
       homeTimelineRepository.updateModel(homeTimelineModel);
     } else {
       HomeTimelineModel newModel = new HomeTimelineModel();
-      newModel.setUserId(UserId);
+      newModel.setUserId(userId);
+      newModel.setCreatedAt(LocalDateTime.now());
+      homeTimelineRepository.create(newModel);
+    }
+  }
+
+  public void handleBlock(String userId, String blockedUserId) {
+    Optional<HomeTimelineModel> homeTimeline = homeTimelineRepository.findByUserId(userId);
+    if (homeTimeline.isPresent()) {
+      HomeTimelineModel homeTimelineModel = homeTimeline.get();
+      List<String> blockedUsers = homeTimelineModel.getBlockedUsersId();
+      if (!blockedUsers.contains(blockedUserId)) {
+        blockedUsers.add(blockedUserId);
+      }
+      homeTimelineModel.setBlockedUsersId(blockedUsers);
+      homeTimelineRepository.updateModel(homeTimelineModel);
+    } else {
+      HomeTimelineModel newModel = new HomeTimelineModel();
+      newModel.setUserId(userId);
+      newModel.setCreatedAt(LocalDateTime.now());
+      List<String> blockedUsers = new ArrayList<>();
+      blockedUsers.add(blockedUserId);
+      newModel.setBlockedUsersId(blockedUsers);
+      homeTimelineRepository.create(newModel);
+    }
+  }
+
+  public void handleUnblock(String userId, String blockedUserId) {
+    Optional<HomeTimelineModel> homeTimeline = homeTimelineRepository.findByUserId(userId);
+    if (homeTimeline.isPresent()) {
+      HomeTimelineModel homeTimelineModel = homeTimeline.get();
+      List<String> blockedUsers = homeTimelineModel.getBlockedUsersId();
+      if (blockedUsers.contains(blockedUserId)) {
+        blockedUsers.remove(blockedUserId);
+      }
+      homeTimelineModel.setBlockedUsersId(blockedUsers);
+      homeTimelineRepository.updateModel(homeTimelineModel);
+    } else {
+      HomeTimelineModel newModel = new HomeTimelineModel();
+      newModel.setUserId(userId);
       newModel.setCreatedAt(LocalDateTime.now());
       homeTimelineRepository.create(newModel);
     }

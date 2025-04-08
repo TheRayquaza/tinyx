@@ -16,6 +16,7 @@ public class HomeTimelineEntity implements Serializable {
   private String userId;
   private List<HomeTimelineEntryEntity> entries;
   private List<String> followersId;
+  private List<String> blockedUsersId;
 
   @Getter
   @Setter
