@@ -1,19 +1,19 @@
 package com.epita.srvc_home_timeline.service;
 
 import com.epita.exchange.redis.aggregate.PostAggregate;
+import com.epita.srvc_home_timeline.converter.HomeTimelineEntityToHomeTimelineModel;
 import com.epita.srvc_home_timeline.converter.HomeTimelineModelToHomeTimelineEntity;
 import com.epita.srvc_home_timeline.converter.HomeTimelinePostModelToHomeTimelinePostEntity;
 import com.epita.srvc_home_timeline.repository.HomeTimelinePostRepository;
 import com.epita.srvc_home_timeline.repository.HomeTimelineRepository;
 import com.epita.srvc_home_timeline.repository.model.HomeTimelineModel;
-import com.epita.srvc_home_timeline.repository.model.HomeTimelinePostModel;
+import com.epita.srvc_home_timeline.service.entity.HomeTimelineEntity;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import org.bson.types.ObjectId;
 
 @ApplicationScoped
 public class HomeTimelineService {
@@ -21,6 +21,7 @@ public class HomeTimelineService {
   @Inject HomeTimelinePostRepository postRepository;
   @Inject HomeTimelineModelToHomeTimelineEntity homeTimelineModelToEntity;
   @Inject HomeTimelinePostModelToHomeTimelinePostEntity homeTimelinePostModelToEntity;
+  @Inject HomeTimelineEntityToHomeTimelineModel homeTimelineEnityToModel;
 
   public void handlePostAggregate(PostAggregate postAggregate) {
     if (postAggregate.isDeleted()) {
@@ -28,26 +29,49 @@ public class HomeTimelineService {
       homeTimelineDelete(postAggregate.getId());
       return;
     }
-
-    HomeTimelinePostModel homeTimelinePostModel =
-        new HomeTimelinePostModel()
-            .withId(new ObjectId())
-            .withPostId(postAggregate.getId())
-            .withOwnerId(postAggregate.getOwnerId())
-            .withText(postAggregate.getText())
-            .withMedia(postAggregate.getMedia())
-            .withRepostId(postAggregate.getRepostId())
-            .withReplyToPostId(postAggregate.getReplyToPostId())
-            .withReply(postAggregate.isReply())
-            .withCreatedAt(postAggregate.getCreatedAt())
-            .withUpdatedAt(postAggregate.getUpdatedAt())
-            .withDeleted(postAggregate.isDeleted());
-
-    postRepository.create(homeTimelinePostModel);
+    homeTimelineAdd(postAggregate);
   }
 
   public void homeTimelineDelete(String postId) {
-    homeTimelineRepository.getHomeTimelineWithPostId(postId);
+    List<HomeTimelineModel> hometimelinesModel =
+        homeTimelineRepository.getHomeTimelineContainingPostId(postId);
+    for (HomeTimelineModel homeTimelineModel : hometimelinesModel) {
+      HomeTimelineEntity homeTimelineEntity =
+          homeTimelineModelToEntity.convertNotNull(homeTimelineModel);
+      List<HomeTimelineEntity.HomeTimelineEntryEntity> entries = homeTimelineEntity.getEntries();
+      HomeTimelineEntity.HomeTimelineEntryEntity toDelete = null;
+      for (HomeTimelineEntity.HomeTimelineEntryEntity homeTimelineEntryEntity : entries) {
+        if (homeTimelineEntryEntity.getPostId().equals(postId)) {
+          toDelete = homeTimelineEntryEntity;
+        }
+      }
+      if (toDelete != null) {
+        entries.remove(toDelete);
+      }
+      homeTimelineRepository.updateModel(
+          homeTimelineEnityToModel.convertNotNull(homeTimelineEntity));
+    }
+  }
+
+  public void homeTimelineAdd(PostAggregate postAggregate) {
+    List<HomeTimelineModel> hometimelinesModel =
+        homeTimelineRepository.getHomeTimelineContainingUserId(postAggregate.getOwnerId());
+    for (HomeTimelineModel homeTimelineModel : hometimelinesModel) {
+      HomeTimelineEntity homeTimelineEntity =
+          homeTimelineModelToEntity.convertNotNull(homeTimelineModel);
+      List<HomeTimelineEntity.HomeTimelineEntryEntity> entries = homeTimelineEntity.getEntries();
+      HomeTimelineEntity.HomeTimelineEntryEntity toAdd =
+          new HomeTimelineEntity.HomeTimelineEntryEntity()
+              .withPostId(postAggregate.getId())
+              .withAuthorId(postAggregate.getOwnerId())
+              .withContent(postAggregate.getText())
+              .withLikedBy(new ArrayList<>())
+              .withType(postAggregate.getMedia())
+              .withTimestamp(LocalDateTime.now());
+      entries.add(toAdd);
+      homeTimelineRepository.updateModel(
+          homeTimelineEnityToModel.convertNotNull(homeTimelineEntity));
+    }
   }
 
   public void handleFollow(String UserId, String followerId) {

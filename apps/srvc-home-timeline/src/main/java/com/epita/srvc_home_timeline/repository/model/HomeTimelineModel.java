@@ -3,10 +3,7 @@ package com.epita.srvc_home_timeline.repository.model;
 import io.quarkus.mongodb.panache.common.MongoEntity;
 import java.time.LocalDateTime;
 import java.util.List;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.bson.codecs.pojo.annotations.BsonId;
 
 @Getter
@@ -14,6 +11,7 @@ import org.bson.codecs.pojo.annotations.BsonId;
 @AllArgsConstructor
 @NoArgsConstructor
 @MongoEntity(collection = "HomeTimelineModel", database = "SrvcHomeTimeline")
+@With
 public class HomeTimelineModel {
   @BsonId private String id;
   private String userId;
@@ -25,6 +23,7 @@ public class HomeTimelineModel {
   @Setter
   @AllArgsConstructor
   @NoArgsConstructor
+  @With
   public static class HomeTimelineEntryModel {
     private String postId;
     private String authorId;
@@ -38,6 +37,7 @@ public class HomeTimelineModel {
   @Setter
   @AllArgsConstructor
   @NoArgsConstructor
+  @With
   public static class HomeTimelineLikedByModel {
     private String userId;
     private LocalDateTime likedAt;
