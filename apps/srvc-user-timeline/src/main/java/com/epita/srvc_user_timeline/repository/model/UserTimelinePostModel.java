@@ -6,6 +6,7 @@ import java.util.List;
 
 import lombok.*;
 import org.bson.codecs.pojo.annotations.BsonId;
+import org.bson.types.ObjectId;
 
 @Getter
 @Setter
@@ -14,7 +15,8 @@ import org.bson.codecs.pojo.annotations.BsonId;
 @NoArgsConstructor
 @MongoEntity(collection = "UserTimelinePost", database = "SrvcUserTimeline")
 public class UserTimelinePostModel {
-  @BsonId private String id;
+  @BsonId private ObjectId id;
+  private String postId;
   private String userId;
   private String ownerId;
   private String text;
