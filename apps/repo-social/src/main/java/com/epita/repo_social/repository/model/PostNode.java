@@ -16,7 +16,7 @@ public record PostNode(String postId, String ownerId) {
 
     public String findCypher() {
         return String.format(
-                "Match (p:Post {postId:\"%s\") Return p",
+                "Match (p:Post {postId:\"%s\"}) Return p",
                 this.postId);
     }
 

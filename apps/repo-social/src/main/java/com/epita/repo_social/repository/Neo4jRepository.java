@@ -6,6 +6,7 @@ import com.epita.repo_social.repository.model.PostNode;
 import com.epita.repo_social.repository.model.UserNode;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
+import org.jboss.logging.Logger;
 import org.neo4j.driver.Driver;
 import org.neo4j.driver.Session;
 
