@@ -3,16 +3,19 @@ package com.epita.srvc_home_timeline.controller.subscribers;
 import static io.quarkus.mongodb.runtime.dns.MongoDnsClientProvider.vertx;
 
 import com.epita.exchange.redis.aggregate.PostAggregate;
+import com.epita.srvc_home_timeline.service.HomeTimelineService;
 import io.quarkus.redis.datasource.RedisDataSource;
 import io.quarkus.redis.datasource.pubsub.PubSubCommands;
 import jakarta.annotation.PreDestroy;
 import jakarta.ejb.Startup;
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
 import java.util.function.Consumer;
 
 @Startup
 @ApplicationScoped
 public class PostAggregateSubscriber implements Consumer<PostAggregate> {
+  @Inject HomeTimelineService homeTimelineService;
   private final PubSubCommands.RedisSubscriber subscriber;
 
   public PostAggregateSubscriber(final RedisDataSource ds) {
@@ -23,6 +26,7 @@ public class PostAggregateSubscriber implements Consumer<PostAggregate> {
   public void accept(final PostAggregate message) {
     vertx.executeBlocking(
         future -> {
+          homeTimelineService.handlePostAggregate(message);
           future.complete();
         });
   }

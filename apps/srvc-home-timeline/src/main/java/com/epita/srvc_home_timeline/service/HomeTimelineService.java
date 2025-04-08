@@ -1,21 +1,51 @@
 package com.epita.srvc_home_timeline.service;
 
+import com.epita.exchange.redis.aggregate.PostAggregate;
 import com.epita.srvc_home_timeline.converter.HomeTimelineModelToHomeTimelineEntity;
+import com.epita.srvc_home_timeline.converter.HomeTimelinePostModelToHomeTimelinePostEntity;
+import com.epita.srvc_home_timeline.repository.HomeTimelinePostRepository;
 import com.epita.srvc_home_timeline.repository.HomeTimelineRepository;
 import com.epita.srvc_home_timeline.repository.model.HomeTimelineModel;
+import com.epita.srvc_home_timeline.repository.model.HomeTimelinePostModel;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import org.bson.types.ObjectId;
 
 @ApplicationScoped
 public class HomeTimelineService {
   @Inject HomeTimelineRepository homeTimelineRepository;
-  @Inject HomeTimelineModelToHomeTimelineEntity converter;
+  @Inject HomeTimelinePostRepository postRepository;
+  @Inject HomeTimelineModelToHomeTimelineEntity homeTimelineModelToEntity;
+  @Inject HomeTimelinePostModelToHomeTimelinePostEntity homeTimelinePostModelToEntity;
 
-  public void follow(String UserId, String followerId) {
+  public void handlePostAggregate(PostAggregate postAggregate) {
+    if (postAggregate.isDeleted()) {
+      homeTimelineRepository.delete("postId", postAggregate.getId());
+      return;
+    }
+
+    HomeTimelinePostModel homeTimelinePostModel =
+        new HomeTimelinePostModel()
+            .withId(new ObjectId())
+            .withPostId(postAggregate.getId())
+            .withOwnerId(postAggregate.getOwnerId())
+            .withText(postAggregate.getText())
+            .withMedia(postAggregate.getMedia())
+            .withRepostId(postAggregate.getRepostId())
+            .withReplyToPostId(postAggregate.getReplyToPostId())
+            .withReply(postAggregate.isReply())
+            .withCreatedAt(postAggregate.getCreatedAt())
+            .withUpdatedAt(postAggregate.getUpdatedAt())
+            .withDeleted(postAggregate.isDeleted());
+
+    postRepository.create(homeTimelinePostModel);
+  }
+
+  public void handleFollow(String UserId, String followerId) {
     Optional<HomeTimelineModel> homeTimeline = homeTimelineRepository.findByUserId(UserId);
     if (homeTimeline.isPresent()) {
       HomeTimelineModel homeTimelineModel = homeTimeline.get();
@@ -36,7 +66,7 @@ public class HomeTimelineService {
     }
   }
 
-  public void unfollow(String UserId, String followerId) {
+  public void handleUnfollow(String UserId, String followerId) {
     Optional<HomeTimelineModel> homeTimeline = homeTimelineRepository.findByUserId(UserId);
     if (homeTimeline.isPresent()) {
       HomeTimelineModel homeTimelineModel = homeTimeline.get();
@@ -46,8 +76,7 @@ public class HomeTimelineService {
       }
       homeTimelineModel.setFollowersId(followers);
       homeTimelineRepository.updateModel(homeTimelineModel);
-    }
-    else {
+    } else {
       HomeTimelineModel newModel = new HomeTimelineModel();
       newModel.setUserId(UserId);
       newModel.setCreatedAt(LocalDateTime.now());
@@ -56,5 +85,6 @@ public class HomeTimelineService {
   }
 
   public void like(String UserId, String followerId, String postId) {}
+
   public void unlike(String UserId, String followerId, String postId) {}
 }
