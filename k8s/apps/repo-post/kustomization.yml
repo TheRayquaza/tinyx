@@ -13,7 +13,9 @@ configMapGenerator:
     literals:
       - REPO_POST_MONGODB_HOST=mongos.mongo.svc.cluster.local
       - REPO_POST_REDIS_HOST=redis.redis-0.svc.cluster.local,redis-1.redis.svc.cluster.local
-      - REPO_POST_MINIO_ENDPOINT=http://minio-service.minio.svc.cluster.local:9000
+      - REPO_POST_MINIO_ENDPOINT1=http://minio.minio-a.svc.cluster.local:9000
+      - REPO_POST_MINIO_ENDPOINT2=http://minio.minio-b.svc.cluster.local:9001
+      - REPO_POST_MINIO_ENDPOINT3=http://minio.minio-c.svc.cluster.local:9001
       - REPO_POST_MINIO_BUCKET=RepoPost
       - REPO_POST_MONGODB_DATABASE=RepoPost
       - REPO_POST_APP_PROFILE=prod
