@@ -28,10 +28,11 @@ public class HomeTimelineService {
   @Inject HomeTimelineEntityToHomeTimelineModel homeTimelineEnityToModel;
 
   public HomeTimelineResponse getHomeTimelineById(String userId) {
-    Optional<HomeTimelineModel> homeTimeline = homeTimelineRepository.findByUserId(userId);
     if (authService.getUserId() != userId) {
       throw HomeTimelineErrorCode.UNAUTHORIZED.createError(userId);
     }
+
+    Optional<HomeTimelineModel> homeTimeline = homeTimelineRepository.findByUserId(userId);
 
     if (homeTimeline.isPresent()) {
       HomeTimelineModel homeTimelineModel = homeTimeline.get();
@@ -143,11 +144,19 @@ public class HomeTimelineService {
     Optional<HomeTimelineModel> homeTimeline = homeTimelineRepository.findByUserId(userId);
     if (homeTimeline.isPresent()) {
       HomeTimelineModel homeTimelineModel = homeTimeline.get();
+
       List<String> blockedUsers = homeTimelineModel.getBlockedUsersId();
       if (!blockedUsers.contains(blockedUserId)) {
         blockedUsers.add(blockedUserId);
       }
       homeTimelineModel.setBlockedUsersId(blockedUsers);
+
+      List<HomeTimelineModel.HomeTimelineEntryModel> entries =
+          homeTimelineModel.getEntries().stream()
+              .filter(entry -> !entry.getAuthorId().equals(blockedUserId))
+              .toList();
+      homeTimelineModel.setEntries(entries);
+
       homeTimelineRepository.updateModel(homeTimelineModel);
     } else {
       HomeTimelineModel newModel = new HomeTimelineModel();
