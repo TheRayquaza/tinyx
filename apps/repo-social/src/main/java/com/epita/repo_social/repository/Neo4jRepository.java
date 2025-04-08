@@ -1,5 +1,6 @@
 package com.epita.repo_social.repository;
 
+import com.epita.repo_social.RepoSocialErrorCode;
 import com.epita.repo_social.repository.model.LikeRelationship;
 import com.epita.repo_social.repository.model.PostNode;
 import com.epita.repo_social.repository.model.UserNode;
@@ -23,24 +24,19 @@ public class Neo4jRepository {
                 return null;
             });
         } catch (Exception e) {
-            throw new RuntimeException("Error while creating node", e);
+            throw RepoSocialErrorCode.ERROR_DURING_CYPHER_EXEC.createError("Error while creating node", e);
         }
     }
 
     // create a relationship
     public void createRelation(String cypherRequest) {
         try (Session session = driver.session()) {
-            int createdRelationships = session
-                    .executeWrite(tx -> tx.run(cypherRequest)
-                            .consume()
-                            .counters()
-                            .relationshipsCreated());
-
-            if (createdRelationships == 0) {
-                throw new RuntimeException("No relationships were created");
-            }
+            session.executeWrite(tx -> {
+                tx.run(cypherRequest);
+                return null;
+            });
         } catch (Exception e) {
-            throw new RuntimeException("Error while creating relation", e);
+            throw RepoSocialErrorCode.ERROR_DURING_CYPHER_EXEC.createError("Error while creating relation", e);
         }
     }
 
@@ -52,24 +48,19 @@ public class Neo4jRepository {
                 return null;
             });
         } catch (Exception e) {
-            throw new RuntimeException("Error while deleting node", e);
+            throw RepoSocialErrorCode.ERROR_DURING_CYPHER_EXEC.createError("Error while deleting node", e);
         }
     }
 
     // delete a relationship
     public void deleteRelation(String cypherRequest) {
         try (Session session = driver.session()) {
-            int deletedRelationships = session
-                    .executeWrite(tx -> tx.run(cypherRequest)
-                            .consume()
-                            .counters()
-                            .relationshipsDeleted());
-
-            if (deletedRelationships == 0) {
-                throw new RuntimeException("No relationships were deleted");
-            }
+            session.executeWrite(tx -> {
+                tx.run(cypherRequest);
+                return null;
+            });
         } catch (Exception e) {
-            throw new RuntimeException("Error while deleting relation", e);
+            throw RepoSocialErrorCode.ERROR_DURING_CYPHER_EXEC.createError("Error while deleting relation", e);
         }
     }
 
@@ -82,7 +73,7 @@ public class Neo4jRepository {
                 return result.hasNext();
             });
         } catch (Exception e) {
-            throw new RuntimeException("Error while checking node existence", e);
+            throw RepoSocialErrorCode.ERROR_DURING_CYPHER_EXEC.createError("Error while checking node existence", e);
         }
     }
 
@@ -94,7 +85,37 @@ public class Neo4jRepository {
                 return result.hasNext();
             });
         } catch (Exception e) {
-            throw new RuntimeException("Error while checking relation existence", e);
+            throw RepoSocialErrorCode.ERROR_DURING_CYPHER_EXEC.createError("Error while checking relation existence", e);
+        }
+    }
+
+    public UserNode getUser(String cypherRequest) {
+        try (Session session = driver.session()) {
+            return session.executeRead(tx -> {
+                var result = tx.run(cypherRequest);
+                if (result.hasNext()) {
+                    var userNode = result.single().get("u").asNode();
+                    return UserNode.from(userNode);
+                }
+                return null;
+            });
+        } catch (Exception e) {
+            throw RepoSocialErrorCode.ERROR_DURING_CYPHER_EXEC.createError("Error while fetching node", e);
+        }
+    }
+
+    public PostNode getPost(String cypherRequest) {
+        try (Session session = driver.session()) {
+            return session.executeRead(tx -> {
+                var result = tx.run(cypherRequest);
+                if (result.hasNext()) {
+                    var postNode = result.single().get("p").asNode();
+                    return PostNode.from(postNode);
+                }
+                return null;
+            });
+        } catch (Exception e) {
+            throw RepoSocialErrorCode.ERROR_DURING_CYPHER_EXEC.createError("Error while fetching node", e);
         }
     }
 
@@ -108,7 +129,7 @@ public class Neo4jRepository {
                 });
             });
         } catch (Exception e) {
-            throw new RuntimeException("Error while fetching likes", e);
+            throw RepoSocialErrorCode.ERROR_DURING_CYPHER_EXEC.createError("Error while fetching likes", e);
         }
     }
 

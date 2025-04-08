@@ -2,33 +2,33 @@ package com.epita.repo_social.repository.model;
 
 import io.smallrye.common.constraint.NotNull;
 
-public record PostNode(String postId) {
+public record PostNode(String postId, String ownerId) {
 
     public PostNode(final @NotNull String postId) {
-        this.postId = postId;
+        this(postId, null);
     }
 
-    public static UserNode from(final @NotNull org.neo4j.driver.types.Node neo4jNode) {
-        final var postId = neo4jNode.get("postId").asString();
-
-        return new UserNode(postId);
+    public static PostNode from(final @NotNull org.neo4j.driver.types.Node neo4jNode) {
+        return new PostNode(
+                neo4jNode.get("postId").asString(),
+                neo4jNode.get("ownerId").asString());
     }
 
     public String findCypher() {
         return String.format(
-                "Match (n:User {postId:\"%s\") Return n",
+                "Match (p:Post {postId:\"%s\") Return p",
                 this.postId);
     }
 
     public String createCypher() {
         return String.format(
-                "Create (n:User {postId: \"%s\"}) Return n",
+                "Create (p:Post {postId: \"%s\"}) Return p",
                 this.postId);
     }
 
     public String getLikesCypher() {
         return String.format(
-                "MATCH (n:Post {postId:\"%s\"})<-[:HAS_LIKED]-(u:User) RETURN u",
+                "MATCH (:Post {postId:\"%s\"})<-[:HAS_LIKED]-(u:User) RETURN u",
                 this.postId);
     }
 }
