@@ -72,7 +72,7 @@ public class RepoSocialController implements RepoSocialControllerApi {
 
   @GET
   @Path("/post/{id}/like")
-  public List<UserResponse> getUsersLike (@PathParam("id") String postId) {
+  public List<UserResponse> getLikes (@PathParam("id") String postId) {
     logger().info("GET /social/post/{}/like", postId);
     return socialService.getPostLikes(postId).stream()
         .map(userEntityToUserResponse::convertNotNull)
@@ -97,12 +97,12 @@ public class RepoSocialController implements RepoSocialControllerApi {
           .toList();
   }
 
-    @GET
-    @Path("/user/{id}/block")
-    public List<UserResponse> getBlockedUsers (@PathParam("id") String userId) {
-        logger().info("GET /social/user/{}/block", userId);
-        return socialService.getUserBlocks(userId).stream()
-            .map(userEntityToUserResponse::convertNotNull)
-            .toList();
-    }
+  @GET
+  @Path("/user/block")
+  public List<UserResponse> getBlocks () {
+      logger().info("GET /social/user/block");
+      return socialService.getUserBlocks().stream()
+          .map(userEntityToUserResponse::convertNotNull)
+          .toList();
+  }
 }

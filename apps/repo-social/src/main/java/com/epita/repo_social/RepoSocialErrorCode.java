@@ -5,10 +5,11 @@ import lombok.Getter;
 
 @Getter
 public enum RepoSocialErrorCode implements ErrorCode {
-  INVALID_USER_DATA(400, "Invalid user data: %s"),
+  INVALID_USER_DATA(400, "Invalid user data"),
   UNAUTHORIZED(401, "Unauthorized access"),
   FORBIDDEN(403, "Forbidden action"),
-  ERROR_DURING_CYPHER_EXEC(404, "Error during the cypher script execution"),
+  NOT_FOUND(404, "Resource not found"),
+  ERROR_DURING_CYPHER_EXEC(500, "Error during the cypher script execution"),
   INTERNAL_SERVER_ERROR(500, "Internal server error");
 
   private final int httpCode;
