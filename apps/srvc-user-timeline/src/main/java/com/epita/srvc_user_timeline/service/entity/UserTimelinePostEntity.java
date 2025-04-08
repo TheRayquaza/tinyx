@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import lombok.*;
 import org.bson.codecs.pojo.annotations.BsonId;
+import org.bson.types.ObjectId;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -12,9 +13,10 @@ import org.bson.codecs.pojo.annotations.BsonId;
 @Setter
 @With
 public class UserTimelinePostEntity implements Serializable {
-  @BsonId private String id;
+  @BsonId private ObjectId id;
   // we add this field, compared to post model in repo-post, to store the user id to which this post
   // belongs
+  private String postId;
   private String userId;
   private String ownerId;
   private String text;
