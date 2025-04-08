@@ -5,7 +5,8 @@ import com.epita.srvc_user_timeline.service.entity.UserTimelinePostEntity;
 import jakarta.enterprise.context.ApplicationScoped;
 
 @ApplicationScoped
-public class UserTimelinePostEntityToUserTimelinePostResponse {
+public class UserTimelinePostEntityToUserTimelinePostResponse implements Converter<UserTimelinePostEntity,UserTimelinePostResponse> {
+  @Override
   public UserTimelinePostResponse convertNotNull(UserTimelinePostEntity input) {
     return new UserTimelinePostResponse()
         .withId(input.getId())

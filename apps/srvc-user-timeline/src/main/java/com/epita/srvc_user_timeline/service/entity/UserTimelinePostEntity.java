@@ -18,7 +18,7 @@ public class UserTimelinePostEntity implements Serializable {
   private String userId;
   private String ownerId;
   private String text;
-  private List<String> media;
+  private String media;
   private String repostId;
   private String replyToPostId;
   private Boolean isReply;
