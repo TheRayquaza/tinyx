@@ -23,13 +23,13 @@ public record UserNode(
     public static UserNode from(final @NotNull org.neo4j.driver.types.Node neo4jNode) {
         return new UserNode(
                 neo4jNode.get("userId").asString(),
-                neo4jNode.containsKey("username") ? neo4jNode.get("username").asString() : null,
-                neo4jNode.containsKey("email") ? neo4jNode.get("email").asString() : null,
-                neo4jNode.containsKey("bio") ? neo4jNode.get("bio").asString() : null,
-                neo4jNode.containsKey("profileImage") ? neo4jNode.get("profileImage").asString() : null,
-                neo4jNode.containsKey("createdAt") ? LocalDateTime.parse(neo4jNode.get("createdAt").asString()) : null,
-                neo4jNode.containsKey("updatedAt") ? LocalDateTime.parse(neo4jNode.get("updatedAt").asString()) : null,
-                neo4jNode.containsKey("deleted") && neo4jNode.get("deleted").asBoolean()
+                neo4jNode.get("username").asString(),
+                neo4jNode.get("email").asString(),
+                neo4jNode.get("bio").asString(),
+                neo4jNode.get("profileImage").asString(),
+                neo4jNode.get("createdAt").asZonedDateTime().toLocalDateTime(),
+                neo4jNode.get("updatedAt").asZonedDateTime().toLocalDateTime(),
+                neo4jNode.get("deleted").asBoolean()
         );
     }
 
@@ -73,9 +73,22 @@ public record UserNode(
                 this.userId);
     }
 
-    public String getBlocksCypher() {
+    public String getBlockedCypher() {
+        return String.format(
+                "MATCH (:User {userId:\"%s\"})-[:HAS_BLOCKED]->(u:User) RETURN u",
+                this.userId);
+    }
+
+    public String getBlockedByCypher() {
         return String.format(
                 "MATCH (n:User {userId:\"%s\"})<-[:HAS_BLOCKED]-(u:User) RETURN u",
                 this.userId);
+    }
+
+    public String deleteLikesOfUserPostsCypher(String blockedUserId) {
+        return String.format(
+                "MATCH (:User {userId:\"%s\"})-[l:HAS_LIKED]->(:Post {ownerId:\"%s\"}) DELETE l",
+                this.userId,
+                blockedUserId);
     }
 }

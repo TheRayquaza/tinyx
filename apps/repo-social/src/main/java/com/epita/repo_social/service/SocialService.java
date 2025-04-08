@@ -78,8 +78,7 @@ public class SocialService implements Logger {
   }
 
   public void likePost(String postId) {
-    logger().info("Running like cypher script with : \n userId: {}\n", authService.getUserId());
-    logger().info("postId: {}\n", postId);
+    logger().info("Running like cypher script with : \n userId: {}\npostId: {}", authService.getUserId(), postId);
 
     UserNode userNode = new UserNode(authService.getUserId());
     PostNode postNode = new PostNode(postId);
@@ -102,8 +101,7 @@ public class SocialService implements Logger {
   }
 
   public void unlikePost(String postId) {
-    logger().info("Running unlike cypher script with : \n userId: {}\n", authService.getUserId());
-    logger().info("postId: {}\n", postId);
+    logger().info("Running unlike cypher script with : \n userId: {}\npostId: {}", authService.getUserId(), postId);
 
     UserNode userNode = new UserNode(authService.getUserId());
     PostNode postNode = new PostNode(postId);
@@ -126,13 +124,12 @@ public class SocialService implements Logger {
   }
 
   public void followUser(String userId) {
-    logger().info("Running follow cypher script with : \n userId: {}\n", authService.getUserId());
-    logger().info("userId Followed: {}\n", userId);
+    logger().info("Running follow cypher script with : \n current userId: {}\ntarget userId: {}\n", authService.getUserId(), userId);
 
     UserNode followerNode = new UserNode(authService.getUserId());
     UserNode followedNode = new UserNode(userId);
 
-    if (!neo4jRepository.checkNodeExists(followerNode.findCypher())) {
+    if (!neo4jRepository.checkNodeExists(followedNode.findCypher())) {
       throw RepoSocialErrorCode.NOT_FOUND.createError("User not found");
     }
 
@@ -148,13 +145,12 @@ public class SocialService implements Logger {
   }
 
   public void unfollowUser(String userId) {
-    logger().info("Running unfollow cypher script with : \n userId: {}\n", authService.getUserId());
-    logger().info("userId Followed: {}\n", userId);
+    logger().info("Running unfollow cypher script with : \n current userId: {}\ntarget userId: {}\n", authService.getUserId(), userId);
 
     UserNode followerNode = new UserNode(authService.getUserId());
     UserNode followedNode = new UserNode(userId);
 
-    if (!neo4jRepository.checkNodeExists(followerNode.findCypher())) {
+    if (!neo4jRepository.checkNodeExists(followedNode.findCypher())) {
       throw RepoSocialErrorCode.NOT_FOUND.createError("User not found");
     }
 
@@ -170,8 +166,7 @@ public class SocialService implements Logger {
   }
 
   public void blockUser(String userId) {
-    logger().info("Running block cypher script with : \n userId: {}\n", authService.getUserId());
-    logger().info("userId Blocked: {}\n", userId);
+    logger().info("Running block cypher script with : \n current userId: {}\ntarget userId: {}\n", authService.getUserId(), userId);
 
     UserNode blockerNode = new UserNode(authService.getUserId());
     UserNode blockedNode = new UserNode(userId);
@@ -184,6 +179,10 @@ public class SocialService implements Logger {
     FollowRelationship followRelationship = new FollowRelationship(blockerNode, blockedNode);
     neo4jRepository.deleteRelation(followRelationship.deleteCypher());
 
+    // Delete the like relationships with the blocked user's posts
+    neo4jRepository.deleteRelation(blockerNode.deleteLikesOfUserPostsCypher(blockedNode.userId()));
+
+
     BlockRelationship blockRelationship = new BlockRelationship(blockerNode, blockedNode);
     neo4jRepository.createRelation(blockRelationship.createCypher());
 
@@ -194,8 +193,7 @@ public class SocialService implements Logger {
   }
 
   public void unblockUser(String userId) {
-    logger().info("Running unblock cypher script with : \n userId: {}\n", authService.getUserId());
-    logger().info("userId Blocked: {}\n", userId);
+    logger().info("Running unblock cypher script with : \n current userId: {}\ntarget userId: {}\n", authService.getUserId(), userId);
 
     UserNode blockerNode = new UserNode(authService.getUserId());
     UserNode blockedNode = new UserNode(userId);
@@ -224,6 +222,8 @@ public class SocialService implements Logger {
     UserNode postOwnerNode = new UserNode(completePostNode.ownerId());
     UserNode currentUserNode = new UserNode(authService.getUserId());
     throwErrorIfBlockRelationshipExists(currentUserNode, postOwnerNode,"get likes of the post of");
+
+    logger().info(postNode.getLikesCypher());
 
     return neo4jRepository.getUsers(postNode.getLikesCypher()).stream()
             .map(userNodeToUserEntity::convertNotNull)
@@ -260,11 +260,20 @@ public class SocialService implements Logger {
               .toList();
   }
 
-  public List<UserEntity> getUserBlocks() {
-      logger().info("Running getUserBlocks cypher script with : \n userId: {}\n", authService.getUserId());
+  public List<UserEntity> getUserBlocked(String userId) {
+    logger().info("Running getUserBlocked cypher script with : \n userId: {}\n", userId);
 
-      UserNode userNode = new UserNode(authService.getUserId());
-      return neo4jRepository.getUsers(userNode.getBlocksCypher()).stream()
+    UserNode userNode = new UserNode(userId);
+    return neo4jRepository.getUsers(userNode.getBlockedCypher()).stream()
+            .map(userNodeToUserEntity::convertNotNull)
+            .toList();
+  }
+
+  public List<UserEntity> getUserBlockedBy(String userId) {
+      logger().info("Running getUserBlockedBy cypher script with : \n userId: {}\n", userId);
+
+      UserNode userNode = new UserNode(userId);
+      return neo4jRepository.getUsers(userNode.getBlockedByCypher()).stream()
               .map(userNodeToUserEntity::convertNotNull)
               .toList();
   }

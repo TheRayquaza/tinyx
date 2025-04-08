@@ -98,11 +98,20 @@ public class RepoSocialController implements RepoSocialControllerApi {
   }
 
   @GET
-  @Path("/user/block")
-  public List<UserResponse> getBlocks () {
+  @Path("/user/{id}/blocked")
+  public List<UserResponse> getBlocked (@PathParam("id") String userId) {
       logger().info("GET /social/user/block");
-      return socialService.getUserBlocks().stream()
+      return socialService.getUserBlocked(userId).stream()
           .map(userEntityToUserResponse::convertNotNull)
           .toList();
+  }
+
+  @GET
+  @Path("/user/{id}/blockedby")
+  public List<UserResponse> getBlockedBy (@PathParam("id") String userId) {
+    logger().info("GET /social/user/block");
+    return socialService.getUserBlockedBy(userId).stream()
+            .map(userEntityToUserResponse::convertNotNull)
+            .toList();
   }
 }

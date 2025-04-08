@@ -250,7 +250,7 @@ public interface RepoSocialControllerApi extends Logger {
   List<UserResponse> getFollowings (@PathParam("id") @NotNull @Valid String userId);
 
   @GET
-  @Path("/user/block")
+  @Path("/user/{id}/blocked")
   @Operation(summary = "Get the users blocked")
   @APIResponses({
           @APIResponse(responseCode = "200", description = "Users blocked retrieved"),
@@ -272,5 +272,30 @@ public interface RepoSocialControllerApi extends Logger {
                   content = @Content(schema = @Schema(implementation = RepoSocialErrorCode.class))),
   })
   @NotNull
-  List<UserResponse> getBlocks ();
+  List<UserResponse> getBlocked (@PathParam("id") @NotNull @Valid String userId);
+
+  @GET
+  @Path("/user/{id}/blockedby")
+  @Operation(summary = "Get the users blocked")
+  @APIResponses({
+          @APIResponse(responseCode = "200", description = "Users blocked retrieved"),
+          @APIResponse(
+                  responseCode = "400",
+                  description = "Invalid input",
+                  content = @Content(schema = @Schema(implementation = RepoSocialErrorCode.class))),
+          @APIResponse(
+                  responseCode = "401",
+                  description = "User not authorized",
+                  content = @Content(schema = @Schema(implementation = RepoSocialErrorCode.class))),
+          @APIResponse(
+                  responseCode = "403",
+                  description = "User blocked",
+                  content = @Content(schema = @Schema(implementation = RepoSocialErrorCode.class))),
+          @APIResponse(
+                  responseCode = "404",
+                  description = "Error during the cypher script execution",
+                  content = @Content(schema = @Schema(implementation = RepoSocialErrorCode.class))),
+  })
+  @NotNull
+  List<UserResponse> getBlockedBy (@PathParam("id") @NotNull @Valid String userId);
 }
