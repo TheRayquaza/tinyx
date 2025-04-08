@@ -27,10 +27,10 @@ public class LikeCommandSubscriber implements Consumer<LikeCommand> {
     vertx.executeBlocking(
         future -> {
           if (message.isLiked()) {
-            homeTimelineService.like(
+            homeTimelineService.handleLike(
                 message.getUserId(), message.getFollowerId(), message.getUuid().toString());
           } else {
-            homeTimelineService.unlike(
+            homeTimelineService.handleUnlike(
                 message.getUserId(), message.getFollowerId(), message.getUuid().toString());
           }
           future.complete();

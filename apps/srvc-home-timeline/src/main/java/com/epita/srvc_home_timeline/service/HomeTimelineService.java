@@ -25,6 +25,7 @@ public class HomeTimelineService {
   public void handlePostAggregate(PostAggregate postAggregate) {
     if (postAggregate.isDeleted()) {
       homeTimelineRepository.delete("postId", postAggregate.getId());
+      homeTimelineDelete(postAggregate.getId());
       return;
     }
 
@@ -43,6 +44,10 @@ public class HomeTimelineService {
             .withDeleted(postAggregate.isDeleted());
 
     postRepository.create(homeTimelinePostModel);
+  }
+
+  public void homeTimelineDelete(String postId) {
+    homeTimelineRepository.getHomeTimelineWithPostId(postId);
   }
 
   public void handleFollow(String UserId, String followerId) {
@@ -84,7 +89,7 @@ public class HomeTimelineService {
     }
   }
 
-  public void like(String UserId, String followerId, String postId) {}
+  public void handleLike(String UserId, String followerId, String postId) {}
 
-  public void unlike(String UserId, String followerId, String postId) {}
+  public void handleUnlike(String UserId, String followerId, String postId) {}
 }
