@@ -2,7 +2,6 @@ package com.epita.srvc_user_timeline.service.entity;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
-import java.util.List;
 import lombok.*;
 import org.bson.codecs.pojo.annotations.BsonId;
 import org.bson.types.ObjectId;

@@ -3,7 +3,6 @@ package com.epita.srvc_user_timeline.controller;
 import com.epita.srvc_user_timeline.controller.contract.UserTimelineResponse;
 import com.epita.srvc_user_timeline.converter.UserTimelineEntityToUserTimelineResponse;
 import com.epita.srvc_user_timeline.service.UserTimelineService;
-import io.quarkus.security.Authenticated;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
