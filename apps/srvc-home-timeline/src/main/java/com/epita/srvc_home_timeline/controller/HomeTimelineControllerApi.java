@@ -13,7 +13,7 @@ import org.eclipse.microprofile.openapi.annotations.responses.APIResponse;
 import org.eclipse.microprofile.openapi.annotations.responses.APIResponses;
 
 @Path("/home-timeline")
-public interface SrvcHomeTimelineControllerApi extends Logger {
+public interface HomeTimelineControllerApi extends Logger {
   @GET
   @Path("/{id}")
   @Consumes(MediaType.APPLICATION_JSON)

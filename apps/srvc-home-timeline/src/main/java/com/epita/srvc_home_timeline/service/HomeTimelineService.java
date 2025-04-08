@@ -1,6 +1,8 @@
 package com.epita.srvc_home_timeline.service;
 
 import com.epita.exchange.redis.aggregate.PostAggregate;
+import com.epita.srvc_home_timeline.HomeTimelineErrorCode;
+import com.epita.srvc_home_timeline.controller.response.HomeTimelineResponse;
 import com.epita.srvc_home_timeline.converter.HomeTimelineModelToHomeTimelineEntity;
 import com.epita.srvc_home_timeline.converter.HomeTimelinePostModelToHomeTimelinePostEntity;
 import com.epita.srvc_home_timeline.repository.HomeTimelinePostRepository;
@@ -21,6 +23,20 @@ public class HomeTimelineService {
   @Inject HomeTimelinePostRepository postRepository;
   @Inject HomeTimelineModelToHomeTimelineEntity homeTimelineModelToEntity;
   @Inject HomeTimelinePostModelToHomeTimelinePostEntity homeTimelinePostModelToEntity;
+
+  public HomeTimelineResponse getHomeTimelineById(String userId) {
+    Optional<HomeTimelineModel> homeTimeline = homeTimelineRepository.findByUserId(userId);
+    if (homeTimeline.isPresent()) {
+      HomeTimelineModel homeTimelineModel = homeTimeline.get();
+      homeTimelineModel.setEntries(
+          homeTimelineModel.getEntries().stream()
+              .sorted((entry1, entry2) -> entry2.getTimestamp().compareTo(entry1.getTimestamp()))
+              .toList());
+      return new HomeTimelineResponse(homeTimelineModelToEntity.convertNotNull(homeTimelineModel));
+    } else {
+      throw HomeTimelineErrorCode.USER_NOT_FOUND.createError(userId);
+    }
+  }
 
   public void handlePostAggregate(PostAggregate postAggregate) {
     if (postAggregate.isDeleted()) {
