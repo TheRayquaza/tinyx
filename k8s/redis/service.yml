@@ -15,7 +15,3 @@ spec:
         protocol: TCP
         port: 6379
         targetPort: 6379
-      - name: cluster
-        protocol: TCP
-        port: 16379
-        targetPort: 16379

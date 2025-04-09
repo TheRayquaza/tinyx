@@ -13,7 +13,7 @@ spec:
           args:
             - |
               for i in 0 1 2; do
-                until redis-cli -h redis-$i.redis.redis.svc.cluster.local ping; do
+                until redis-cli -a admin -h redis-$i.redis.redis.svc.cluster.local ping; do
                   echo "Waiting for redis-$i to be ready..."
                   sleep 5
                 done
@@ -24,11 +24,20 @@ spec:
           command: ["sh", "-c"]
           args:
             - |
-              redis-cli --cluster create \
-                redis-0.redis.redis.svc.cluster.local:6379 \
-                redis-1.redis.redis.svc.cluster.local:6379 \
-                redis-2.redis.redis.svc.cluster.local:6379 \
-                --cluster-replicas 0 --cluster-yes
+              # Check if redis-0 is already clustered
+              IS_CLUSTERED=$(redis-cli -a admin -h redis-0.redis.redis.svc.cluster.local cluster info 2>/dev/null | grep cluster_state:ok || true)
+              if [ -n "$IS_CLUSTERED" ]; then
+                echo "Redis cluster is already created. Skipping."
+              else
+                echo "Creating Redis cluster..."
+                redis-cli --cluster create \
+                  redis-0.redis.redis.svc.cluster.local:6379 \
+                  redis-1.redis.redis.svc.cluster.local:6379 \
+                  redis-2.redis.redis.svc.cluster.local:6379 \
+                  --cluster-replicas 0 \
+                  -a admin \
+                  --cluster-yes
+              fi
       restartPolicy: OnFailure
   backoffLimit: 4
   ttlSecondsAfterFinished: 60
