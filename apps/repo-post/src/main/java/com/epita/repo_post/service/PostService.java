@@ -67,7 +67,7 @@ public class PostService implements Logger {
     if (request.media != null) {
       String objectKey = "post/" + post_id + "/image/" + UUID.randomUUID() + ".jpeg";
       try {
-        s3Service.uploadFile(objectKey, request.getMedia(), request.getMedia().available());
+        objectKey = s3Service.uploadFile(objectKey, request.getMedia(), request.getMedia().available());
         logger().info("Uploaded media to S3: {}", objectKey);
       } catch (Exception e) {
         logger().error("Failed to upload media to S3", e);
@@ -149,7 +149,7 @@ public class PostService implements Logger {
           s3Service.deleteFile(postModel.getMedia());
           logger().info("Deleted old media from S3: {}", postModel.getMedia());
         }
-        s3Service.uploadFile(objectKey, request.getMedia(), request.getMedia().available());
+        objectKey = s3Service.uploadFile(objectKey, request.getMedia(), request.getMedia().available());
         logger().info("Uploaded new media to S3: {}", objectKey);
       } catch (Exception e) {
         logger().error("Media update failed", e);
