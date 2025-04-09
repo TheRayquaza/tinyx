@@ -78,21 +78,11 @@ spec:
               #  configMapKeyRef:
               #    name: apps-config
               #    key: USER_APP_PROFILE
-            - name: REPO_USER_MINIO_ENDPOINT1
+            - name: REPO_USER_MINIO_ENDPOINT
               valueFrom:
                 configMapKeyRef:
                   name: repo-user-config
-                  key: REPO_USER_MINIO_ENDPOINT1
-            - name: REPO_USER_MINIO_ENDPOINT2
-              valueFrom:
-                configMapKeyRef:
-                  name: repo-user-config
-                  key: REPO_USER_MINIO_ENDPOINT2
-            - name: REPO_USER_MINIO_ENDPOINT3
-              valueFrom:
-                configMapKeyRef:
-                  name: repo-user-config
-                  key: REPO_USER_MINIO_ENDPOINT3
+                  key: REPO_USER_MINIO_ENDPOINT
             - name: REPO_USER_MINIO_BUCKET
               value: "RepoUser"
             - name: REPO_USER_MINIO_ACCESS_KEY

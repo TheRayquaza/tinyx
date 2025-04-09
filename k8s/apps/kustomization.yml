@@ -12,3 +12,13 @@ resources:
   #- srvc-search
   #- srvc-user-timeline
   #- srvc-home-timeline
+configMapGenerator:
+  - name: apps-config
+    namespace: apps
+    literals:
+      - USER_AGGREGATE_CHANNEL=user_aggregate
+      - POST_AGGREGATE_CHANNEL=post_aggregate
+      - LIKE_COMMAND_CHANNEL=like_command
+      - BLOCK_COMMAND_CHANNEL=block_command
+      - FOLLOW_COMMAND_CHANNEL=follow_command
+      - USER_APP_PROFILE=prod
