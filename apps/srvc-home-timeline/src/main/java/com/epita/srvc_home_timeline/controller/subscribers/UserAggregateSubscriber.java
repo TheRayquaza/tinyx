@@ -2,12 +2,12 @@ package com.epita.srvc_home_timeline.controller.subscribers;
 
 import static io.quarkus.mongodb.runtime.dns.MongoDnsClientProvider.vertx;
 
-import com.epita.exchange.redis.aggregate.PostAggregate;
+import com.epita.exchange.redis.aggregate.UserAggregate;
 import com.epita.srvc_home_timeline.service.HomeTimelineService;
 import io.quarkus.redis.datasource.RedisDataSource;
 import io.quarkus.redis.datasource.pubsub.PubSubCommands;
+import io.quarkus.runtime.Startup;
 import jakarta.annotation.PreDestroy;
-import jakarta.ejb.Startup;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import java.util.function.Consumer;
@@ -15,25 +15,29 @@ import org.eclipse.microprofile.config.inject.ConfigProperty;
 
 @Startup
 @ApplicationScoped
-public class PostAggregateSubscriber implements Consumer<PostAggregate> {
+public class UserAggregateSubscriber implements Consumer<UserAggregate> {
   @Inject
-  @ConfigProperty(name = "repo.post.aggregate.channel", defaultValue = "post_aggregate")
+  @ConfigProperty(name = "repo.user.aggregate.channel", defaultValue = "user_aggregate")
   String channel;
 
   private final PubSubCommands.RedisSubscriber subscriber;
   @Inject HomeTimelineService homeTimelineService;
 
-  public PostAggregateSubscriber(
+  public UserAggregateSubscriber(
       final RedisDataSource ds, HomeTimelineService homeTimelineService) {
-    subscriber = ds.pubsub(PostAggregate.class).subscribe("post_aggregate", this);
+    subscriber = ds.pubsub(UserAggregate.class).subscribe("user_aggregate", this);
     this.homeTimelineService = homeTimelineService;
   }
 
   @Override
-  public void accept(final PostAggregate message) {
+  public void accept(final UserAggregate message) {
     vertx.executeBlocking(
         future -> {
-          this.homeTimelineService.handlePostAggregate(message);
+          if (message.isDeleted()) {
+            this.homeTimelineService.handleUserDeletion(message.getId());
+          } else {
+            this.homeTimelineService.handleUserCreation(message.getId());
+          }
           future.complete();
         });
   }

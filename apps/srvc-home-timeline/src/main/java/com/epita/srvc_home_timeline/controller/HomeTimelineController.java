@@ -1,7 +1,6 @@
 package com.epita.srvc_home_timeline.controller;
 
 import com.epita.exchange.auth.service.AuthService;
-import com.epita.srvc_home_timeline.HomeTimelineErrorCode;
 import com.epita.srvc_home_timeline.controller.response.HomeTimelineResponse;
 import com.epita.srvc_home_timeline.service.HomeTimelineService;
 import io.quarkus.security.Authenticated;

@@ -23,8 +23,9 @@ public class LikeCommandSubscriber implements Consumer<LikeCommand> {
   private final PubSubCommands.RedisSubscriber subscriber;
   @Inject HomeTimelineService homeTimelineService;
 
-  public LikeCommandSubscriber(final RedisDataSource ds) {
+  public LikeCommandSubscriber(final RedisDataSource ds, HomeTimelineService homeTimelineService) {
     subscriber = ds.pubsub(LikeCommand.class).subscribe("like_command", this);
+    this.homeTimelineService = homeTimelineService;
   }
 
   @Override
@@ -32,9 +33,9 @@ public class LikeCommandSubscriber implements Consumer<LikeCommand> {
     vertx.executeBlocking(
         future -> {
           if (message.isLiked()) {
-            homeTimelineService.handleLike(message.getUserId(), message.getPostId());
+            this.homeTimelineService.handleLike(message.getUserId(), message.getPostId());
           } else {
-            homeTimelineService.handleUnlike(message.getUserId(), message.getPostId());
+            this.homeTimelineService.handleUnlike(message.getUserId(), message.getPostId());
           }
           future.complete();
         });
