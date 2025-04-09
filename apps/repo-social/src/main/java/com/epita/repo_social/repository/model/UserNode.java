@@ -43,13 +43,13 @@ public record UserNode(
     public String createCypher() {
         return String.format(
                 "CREATE (n:User {userId: \"%s\"%s%s%s%s%s%s%s}) RETURN n",
-                this.userId,
+                userId,
                 username != null ? String.format(", username: \"%s\"", username) : "",
                 email != null ? String.format(", email: \"%s\"", email) : "",
                 bio != null ? String.format(", bio: \"%s\"", bio) : "",
                 profileImage != null ? String.format(", profileImage: \"%s\"", profileImage) : "",
-                createdAt != null ? String.format(", createdAt: \"%s\"", createdAt) : "",
-                updatedAt != null ? String.format(", updatedAt: \"%s\"", updatedAt) : "",
+                createdAt != null ? String.format(", createdAt: datetime(\"%s\")", createdAt) : "",
+                updatedAt != null ? String.format(", updatedAt: datetime(\"%s\")", updatedAt) : "",
                 deleted ? ", deleted: true" : ""
         );
     }
@@ -83,12 +83,5 @@ public record UserNode(
         return String.format(
                 "MATCH (n:User {userId:\"%s\"})<-[:HAS_BLOCKED]-(u:User) RETURN u",
                 this.userId);
-    }
-
-    public String deleteLikesOfUserPostsCypher(String blockedUserId) {
-        return String.format(
-                "MATCH (:User {userId:\"%s\"})-[l:HAS_LIKED]->(:Post {ownerId:\"%s\"}) DELETE l",
-                this.userId,
-                blockedUserId);
     }
 }
