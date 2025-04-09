@@ -118,11 +118,7 @@ public class HomeTimelineService {
       homeTimelineModel.setFollowersId(followers);
       homeTimelineRepository.updateModel(homeTimelineModel);
     } else {
-      HomeTimelineModel newModel = initHomeTimeline(userId);
-      List<String> followers = newModel.getFollowersId();
-      followers.add(followerId);
-      newModel.setFollowersId(followers);
-      homeTimelineRepository.create(newModel);
+      // FIXME handle error
     }
   }
 
@@ -247,6 +243,23 @@ public class HomeTimelineService {
       homeTimelineEntity.setEntries(entries);
       homeTimelineRepository.updateModel(
           homeTimelineEnityToModel.convertNotNull(homeTimelineEntity));
+    }
+  }
+
+  public void handleUserDeletion(String UserId) {
+    Optional<HomeTimelineModel> homeTimeline = homeTimelineRepository.findByUserId(UserId);
+    if (homeTimeline.isPresent()) {
+      HomeTimelineModel toDelete = homeTimeline.get();
+      homeTimelineRepository.deleteModel(toDelete);
+    }
+  }
+
+  public void handleUserCreation(String UserId) {
+    Optional<HomeTimelineModel> homeTimeline = homeTimelineRepository.findByUserId(UserId);
+    if (homeTimeline.isPresent()) {
+      // FIXME handle error (it shouldn't happen)
+    } else {
+      homeTimelineRepository.create(initHomeTimeline(UserId));
     }
   }
 }

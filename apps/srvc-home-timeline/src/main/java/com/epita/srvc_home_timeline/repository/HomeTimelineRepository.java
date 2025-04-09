@@ -20,6 +20,10 @@ public class HomeTimelineRepository implements PanacheMongoRepository<HomeTimeli
     this.persist(homeTimelineModel);
   }
 
+  public void deleteModel(HomeTimelineModel homeTimelineModel) {
+    this.delete(homeTimelineModel);
+  }
+
   public List<HomeTimelineModel> getHomeTimelineContainingPostId(String postId) {
     return this.find("entries.PostId", postId).list();
   }

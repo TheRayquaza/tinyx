@@ -23,8 +23,9 @@ public class BlockCommandSubscriber implements Consumer<BlockCommand> {
   private final PubSubCommands.RedisSubscriber subscriber;
   @Inject HomeTimelineService homeTimelineService;
 
-  public BlockCommandSubscriber(final RedisDataSource ds) {
+  public BlockCommandSubscriber(final RedisDataSource ds, HomeTimelineService homeTimelineService) {
     subscriber = ds.pubsub(BlockCommand.class).subscribe("block_command", this);
+    this.homeTimelineService = homeTimelineService;
   }
 
   @Override
@@ -32,9 +33,9 @@ public class BlockCommandSubscriber implements Consumer<BlockCommand> {
     vertx.executeBlocking(
         future -> {
           if (message.isBlocked()) {
-            homeTimelineService.handleBlock(message.getUserId(), message.getTargetId());
+            this.homeTimelineService.handleBlock(message.getUserId(), message.getTargetId());
           } else {
-            homeTimelineService.handleUnblock(message.getUserId(), message.getTargetId());
+            this.homeTimelineService.handleUnblock(message.getUserId(), message.getTargetId());
           }
           future.complete();
         });
