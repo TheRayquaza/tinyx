@@ -157,8 +157,9 @@ public class UserService implements Logger {
             .findByIdOptional(userId)
             .orElseThrow(() -> RepoUserErrorCode.USER_NOT_FOUND.createError(userId));
     try {
-     objectKey = s3Service.uploadFile(
-          objectKey, request.getFile(), request.getFile().available()); // TODO: fix size
+      objectKey =
+          s3Service.uploadFile(
+              objectKey, request.getFile(), request.getFile().available()); // TODO: fix size
       if (userModel.getProfileImage() != null) {
         s3Service.deleteFile(userModel.getProfileImage());
       }

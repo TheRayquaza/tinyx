@@ -4,11 +4,24 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 resources:
   - namespace.yml
   - pull-secrets.yml
-  #- https://raw.githubusercontent.com/kubernetes/ingress-nginx/main/deploy/static/provider/kind/deploy.yaml
-  #- ingress.yml  # global ingress for endpoints
   - repo-user
   #- repo-social
   #- repo-post
   #- srvc-search
   #- srvc-user-timeline
   #- srvc-home-timeline
+
+  #- https://raw.githubusercontent.com/kubernetes/ingress-nginx/main/deploy/static/provider/kind/deploy.yaml
+  #- ingress.yml  # global ingress for endpoints
+configMapGenerator:
+  - name: apps-config
+    namespace: apps
+    literals:
+      - USER_AGGREGATE_CHANNEL=user-aggregate
+      - POST_AGGREGATE_CHANNEL=post-aggregate
+      - LIKE_COMMAND_CHANNEL=like-command
+      - BLOCK_COMMAND_CHANNEL=block-command
+      - FOLLOW_COMMAND_CHANNEL=follow-command
+      - QUARKUS_PROFILE=prod
+      - QUARKUS_PORT=8080
+      - QUARKUS_HOST=0.0.0.0

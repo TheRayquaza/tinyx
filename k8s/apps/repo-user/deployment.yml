@@ -24,39 +24,52 @@ spec:
         - name: pull-secret
       containers:
         - name: repo-user
-          image: registry.cri.epita.fr/ing/majeures/tc/info/student/2026/2025-epitweet-tinyx-02/repo-user:v1.0.5
+          image: registry.cri.epita.fr/ing/majeures/tc/info/student/2026/2025-epitweet-tinyx-02/repo-user:v1.0.14
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 8080
           resources:
             requests:
-              memory: "128Mi"
-              cpu: "125m"
+              memory: "256Mi"
+              cpu: "250m"
             limits:
               memory: "512Mi"
-              cpu: "250m"
+              cpu: "500m"
           livenessProbe:
             httpGet:
-              path: /q/health/live
+              path: /q/health
               port: 8080
-            initialDelaySeconds: 5
-            periodSeconds: 10
+            initialDelaySeconds: 20
+            periodSeconds: 5
           readinessProbe:
             httpGet:
-              path: /q/health/ready
+              path: /q/health
               port: 8080
-            initialDelaySeconds: 5
-            periodSeconds: 10
+            initialDelaySeconds: 20
+            periodSeconds: 5
           env:
+            # Generic Quarkus
             - name: QUARKUS_HTTP_PORT
-              value: "8080"
+              valueFrom:
+                configMapKeyRef:
+                  name: apps-config
+                  key: QUARKUS_PORT
             - name: QUARKUS_HTTP_HOST
-              value: "0.0.0.0"
-            - name: REPO_USER_REDIS_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: apps-config
+                  key: QUARKUS_HOST
+            - name: QUARKUS_PROFILE
+              valueFrom:
+                configMapKeyRef:
+                  name: apps-config
+                  key: QUARKUS_PROFILE
+            # Redis
+            - name: QUARKUS_REDIS_HOSTS
               valueFrom:
                 configMapKeyRef:
                   name: repo-user-config
-                  key: REPO_USER_REDIS_HOST
+                  key: REPO_USER_REDIS_HOSTS
             - name: REPO_USER_REDIS_PASSWORD
               valueFrom:
                 secretKeyRef:
@@ -67,17 +80,13 @@ spec:
                 configMapKeyRef:
                   name: apps-config
                   key: USER_AGGREGATE_CHANNEL
-            - name: REPO_USER_MONGODB_HOST
+            # MONGO
+            - name: REPO_USER_MONGODB_ENDPOINT
               valueFrom:
-                configMapKeyRef:
-                  name: repo-user-config
-                  key: REPO_USER_MONGODB_HOST
-            - name: REPO_USER_APP_PROFILE
-              value: "prod"
-              #valueFrom:
-              #  configMapKeyRef:
-              #    name: apps-config
-              #    key: USER_APP_PROFILE
+                secretKeyRef:
+                  name: repo-user-secret
+                  key: REPO_USER_MONGODB_ENDPOINT
+            # MINIO
             - name: REPO_USER_MINIO_ENDPOINT
               valueFrom:
                 configMapKeyRef:
@@ -95,8 +104,3 @@ spec:
                 secretKeyRef:
                   name: repo-user-secret
                   key: REPO_USER_MINIO_SECRET_KEY
-            - name: REPO_USER_MONGODB_DATABASE
-              valueFrom:
-                configMapKeyRef:
-                  name: repo-user-config
-                  key: REPO_USER_MONGODB_DATABASE
