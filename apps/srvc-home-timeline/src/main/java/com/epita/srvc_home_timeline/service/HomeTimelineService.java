@@ -1,6 +1,5 @@
 package com.epita.srvc_home_timeline.service;
 
-import com.epita.exchange.auth.service.AuthService;
 import com.epita.exchange.redis.aggregate.PostAggregate;
 import com.epita.srvc_home_timeline.HomeTimelineErrorCode;
 import com.epita.srvc_home_timeline.controller.response.HomeTimelineResponse;
