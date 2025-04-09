@@ -9,7 +9,7 @@ resources:
   #- ingress.yml  # global ingress for endpoints
   - repo-user
   #- repo-social
-  #- repo-post
+  - repo-post
   #- srvc-search
   #- srvc-user-timeline
   #- srvc-home-timeline

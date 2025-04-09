@@ -2,7 +2,7 @@ kind: Ingress
 apiVersion: networking.k8s.io/v1
 metadata:
   name: repo-post
-  namespace: repo-post
+  namespace: apps
   labels:
     app: repo-post
 spec:
@@ -16,4 +16,4 @@ spec:
               service:
                 name: repo-post
                 port:
-                  number: 80
+                  number: 8080

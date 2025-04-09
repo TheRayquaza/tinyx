@@ -70,7 +70,7 @@ spec:
                   name: apps-config
                   key: QUARKUS_APP_PROFILE
             
-            
+
             ## REDIS
             - name: QUARKUS_REDIS_HOSTS
               valueFrom:
@@ -106,7 +106,7 @@ spec:
               valueFrom:
                 configMapKeyRef:
                   name: apps-config
-                  key: BLOCK_AGGREGE_CHANNEL
+                  key: BLOCK_COMMAND_CHANNEL
             
                   
             ## MONGODB
