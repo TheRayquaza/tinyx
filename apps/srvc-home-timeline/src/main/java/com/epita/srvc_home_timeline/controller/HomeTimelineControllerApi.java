@@ -3,7 +3,6 @@ package com.epita.srvc_home_timeline.controller;
 import com.epita.exchange.utils.Logger;
 import com.epita.srvc_home_timeline.controller.response.HomeTimelineResponse;
 import com.epita.srvc_home_timeline.service.entity.HomeTimelineEntity;
-
 import io.quarkus.security.Authenticated;
 import jakarta.validation.constraints.NotNull;
 import jakarta.ws.rs.*;
