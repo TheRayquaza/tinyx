@@ -1,7 +1,9 @@
 kind: Kustomization
 apiVersion: kustomize.config.k8s.io/v1beta1
+namespace: redis
 resources:
   - namespace.yml
   - statefulset.yml
-  - secrets.yml
   - service.yml
+  - job.yml
+  - secrets.yml

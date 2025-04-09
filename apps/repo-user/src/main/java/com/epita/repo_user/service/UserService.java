@@ -21,7 +21,6 @@ import jakarta.inject.Inject;
 import java.time.LocalDateTime;
 import java.util.*;
 import org.bson.types.ObjectId;
-import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.mindrot.jbcrypt.BCrypt;
 
 @ApplicationScoped
@@ -39,9 +38,8 @@ public class UserService implements Logger {
 
   @Inject RedisPublisher redisPublisher;
 
-  @ConfigProperty(name = "repo.user.aggregate.channel")
-  @Inject
-  String userAggregateChannel;
+  String userAggregateChannel =
+      System.getenv().getOrDefault("USER_AGGREGATE_CHANNEL", "user_channel");
 
   public UserLoginResponse login(LoginRequest request) {
     if (request == null || request.username == null || request.password == null) {
@@ -157,8 +155,9 @@ public class UserService implements Logger {
             .findByIdOptional(userId)
             .orElseThrow(() -> RepoUserErrorCode.USER_NOT_FOUND.createError(userId));
     try {
-     objectKey = s3Service.uploadFile(
-          objectKey, request.getFile(), request.getFile().available()); // TODO: fix size
+      byte[] bytes = request.getFile().readAllBytes();
+      int size = bytes.length;
+      objectKey = s3Service.uploadFile(objectKey, new ByteArrayInputStream(bytes), size);
       if (userModel.getProfileImage() != null) {
         s3Service.deleteFile(userModel.getProfileImage());
       }

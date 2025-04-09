@@ -9,7 +9,6 @@ import io.quarkus.runtime.Startup;
 import jakarta.annotation.PostConstruct;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
-import org.eclipse.microprofile.config.inject.ConfigProperty;
 
 @Startup
 @ApplicationScoped
@@ -17,9 +16,7 @@ public class RedisSubscriber implements Logger {
 
   private final PubSubCommands<BlockCommand> subscriber;
 
-  @ConfigProperty(name = "repo.social.block.command.channel", defaultValue = "block-command")
-  @Inject
-  String channel;
+  String channel = System.getenv().getOrDefault("BLOCK_COMMAND_CHANNEL", "block-command");
 
   @Inject PostService postService;
 

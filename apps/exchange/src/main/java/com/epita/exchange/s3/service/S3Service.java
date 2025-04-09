@@ -4,11 +4,8 @@ import com.epita.exchange.utils.Logger;
 import io.minio.*;
 import jakarta.annotation.PostConstruct;
 import jakarta.enterprise.context.ApplicationScoped;
-import jakarta.inject.Inject;
 import java.io.File;
 import java.io.InputStream;
-import org.eclipse.microprofile.config.inject.ConfigProperty;
-
 import java.util.AbstractMap;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -18,25 +15,28 @@ import java.util.regex.Pattern;
 public class S3Service implements Logger {
   private MinioClient minioClient;
 
-  @Inject
-  @ConfigProperty(name = "s3.endpoint", defaultValue = "http://localhost:9000")
   String endpoint;
 
-  @Inject
-  @ConfigProperty(name = "s3.accessKey", defaultValue = "minioadmin")
   String accessKey;
 
-  @Inject
-  @ConfigProperty(name = "s3.secretKey", defaultValue = "minioadmin")
   String secretKey;
 
-  @Inject
-  @ConfigProperty(name = "s3.bucketName", defaultValue = "default")
   String bucketName;
+
+  public static String getEnv(String key, String defaultValue) {
+    String value = System.getenv(key);
+    return value != null ? value : defaultValue;
+  }
 
   @PostConstruct
   public void init() {
-    minioClient = MinioClient.builder().endpoint(endpoint).credentials(accessKey, secretKey).build();
+    endpoint = getEnv("S3_ENDPOINT", "http://localhost:9000");
+    accessKey = getEnv("S3_ACCESS_KEY", "minioadmin");
+    secretKey = getEnv("S3_SECRET_KEY", "minioadmin");
+    bucketName = getEnv("S3_BUCKET", "default");
+
+    minioClient =
+        MinioClient.builder().endpoint(endpoint).credentials(accessKey, secretKey).build();
     logger().info("S3Configuration - Endpoint: {}", endpoint);
     logger().info("S3Configuration - Bucket: {}", bucketName);
     logger().info("S3Configuration - AccessKey: {}", accessKey);
@@ -47,7 +47,7 @@ public class S3Service implements Logger {
     try {
       logger().info("Verification if bucket {} exist", bucketName);
       boolean found =
-              minioClient.bucketExists(BucketExistsArgs.builder().bucket(bucketName).build());
+          minioClient.bucketExists(BucketExistsArgs.builder().bucket(bucketName).build());
       if (!found) {
         minioClient.makeBucket(MakeBucketArgs.builder().bucket(bucketName).build());
         logger().info("Bucket created: {}", bucketName);

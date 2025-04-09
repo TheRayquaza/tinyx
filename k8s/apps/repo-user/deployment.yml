@@ -6,7 +6,7 @@ metadata:
   labels:
     app: repo-user
 spec:
-  replicas: 1 # TODO: make it 3
+  replicas: 1 # Number of replicas
   strategy:
     type: RollingUpdate
     rollingUpdate:
@@ -24,79 +24,108 @@ spec:
         - name: pull-secret
       containers:
         - name: repo-user
-          image: registry.cri.epita.fr/ing/majeures/tc/info/student/2026/2025-epitweet-tinyx-02/repo-user:v1.0.5
+          image: registry.cri.epita.fr/ing/majeures/tc/info/student/2026/2025-epitweet-tinyx-02/repo-user:v2.0.2
           imagePullPolicy: IfNotPresent
           ports:
-            - containerPort: 8080
+            - name: http
+              containerPort: 8080
+              protocol: TCP
           resources:
             requests:
-              memory: "128Mi"
-              cpu: "125m"
+              memory: "256Mi"
+              cpu: "250m"
             limits:
               memory: "512Mi"
-              cpu: "250m"
+              cpu: "500m"
           livenessProbe:
             httpGet:
               path: /q/health/live
               port: 8080
-            initialDelaySeconds: 5
+            initialDelaySeconds: 20
             periodSeconds: 10
           readinessProbe:
             httpGet:
               path: /q/health/ready
               port: 8080
-            initialDelaySeconds: 5
+            initialDelaySeconds: 20
             periodSeconds: 10
           env:
-            - name: QUARKUS_HTTP_PORT
-              value: "8080"
-            - name: QUARKUS_HTTP_HOST
-              value: "0.0.0.0"
-            - name: REPO_USER_REDIS_HOST
+            ## QUARKUS
+            - name: QUARKUS_LOG_LEVEL
               valueFrom:
                 configMapKeyRef:
-                  name: repo-user-config
-                  key: REPO_USER_REDIS_HOST
-            - name: REPO_USER_REDIS_PASSWORD
+                  name: apps-config
+                  key: QUARKUS_LOG_LEVEL
+            - name: QUARKUS_HTTP_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: apps-config
+                  key: QUARKUS_HTTP_PORT
+            - name: QUARKUS_HTTP_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: apps-config
+                  key: QUARKUS_HTTP_HOST
+            - name: QUARKUS_APP_PROFILE
+              valueFrom:
+                configMapKeyRef:
+                  name: apps-config
+                  key: QUARKUS_APP_PROFILE
+            ## REDIS
+            - name: QUARKUS_REDIS_HOSTS
+              valueFrom:
+                configMapKeyRef:
+                  name: apps-config
+                  key: QUARKUS_REDIS_HOSTS
+            - name: QUARKUS_REDIS_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: repo-user-secret
-                  key: REPO_USER_REDIS_PASSWORD
-            - name: REPO_USER_AGGREGATE_CHANNEL
+                  name: apps-secret
+                  key: QUARKUS_REDIS_PASSWORD
+            - name: QUARKUS_REDIS_CLIENT_TYPE
+              valueFrom:
+                configMapKeyRef:
+                  name: apps-config
+                  key: QUARKUS_REDIS_CLIENT_TYPE
+            - name: QUARKUS_REDIS_RECONNECT_ATTEMPTS
+              valueFrom:
+                configMapKeyRef:
+                  name: apps-config
+                  key: QUARKUS_REDIS_RECONNECT_ATTEMPTS
+            - name: QUARKUS_REDIS_AUTO_FAILOVER
+              valueFrom:
+                configMapKeyRef:
+                  name: apps-config
+                  key: QUARKUS_REDIS_AUTO_FAILOVER
+            - name: USER_AGGREGATE_CHANNEL
               valueFrom:
                 configMapKeyRef:
                   name: apps-config
                   key: USER_AGGREGATE_CHANNEL
-            - name: REPO_USER_MONGODB_HOST
-              valueFrom:
-                configMapKeyRef:
-                  name: repo-user-config
-                  key: REPO_USER_MONGODB_HOST
-            - name: REPO_USER_APP_PROFILE
-              value: "prod"
-              #valueFrom:
-              #  configMapKeyRef:
-              #    name: apps-config
-              #    key: USER_APP_PROFILE
-            - name: REPO_USER_MINIO_ENDPOINT
-              valueFrom:
-                configMapKeyRef:
-                  name: repo-user-config
-                  key: REPO_USER_MINIO_ENDPOINT
-            - name: REPO_USER_MINIO_BUCKET
-              value: "RepoUser"
-            - name: REPO_USER_MINIO_ACCESS_KEY
+            ## MONGODB
+            - name: QUARKUS_MONGODB_CONNECTION_STRING
               valueFrom:
                 secretKeyRef:
                   name: repo-user-secret
-                  key: REPO_USER_MINIO_ACCESS_KEY
-            - name: REPO_USER_MINIO_SECRET_KEY
-              valueFrom:
-                secretKeyRef:
-                  name: repo-user-secret
-                  key: REPO_USER_MINIO_SECRET_KEY
-            - name: REPO_USER_MONGODB_DATABASE
+                  key: REPO_USER_MONGODB_ENDPOINT
+            ## MINIO
+            - name: S3_ENDPOINT
               valueFrom:
                 configMapKeyRef:
-                  name: repo-user-config
-                  key: REPO_USER_MONGODB_DATABASE
+                  name: apps-config
+                  key: S3_ENDPOINT
+            - name: S3_BUCKET
+              valueFrom:
+                configMapKeyRef:
+                  name: apps-config
+                  key: S3_BUCKET
+            - name: S3_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: apps-secret
+                  key: S3_ACCESS_KEY
+            - name: S3_SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: apps-secret
+                  key: S3_SECRET_KEY

@@ -50,12 +50,19 @@ public class UserControllerTest {
             .when()
             .post("/user")
             .then()
-            .statusCode(200)
-            .body("username", equalTo(TEST_USERNAME))
-            .body("email", equalTo(TEST_EMAIL))
-            .body("id", notNullValue())
             .extract()
             .response();
+
+    System.out.println(response.body().prettyPrint());
+
+    response
+        .then()
+        .statusCode(200)
+        .body("username", equalTo(TEST_USERNAME))
+        .body("email", equalTo(TEST_EMAIL))
+        .body("id", notNullValue())
+        .extract()
+        .response();
 
     userId = response.jsonPath().getString("id");
   }
