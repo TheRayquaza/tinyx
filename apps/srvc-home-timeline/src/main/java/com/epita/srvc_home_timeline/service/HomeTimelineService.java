@@ -21,7 +21,6 @@ import java.util.Optional;
 
 @ApplicationScoped
 public class HomeTimelineService {
-  @Inject AuthService authService;
   @Inject HomeTimelineRepository homeTimelineRepository;
   @Inject HomeTimelinePostRepository postRepository;
   @Inject HomeTimelineModelToHomeTimelineEntity homeTimelineModelToEntity;
@@ -29,11 +28,17 @@ public class HomeTimelineService {
   @Inject HomeTimelineEntityToHomeTimelineModel homeTimelineEnityToModel;
   @Inject HomeTimelinePostRepository homeTimelinePostRepository;
 
-  public HomeTimelineResponse getHomeTimelineById(String userId) {
-    if (authService.getUserId() != userId) {
-      throw HomeTimelineErrorCode.UNAUTHORIZED.createError(userId);
-    }
+  HomeTimelineModel initHomeTimeline(String userId) {
+    HomeTimelineModel homeTimelineModel = new HomeTimelineModel();
+    homeTimelineModel.setCreatedAt(LocalDateTime.now());
+    homeTimelineModel.setUserId(userId);
+    homeTimelineModel.setEntries(new ArrayList<>());
+    homeTimelineModel.setFollowersId(new ArrayList<>());
+    homeTimelineModel.setBlockedUsersId(new ArrayList<>());
+    return homeTimelineModel;
+  }
 
+  public HomeTimelineResponse getHomeTimelineById(String userId) {
     Optional<HomeTimelineModel> homeTimeline = homeTimelineRepository.findByUserId(userId);
 
     if (homeTimeline.isPresent()) {
@@ -114,13 +119,10 @@ public class HomeTimelineService {
       homeTimelineModel.setFollowersId(followers);
       homeTimelineRepository.updateModel(homeTimelineModel);
     } else {
-      HomeTimelineModel newModel = new HomeTimelineModel();
-      newModel.setUserId(userId);
-      newModel.setCreatedAt(LocalDateTime.now());
-      List<String> followers = new ArrayList<>();
+      HomeTimelineModel newModel = initHomeTimeline(userId);
+      List<String> followers = newModel.getFollowersId();
       followers.add(followerId);
       newModel.setFollowersId(followers);
-      newModel.setBlockedUsersId(new ArrayList<>());
       homeTimelineRepository.create(newModel);
     }
   }
@@ -136,9 +138,7 @@ public class HomeTimelineService {
       homeTimelineModel.setFollowersId(followers);
       homeTimelineRepository.updateModel(homeTimelineModel);
     } else {
-      HomeTimelineModel newModel = new HomeTimelineModel();
-      newModel.setUserId(userId);
-      newModel.setCreatedAt(LocalDateTime.now());
+      HomeTimelineModel newModel = initHomeTimeline(userId);
       homeTimelineRepository.create(newModel);
     }
   }
@@ -162,10 +162,8 @@ public class HomeTimelineService {
 
       homeTimelineRepository.updateModel(homeTimelineModel);
     } else {
-      HomeTimelineModel newModel = new HomeTimelineModel();
-      newModel.setUserId(userId);
-      newModel.setCreatedAt(LocalDateTime.now());
-      List<String> blockedUsers = new ArrayList<>();
+      HomeTimelineModel newModel = initHomeTimeline(userId);
+      List<String> blockedUsers = newModel.getBlockedUsersId();
       blockedUsers.add(blockedUserId);
       newModel.setBlockedUsersId(blockedUsers);
       homeTimelineRepository.create(newModel);
@@ -183,9 +181,7 @@ public class HomeTimelineService {
       homeTimelineModel.setBlockedUsersId(blockedUsers);
       homeTimelineRepository.updateModel(homeTimelineModel);
     } else {
-      HomeTimelineModel newModel = new HomeTimelineModel();
-      newModel.setUserId(userId);
-      newModel.setCreatedAt(LocalDateTime.now());
+      HomeTimelineModel newModel = initHomeTimeline(blockedUserId);
       homeTimelineRepository.create(newModel);
     }
   }

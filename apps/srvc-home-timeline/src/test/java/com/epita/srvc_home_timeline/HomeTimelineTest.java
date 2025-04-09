@@ -7,8 +7,13 @@ import com.epita.exchange.auth.service.AuthContext;
 import com.epita.exchange.auth.service.AuthService;
 import com.epita.exchange.auth.service.entity.AuthEntity;
 import com.epita.exchange.redis.aggregate.PostAggregate;
+import com.epita.exchange.redis.command.FollowCommand;
 import com.epita.exchange.redis.command.LikeCommand;
+import com.epita.srvc_home_timeline.controller.HomeTimelineController;
+
+import io.quarkus.test.common.http.TestHTTPEndpoint;
 import io.quarkus.test.junit.QuarkusTest;
+import io.quarkus.test.security.TestSecurity;
 import io.restassured.response.Response;
 import jakarta.inject.Inject;
 import java.time.LocalDateTime;
@@ -17,7 +22,9 @@ import org.jboss.logging.Logger;
 import org.junit.jupiter.api.*;
 
 @QuarkusTest
+@TestHTTPEndpoint(HomeTimelineController.class)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
+@TestSecurity(authorizationEnabled = false)
 public class HomeTimelineTest {
   private static final String USER_ID_1 = "15a1a100c293c91129883571";
   private static final String USER_ID_2 = "15a1a100c293c91129883572";
@@ -38,7 +45,7 @@ public class HomeTimelineTest {
 
   void publishAndWait(String channel, Object object) throws InterruptedException {
     redisPublisher.publish(channel, object);
-    Thread.sleep(300);
+    Thread.sleep(15000);
   }
 
   @BeforeAll
@@ -57,13 +64,19 @@ public class HomeTimelineTest {
   @Order(1)
   void timelineInitiallyEmpty() {
     logger.error("token user 1" + TOKEN_USER_1);
-    given()
+    AuthEntity authEntity1 = new AuthEntity(USER_ID_1, USER_1);
+    authContext.setAuthEntity(authEntity1);
+    Response response = given()
         .header("Authorization", "Bearer " + TOKEN_USER_1)
         .when()
-        .get("/home-timeline/" + USER_ID_1)
+        .get(USER_ID_1);
+    
+    System.out.println(response.body().prettyPrint());
+    
+    response    
         .then()
         .statusCode(200)
-        .body("posts", empty());
+        .body("hometimeline.entries", empty());
   }
 
   @Test
@@ -93,13 +106,36 @@ public class HomeTimelineTest {
         given()
             .header("Authorization", "Bearer " + TOKEN_USER_1)
             .when()
-            .get("/home-timeline/" + USER_ID_1);
+            .get(USER_ID_1);
 
     System.out.println(response.body().prettyPrint());
   }
 
   @Test
   @Order(3)
+  void user1FollowsUser2() throws Exception {
+    FollowCommand follow = new FollowCommand();
+    follow.setUserId(USER_ID_1);
+    follow.setFollowerId(USER_ID_2);
+    follow.setFollowing(true);
+
+    publishAndWait("follow_command", follow);
+
+    Response response = given()
+        .header("Authorization", "Bearer " + TOKEN_USER_1)
+        .when()
+        .get(USER_ID_1);
+
+    System.out.println(response.body().prettyPrint());
+
+    response
+        .then()
+        .statusCode(200)
+        .body("posts.text", hasItem("Post from user 2"));
+  }
+
+  @Test
+  @Order(4)
   void user1LikesPostFromUser2() throws Exception {
     LikeCommand like = new LikeCommand();
     like.setUserId(USER_ID_1);
@@ -108,10 +144,14 @@ public class HomeTimelineTest {
 
     publishAndWait("like_command", like);
 
-    given()
+    Response response = given()
         .header("Authorization", "Bearer " + TOKEN_USER_1)
         .when()
-        .get("/user-timeline/" + USER_ID_1)
+        .get(USER_ID_1);
+
+    System.out.println(response.body().prettyPrint());
+    
+    response
         .then()
         .statusCode(200)
         .body("posts.text", hasItem("Post from user 2"));

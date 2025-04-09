@@ -1,5 +1,6 @@
 package com.epita.srvc_home_timeline.controller;
 
+import com.epita.exchange.auth.service.AuthService;
 import com.epita.srvc_home_timeline.controller.response.HomeTimelineResponse;
 import com.epita.srvc_home_timeline.service.HomeTimelineService;
 import io.quarkus.security.Authenticated;
@@ -13,6 +14,7 @@ import jakarta.ws.rs.core.MediaType;
 @Path("/home-timeline")
 public class HomeTimelineController implements HomeTimelineControllerApi {
   @Inject HomeTimelineService homeTimelineService;
+  @Inject AuthService authService;
 
   @GET
   @Path("/{id}")
