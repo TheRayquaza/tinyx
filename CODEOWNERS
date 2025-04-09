@@ -1,27 +1,27 @@
 # ========== REPOS ==========
 
-/apps/repo-user/           @aurelien.daudin @mateo.lelong @khaled.mili @samy.yacef @maxim.bocquillion
-/apps/exchange/            @aurelien.daudin @mateo.lelong @khaled.mili @samy.yacef @maxim.bocquillion
-/apps/repo-post/           @khaled.mili @maxim.bocquillion @armand.blin @baptiste.arnold @aurelien.daudin
-/apps/repo-social/         @achille.guerard @gabriel.monteillard @mateo.lelong
+/apps/repo-user            @aurelien.daudin @mateo.lelong @khaled.mili @samy.yacef @maxim.bocquillion
+/apps/exchange             @aurelien.daudin @mateo.lelong @khaled.mili @samy.yacef @maxim.bocquillion
+/apps/repo-post            @khaled.mili @maxim.bocquillion @armand.blin @baptiste.arnold @aurelien.daudin
+/apps/repo-social          @achille.guerard @gabriel.monteillard @mateo.lelong
 
 # ========== SERVICES ==========
 
-/apps/srvc-search/         @armand.blin @mateo.lelong @gabriel.monteillard
-/apps/srvc-home-timeline/  @anton.vella @baptiste.arnold
-/apps/srvc-user-timeline/  @alexis.pinson @gabriel.toledano @timothe.merle @noe.susset
+/apps/srvc-search          @armand.blin @mateo.lelong @gabriel.monteillard
+/apps/srvc-home-timeline   @anton.vella @baptiste.arnold
+/apps/srvc-user-timeline   @alexis.pinson @gabriel.toledano @timothe.merle @noe.susset
 
 # ========== INFRA ==========
 
-/k8s/mongodb/              @mateo.lelong @samy.yacef @khaled.mili
-/k8s/redis/                @mateo.lelong @samy.yacef @baptiste.arnold
-/k8s/neo4j/                @achille.guerard @mateo.lelong @samy.yacef @baptiste.arnold
-/k8s/elastic/              @mateo.lelong @timothe.merle  # (à compléter si d’autres y touchent)
-/k8s/apps/                 @alexis.pinson @gabriel.toledano @timothe.merle @noe.susset   # services + auth = SRS
-/k8s                       @alexis.pinson @gabriel.toledano @timothe.merle @noe.susset   # général infra SRS
+/k8s/mongodb              @mateo.lelong @samy.yacef @khaled.mili
+/k8s/redis                @mateo.lelong @samy.yacef @baptiste.arnold
+/k8s/neo4j                @achille.guerard @mateo.lelong @samy.yacef @baptiste.arnold
+/k8s/elastic              @mateo.lelong @timothe.merle  # (à compléter si d’autres y touchent)
+/k8s/apps                 @alexis.pinson @gabriel.toledano @timothe.merle @noe.susset   # services + auth = SRS
+/k8s                      @alexis.pinson @gabriel.toledano @timothe.merle @noe.susset   # général infra SRS
 
 # ========== CI & GLOBAL ==========
 
-/ci/                       @samy.yacef @armand.blin
+/ci                        @samy.yacef @armand.blin
 /README.md                 @alexis.pinson @gabriel.toledano @timothe.merle @noe.susset
 
