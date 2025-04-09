@@ -27,10 +27,9 @@ public class LikeCommandSubscriber implements Consumer<LikeCommand> {
     vertx.executeBlocking(
         future -> {
           if (message.isLiked()) {
-            homeTimelineService.handleLike(
-                message.getUserId(), message.getUuid().toString(), message.getFollowerId());
+            homeTimelineService.handleLike(message.getUserId(), message.getPostId());
           } else {
-            homeTimelineService.handleUnlike(message.getUserId(), message.getUuid().toString());
+            homeTimelineService.handleUnlike(message.getUserId(), message.getPostId());
           }
           future.complete();
         });

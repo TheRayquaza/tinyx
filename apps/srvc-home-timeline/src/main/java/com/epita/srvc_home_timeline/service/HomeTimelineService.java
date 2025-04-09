@@ -190,15 +190,16 @@ public class HomeTimelineService {
     }
   }
 
-  public void handleLike(String UserId, String postId, String followerId) {
-    List<HomeTimelineModel> hometimelinesModel =
-        homeTimelineRepository.getHomeTimelineContainingUserId(UserId, followerId);
+  public void handleLike(String UserId, String postId) {
     Optional<HomeTimelinePostModel> homeTimelinePostModel =
         homeTimelinePostRepository.findByPostId(postId);
     if (homeTimelinePostModel.isEmpty()) {
       // maybe error because there is a like of a post that doesn't exist
       return;
     }
+    String followerId = homeTimelinePostModel.get().getOwnerId();
+    List<HomeTimelineModel> hometimelinesModel =
+        homeTimelineRepository.getHomeTimelineContainingUserId(UserId, followerId);
     HomeTimelinePostModel PostModel = homeTimelinePostModel.get();
     for (HomeTimelineModel homeTimelineModel : hometimelinesModel) {
       HomeTimelineEntity homeTimelineEntity =
