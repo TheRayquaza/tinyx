@@ -3,19 +3,18 @@ package com.epita.srvc_home_timeline;
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.*;
 
-import com.epita.exchange.redis.command.LikeCommand;
-import io.restassured.response.Response;
 import com.epita.exchange.auth.service.AuthContext;
 import com.epita.exchange.auth.service.AuthService;
 import com.epita.exchange.auth.service.entity.AuthEntity;
 import com.epita.exchange.redis.aggregate.PostAggregate;
+import com.epita.exchange.redis.command.LikeCommand;
 import io.quarkus.test.junit.QuarkusTest;
+import io.restassured.response.Response;
 import jakarta.inject.Inject;
+import java.time.LocalDateTime;
 import org.bson.types.ObjectId;
 import org.jboss.logging.Logger;
 import org.junit.jupiter.api.*;
-
-import java.time.LocalDateTime;
 
 @QuarkusTest
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)

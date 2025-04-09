@@ -7,12 +7,11 @@ import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import java.io.File;
 import java.io.InputStream;
-import org.eclipse.microprofile.config.inject.ConfigProperty;
-
 import java.util.AbstractMap;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import org.eclipse.microprofile.config.inject.ConfigProperty;
 
 @ApplicationScoped
 public class S3Service implements Logger {
@@ -36,7 +35,8 @@ public class S3Service implements Logger {
 
   @PostConstruct
   public void init() {
-    minioClient = MinioClient.builder().endpoint(endpoint).credentials(accessKey, secretKey).build();
+    minioClient =
+        MinioClient.builder().endpoint(endpoint).credentials(accessKey, secretKey).build();
     logger().info("S3Configuration - Endpoint: {}", endpoint);
     logger().info("S3Configuration - Bucket: {}", bucketName);
     logger().info("S3Configuration - AccessKey: {}", accessKey);
@@ -47,7 +47,7 @@ public class S3Service implements Logger {
     try {
       logger().info("Verification if bucket {} exist", bucketName);
       boolean found =
-              minioClient.bucketExists(BucketExistsArgs.builder().bucket(bucketName).build());
+          minioClient.bucketExists(BucketExistsArgs.builder().bucket(bucketName).build());
       if (!found) {
         minioClient.makeBucket(MakeBucketArgs.builder().bucket(bucketName).build());
         logger().info("Bucket created: {}", bucketName);
