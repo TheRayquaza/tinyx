@@ -126,6 +126,11 @@ public class SocialService implements Logger {
   public void followUser(String userId) {
     logger().info("Running follow cypher script with : \n current userId: {}\ntarget userId: {}\n", authService.getUserId(), userId);
 
+    //Cannot follow yourself
+    if (userId.equals(authService.getUserId())) {
+      throw RepoSocialErrorCode.FORBIDDEN.createError("Cannot follow yourself");
+    }
+
     UserNode followerNode = new UserNode(authService.getUserId());
     UserNode followedNode = new UserNode(userId);
 
@@ -147,6 +152,11 @@ public class SocialService implements Logger {
   public void unfollowUser(String userId) {
     logger().info("Running unfollow cypher script with : \n current userId: {}\ntarget userId: {}\n", authService.getUserId(), userId);
 
+    //Cannot unfollow yourself
+    if (userId.equals(authService.getUserId())) {
+      throw RepoSocialErrorCode.FORBIDDEN.createError("Cannot unfollow yourself");
+    }
+
     UserNode followerNode = new UserNode(authService.getUserId());
     UserNode followedNode = new UserNode(userId);
 
@@ -167,6 +177,11 @@ public class SocialService implements Logger {
 
   public void blockUser(String userId) {
     logger().info("Running block cypher script with : \n current userId: {}\ntarget userId: {}\n", authService.getUserId(), userId);
+
+    //Cannot block yourself
+    if (userId.equals(authService.getUserId())) {
+      throw RepoSocialErrorCode.FORBIDDEN.createError("Cannot block yourself");
+    }
 
     UserNode blockerNode = new UserNode(authService.getUserId());
     UserNode blockedNode = new UserNode(userId);
@@ -194,6 +209,11 @@ public class SocialService implements Logger {
 
   public void unblockUser(String userId) {
     logger().info("Running unblock cypher script with : \n current userId: {}\ntarget userId: {}\n", authService.getUserId(), userId);
+
+    //Cannot unblock yourself
+    if (userId.equals(authService.getUserId())) {
+      throw RepoSocialErrorCode.FORBIDDEN.createError("Cannot unblock yourself");
+    }
 
     UserNode blockerNode = new UserNode(authService.getUserId());
     UserNode blockedNode = new UserNode(userId);
