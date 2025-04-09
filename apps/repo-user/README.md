@@ -43,15 +43,20 @@ For a deployment in production, you must configure the following environment
 variables.
 
 | Variable                        | Description                                         |
-|---------------------------------|-----------------------------------------------------|
-| `REPO_USER_LOG_LEVEL`           | Log level                                           |
-| `REPO_USER_QUARKUS_HTTP_PORT`   | Quarkus HTTP port (e.g., `8080`)                    |
-| `REPO_USER_APP_PROFILE`         | Application profile (`dev` / `prod`)                |
-| `REPO_USER_REDIS_HOSTS`         | Redis hosts                                         |
-| `REPO_USER_REDIS_PASSWORD`      | Redis password                                      |
-| `REPO_USER_AGGREGATE_CHANNEL`   | Redis user aggregate channel                        |
-| `REPO_USER_MONGODB_ENDPOINTS`   | MongoDB endpoint host(s)                            |
-| `REPO_USER_MINIO_ENDPOINT`      | MinIO endpoint (`http://localhost:9000` by default) |
-| `REPO_USER_MINIO_BUCKET`        | MinIO bucket name (`default` by default)            |
-| `REPO_USER_MINIO_ACCESS_KEY`    | MinIO access key (`minioadmin` by default)          |
-| `REPO_USER_MINIO_SECRET_KEY`    | MinIO secret key (`minioadmin` by default)          |
+|----------------------------------|-----------------------------------------------------|
+| `QUARKUS_LOG_LEVEL`             | Log level                                           |
+| `QUARKUS_HTTP_PORT`             | Quarkus HTTP port (e.g., `8080`)                    |
+| `QUARKUS_HTTP_HOST`             | Quarkus HTTP host (e.g., `0.0.0.0` or `localhost`)  |
+| `QUARKUS_APP_PROFILE`           | Application profile (`dev` or `prod`)               |
+| `QUARKUS_REDIS_HOSTS`           | Redis hosts                                         |
+| `QUARKUS_REDIS_PASSWORD`        | Redis password                                      |
+| `QUARKUS_REDIS_CLIENT_TYPE`     | Redis client type (e.g., `jedis`, `lettuce`)        |
+| `QUARKUS_REDIS_RECONNECT_ATTEMPTS` | Number of reconnect attempts for Redis            |
+| `QUARKUS_REDIS_AUTO_FAILOVER`   | Enable Redis auto failover (`true` or `false`)      |
+| `USER_AGGREGATE_CHANNEL`        | Redis user aggregate channel                        |
+| `QUARKUS_MONGODB_CONNECTION_STRING` | MongoDB connection string                        |
+| `S3_ENDPOINT`                   | MinIO endpoint (e.g., `http://localhost:9000`)       |
+| `S3_BUCKET`                     | MinIO bucket name (e.g., `default`)                 |
+| `S3_ACCESS_KEY`                 | MinIO access key (e.g., `minioadmin`)               |
+| `S3_SECRET_KEY`                 | MinIO secret key (e.g., `minioadmin`)               |
+
