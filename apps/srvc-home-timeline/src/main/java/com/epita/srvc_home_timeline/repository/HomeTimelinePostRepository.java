@@ -18,4 +18,8 @@ public class HomeTimelinePostRepository implements PanacheMongoRepository<HomeTi
   public void create(HomeTimelinePostModel postModel) {
     this.persist(postModel);
   }
+
+  public void deleteModel(HomeTimelinePostModel postModel) {
+    this.delete(postModel.getPostId());
+  }
 }

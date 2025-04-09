@@ -17,6 +17,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @ApplicationScoped
 public class HomeTimelineService {
@@ -37,6 +38,20 @@ public class HomeTimelineService {
     return homeTimelineModel;
   }
 
+  HomeTimelinePostModel initHomeTimelinePost(PostAggregate postAggregate) {
+    return new HomeTimelinePostModel()
+        .withPostId(postAggregate.getId())
+        .withOwnerId(postAggregate.getOwnerId())
+        .withText(postAggregate.getText())
+        .withMedia(postAggregate.getMedia())
+        .withRepostId(postAggregate.getRepostId())
+        .withReplyToPostId(postAggregate.getReplyToPostId())
+        .withReply(postAggregate.isReply())
+        .withCreatedAt(postAggregate.getCreatedAt())
+        .withUpdatedAt(postAggregate.getUpdatedAt())
+        .withDeleted(postAggregate.isDeleted());
+  }
+
   public HomeTimelineResponse getHomeTimelineById(String userId) {
     Optional<HomeTimelineModel> homeTimeline = homeTimelineRepository.findByUserId(userId);
 
@@ -54,9 +69,15 @@ public class HomeTimelineService {
 
   public void handlePostAggregate(PostAggregate postAggregate) {
     if (postAggregate.isDeleted()) {
-      homeTimelineRepository.delete("postId", postAggregate.getId());
+      Optional<HomeTimelinePostModel> toDelete =
+          homeTimelinePostRepository.findByPostId(postAggregate.getId());
+      if (!toDelete.isPresent()) {
+        return;
+      }
+      homeTimelinePostRepository.deleteModel(toDelete.get());
       homeTimelineDelete(postAggregate.getId());
     } else {
+      homeTimelinePostRepository.create(initHomeTimelinePost(postAggregate));
       homeTimelineAdd(postAggregate);
     }
   }
@@ -126,15 +147,31 @@ public class HomeTimelineService {
     Optional<HomeTimelineModel> homeTimeline = homeTimelineRepository.findByUserId(userId);
     if (homeTimeline.isPresent()) {
       HomeTimelineModel homeTimelineModel = homeTimeline.get();
-      List<String> followers = homeTimelineModel.getFollowersId();
+      HomeTimelineEntity homeTimelineEntity =
+          homeTimelineModelToEntity.convertNotNull(homeTimelineModel);
+      List<String> followers = homeTimelineEntity.getFollowersId();
       if (followers.contains(followerId)) {
         followers.remove(followerId);
       }
-      homeTimelineModel.setFollowersId(followers);
-      homeTimelineRepository.updateModel(homeTimelineModel);
+      homeTimelineEntity.setFollowersId(followers);
+      List<HomeTimelineEntity.HomeTimelineEntryEntity> newEntries =
+          homeTimelineEntity.getEntries().stream()
+              .filter(entry -> entry.getAuthorId().equals(followerId))
+              .collect(Collectors.toList());
+      homeTimelineEntity.setEntries(newEntries);
+      for (HomeTimelineEntity.HomeTimelineEntryEntity homeTimelineEntryEntity :
+          homeTimelineEntity.getEntries()) {
+        if (homeTimelineEntryEntity.getLikedBy().contains(followerId)) {
+          homeTimelineEntryEntity.setLikedBy(
+              homeTimelineEntryEntity.getLikedBy().stream()
+                  .filter(likedBy -> !likedBy.equals(followerId))
+                  .collect(Collectors.toList()));
+        }
+      }
+      homeTimelineRepository.updateModel(
+          homeTimelineEnityToModel.convertNotNull(homeTimelineEntity));
     } else {
-      HomeTimelineModel newModel = initHomeTimeline(userId);
-      homeTimelineRepository.create(newModel);
+      // FIXME Shouldn't happen handle error
     }
   }
 
@@ -236,23 +273,22 @@ public class HomeTimelineService {
       HomeTimelineEntity homeTimelineEntity =
           homeTimelineModelToEntity.convertNotNull(homeTimelineModel);
       List<HomeTimelineEntity.HomeTimelineEntryEntity> entries = homeTimelineEntity.getEntries();
-      for (HomeTimelineEntity.HomeTimelineEntryEntity homeTimelineEntryEntity : entries) {
-        if (homeTimelineEntryEntity.getPostId().equals(postId)) {
-          HomeTimelineEntity.HomeTimelineLikedByEntity toDelete = null;
-          List<HomeTimelineEntity.HomeTimelineLikedByEntity> likedBy =
-              homeTimelineEntryEntity.getLikedBy();
-          for (HomeTimelineEntity.HomeTimelineLikedByEntity likedByEntity : likedBy) {
-            if (likedByEntity.getUserId().equals(UserId)) {
-              toDelete = likedByEntity;
-            }
-          }
-          if (toDelete != null) {
-            likedBy.remove(toDelete);
-            homeTimelineEntryEntity.setLikedBy(likedBy);
-          }
+      for (HomeTimelineEntity.HomeTimelineEntryEntity entry : entries) {
+        if (entry.getLikedBy().stream().anyMatch(likedBy -> likedBy.getUserId().equals(UserId))) {
+          entry.setLikedBy(
+              entry.getLikedBy().stream()
+                  .filter(likedBy -> !likedBy.getUserId().equals(UserId))
+                  .toList());
         }
       }
       homeTimelineEntity.setEntries(entries);
+      homeTimelineEntity.setEntries(
+          homeTimelineEntity.getEntries().stream()
+              .filter(
+                  entry ->
+                      !(entry.getLikedBy().size() == 0
+                          && !homeTimelineEntity.getFollowersId().contains(entry.getAuthorId())))
+              .toList());
       homeTimelineRepository.updateModel(
           homeTimelineEnityToModel.convertNotNull(homeTimelineEntity));
     }
