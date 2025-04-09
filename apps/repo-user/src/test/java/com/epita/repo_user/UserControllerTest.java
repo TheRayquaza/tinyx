@@ -49,18 +49,20 @@ public class UserControllerTest {
             .body(request)
             .when()
             .post("/user")
-            .then().extract().response();
+            .then()
+            .extract()
+            .response();
 
     System.out.println(response.body().prettyPrint());
 
     response
-            .then()
-            .statusCode(200)
-            .body("username", equalTo(TEST_USERNAME))
-            .body("email", equalTo(TEST_EMAIL))
-            .body("id", notNullValue())
-            .extract()
-            .response();
+        .then()
+        .statusCode(200)
+        .body("username", equalTo(TEST_USERNAME))
+        .body("email", equalTo(TEST_EMAIL))
+        .body("id", notNullValue())
+        .extract()
+        .response();
 
     userId = response.jsonPath().getString("id");
   }

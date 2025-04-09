@@ -23,7 +23,6 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 import org.bson.types.ObjectId;
-import org.eclipse.microprofile.config.inject.ConfigProperty;
 
 @ApplicationScoped
 public class PostService implements Logger {
@@ -42,7 +41,8 @@ public class PostService implements Logger {
 
   @Inject PostModelToPostAggregate postModelToPostAggregate;
 
-  String postAggregateChannel = System.getenv().getOrDefault("POST_AGGREGATE_CHANNEL", "post-channel");
+  String postAggregateChannel =
+      System.getenv().getOrDefault("POST_AGGREGATE_CHANNEL", "post-channel");
 
   public PostEntity createPost(CreatePostRequest request, String ownerId) {
     if (request == null
