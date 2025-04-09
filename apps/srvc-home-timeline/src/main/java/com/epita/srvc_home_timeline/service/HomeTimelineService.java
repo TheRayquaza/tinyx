@@ -216,5 +216,32 @@ public class HomeTimelineService {
     }
   }
 
-  public void handleUnlike(String UserId, String postId) {}
+  public void handleUnlike(String UserId, String postId) {
+    List<HomeTimelineModel> homeTimelinesModel =
+        homeTimelineRepository.getHomeTimelineContainingPostId(postId);
+    for (HomeTimelineModel homeTimelineModel : homeTimelinesModel) {
+      HomeTimelineEntity homeTimelineEntity =
+          homeTimelineModelToEntity.convertNotNull(homeTimelineModel);
+      List<HomeTimelineEntity.HomeTimelineEntryEntity> entries = homeTimelineEntity.getEntries();
+      for (HomeTimelineEntity.HomeTimelineEntryEntity homeTimelineEntryEntity : entries) {
+        if (homeTimelineEntryEntity.getPostId().equals(postId)) {
+          HomeTimelineEntity.HomeTimelineLikedByEntity toDelete = null;
+          List<HomeTimelineEntity.HomeTimelineLikedByEntity> likedBy =
+              homeTimelineEntryEntity.getLikedBy();
+          for (HomeTimelineEntity.HomeTimelineLikedByEntity likedByEntity : likedBy) {
+            if (likedByEntity.getUserId().equals(UserId)) {
+              toDelete = likedByEntity;
+            }
+          }
+          if (toDelete != null) {
+            likedBy.remove(toDelete);
+            homeTimelineEntryEntity.setLikedBy(likedBy);
+          }
+        }
+      }
+      homeTimelineEntity.setEntries(entries);
+      homeTimelineRepository.updateModel(
+          homeTimelineEnityToModel.convertNotNull(homeTimelineEntity));
+    }
+  }
 }
