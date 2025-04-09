@@ -153,6 +153,18 @@ public class HomeTimelineService {
           homeTimelineModel.getEntries().stream()
               .filter(entry -> !entry.getAuthorId().equals(blockedUserId))
               .toList();
+
+      entries.forEach(
+          entry -> {
+              entry.setLikedBy(
+                  entry.getLikedBy().stream()
+                      .filter(likedBy -> !likedBy.getUserId().equals(blockedUserId))
+                      .toList());
+              if (entry.getLikedBy().isEmpty() && !homeTimelineModel.getFollowersId().contains(entry.getAuthorId())) {
+                entries.remove(entry);
+              }
+      });
+        
       homeTimelineModel.setEntries(entries);
 
       homeTimelineRepository.updateModel(homeTimelineModel);

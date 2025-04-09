@@ -7,6 +7,7 @@ import com.epita.exchange.auth.service.AuthContext;
 import com.epita.exchange.auth.service.AuthService;
 import com.epita.exchange.auth.service.entity.AuthEntity;
 import com.epita.exchange.redis.aggregate.PostAggregate;
+import com.epita.exchange.redis.command.BlockCommand;
 import com.epita.exchange.redis.command.FollowCommand;
 import com.epita.exchange.redis.command.LikeCommand;
 import com.epita.srvc_home_timeline.controller.HomeTimelineController;
@@ -315,5 +316,62 @@ public class HomeTimelineTest {
         .then()
         .statusCode(200)
         .body("hometimeline.entries.text", not(hasItem("new Post from user 4")));
+  }
+
+  @Test
+  @Order(10)
+  void blockTest() throws Exception {
+    // User 1 follows user 2
+    followUser(USER_ID_2, USER_ID_1, true);
+
+    // User 2 posts
+    String newpostId2 = new ObjectId().toString();
+    PostAggregate newpost2 = new PostAggregate();
+    newpost2.setId(newpostId2);
+    newpost2.setOwnerId(USER_ID_2);
+    newpost2.setText("new Post from user 2");
+    newpost2.setCreatedAt(LocalDateTime.now());
+    newpost2.setUpdatedAt(LocalDateTime.now());
+    publishAndWait("post_aggregate", newpost2);
+    System.out.println("user 2 posts - done");
+
+    // User 1 blocks user 2
+    BlockCommand block = new BlockCommand();
+    block.setUserId(USER_ID_1);
+    block.setTargetId(USER_ID_2);
+    block.setBlocked(true);
+    publishAndWait("block_command", block);
+
+    // Checking user 1 home timelines
+    Response response =
+        given().header("Authorization", "Bearer " + TOKEN_USER_1).when().get(USER_ID_1);
+    System.out.println(response.body().prettyPrint());
+    response
+        .then()
+        .statusCode(200)
+        .body("hometimeline.entries.text", not(hasItem("new Post from user 2")));
+
+    // User 1 unblocks user 2
+    block.setBlocked(false);
+    publishAndWait("block_command", block);
+    
+    // User 2 posts
+    String newpostId2_2 = new ObjectId().toString();
+    PostAggregate newpost2_2 = new PostAggregate();
+    newpost2_2.setId(newpostId2_2);
+    newpost2_2.setOwnerId(USER_ID_2);
+    newpost2_2.setText("new Post from user 2");
+    newpost2_2.setCreatedAt(LocalDateTime.now());
+    newpost2_2.setUpdatedAt(LocalDateTime.now());
+    publishAndWait("post_aggregate", newpost2_2);
+    System.out.println("user 2 posts - done");
+
+    // Checking user 1 home timelines
+    response = given().header("Authorization", "Bearer " + TOKEN_USER_1).when().get(USER_ID_1);
+    System.out.println(response.body().prettyPrint());
+    response
+        .then()
+        .statusCode(200)
+        .body("hometimeline.entries.text", hasItem("new Post from user 2"));
   }
 }
