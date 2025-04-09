@@ -11,15 +11,22 @@ import jakarta.ejb.Startup;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import java.util.function.Consumer;
+import org.eclipse.microprofile.config.inject.ConfigProperty;
 
 @Startup
 @ApplicationScoped
 public class FollowCommandSubscriber implements Consumer<FollowCommand> {
-  @Inject HomeTimelineService homeTimelineService;
-  private final PubSubCommands.RedisSubscriber subscriber;
+  @Inject
+  @ConfigProperty(name = "repo.social.command.channel", defaultValue = "follow_command")
+  String channel;
 
-  public FollowCommandSubscriber(final RedisDataSource ds) {
+  private final PubSubCommands.RedisSubscriber subscriber;
+  @Inject HomeTimelineService homeTimelineService;
+
+  public FollowCommandSubscriber(
+      final RedisDataSource ds, HomeTimelineService homeTimelineService) {
     subscriber = ds.pubsub(FollowCommand.class).subscribe("follow_command", this);
+    this.homeTimelineService = homeTimelineService;
   }
 
   @Override
@@ -27,9 +34,9 @@ public class FollowCommandSubscriber implements Consumer<FollowCommand> {
     vertx.executeBlocking(
         future -> {
           if (message.isFollowing()) {
-            homeTimelineService.handleFollow(message.getUserId(), message.getFollowerId());
+            this.homeTimelineService.handleFollow(message.getUserId(), message.getFollowerId());
           } else {
-            homeTimelineService.handleUnfollow(message.getUserId(), message.getFollowerId());
+            this.homeTimelineService.handleUnfollow(message.getUserId(), message.getFollowerId());
           }
           future.complete();
         });

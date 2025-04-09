@@ -11,12 +11,17 @@ import jakarta.ejb.Startup;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import java.util.function.Consumer;
+import org.eclipse.microprofile.config.inject.ConfigProperty;
 
 @Startup
 @ApplicationScoped
 public class PostAggregateSubscriber implements Consumer<PostAggregate> {
-  @Inject HomeTimelineService homeTimelineService;
+  @Inject
+  @ConfigProperty(name = "repo.post.aggregate.channel", defaultValue = "post_aggregate")
+  String channel;
+
   private final PubSubCommands.RedisSubscriber subscriber;
+  @Inject HomeTimelineService homeTimelineService;
 
   public PostAggregateSubscriber(final RedisDataSource ds) {
     subscriber = ds.pubsub(PostAggregate.class).subscribe("post_aggregate", this);

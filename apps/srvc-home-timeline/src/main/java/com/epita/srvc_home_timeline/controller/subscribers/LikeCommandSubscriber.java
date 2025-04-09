@@ -11,12 +11,17 @@ import jakarta.ejb.Startup;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import java.util.function.Consumer;
+import org.eclipse.microprofile.config.inject.ConfigProperty;
 
 @Startup
 @ApplicationScoped
 public class LikeCommandSubscriber implements Consumer<LikeCommand> {
-  @Inject HomeTimelineService homeTimelineService;
+  @Inject
+  @ConfigProperty(name = "repo.social.command.channel", defaultValue = "like_command")
+  String channel;
+
   private final PubSubCommands.RedisSubscriber subscriber;
+  @Inject HomeTimelineService homeTimelineService;
 
   public LikeCommandSubscriber(final RedisDataSource ds) {
     subscriber = ds.pubsub(LikeCommand.class).subscribe("like_command", this);

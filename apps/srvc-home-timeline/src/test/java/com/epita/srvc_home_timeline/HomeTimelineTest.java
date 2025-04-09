@@ -10,7 +10,6 @@ import com.epita.exchange.redis.aggregate.PostAggregate;
 import com.epita.exchange.redis.command.FollowCommand;
 import com.epita.exchange.redis.command.LikeCommand;
 import com.epita.srvc_home_timeline.controller.HomeTimelineController;
-
 import io.quarkus.test.common.http.TestHTTPEndpoint;
 import io.quarkus.test.junit.QuarkusTest;
 import io.quarkus.test.security.TestSecurity;
@@ -66,17 +65,12 @@ public class HomeTimelineTest {
     logger.error("token user 1" + TOKEN_USER_1);
     AuthEntity authEntity1 = new AuthEntity(USER_ID_1, USER_1);
     authContext.setAuthEntity(authEntity1);
-    Response response = given()
-        .header("Authorization", "Bearer " + TOKEN_USER_1)
-        .when()
-        .get(USER_ID_1);
-    
+    Response response =
+        given().header("Authorization", "Bearer " + TOKEN_USER_1).when().get(USER_ID_1);
+
     System.out.println(response.body().prettyPrint());
-    
-    response    
-        .then()
-        .statusCode(200)
-        .body("hometimeline.entries", empty());
+
+    response.then().statusCode(200).body("hometimeline.entries", empty());
   }
 
   @Test
@@ -103,10 +97,7 @@ public class HomeTimelineTest {
 
     // Les hometimelines devrait toujours etre vide
     Response response =
-        given()
-            .header("Authorization", "Bearer " + TOKEN_USER_1)
-            .when()
-            .get(USER_ID_1);
+        given().header("Authorization", "Bearer " + TOKEN_USER_1).when().get(USER_ID_1);
 
     System.out.println(response.body().prettyPrint());
   }
@@ -121,17 +112,12 @@ public class HomeTimelineTest {
 
     publishAndWait("follow_command", follow);
 
-    Response response = given()
-        .header("Authorization", "Bearer " + TOKEN_USER_1)
-        .when()
-        .get(USER_ID_1);
+    Response response =
+        given().header("Authorization", "Bearer " + TOKEN_USER_1).when().get(USER_ID_1);
 
     System.out.println(response.body().prettyPrint());
 
-    response
-        .then()
-        .statusCode(200)
-        .body("posts.text", hasItem("Post from user 2"));
+    response.then().statusCode(200).body("posts.text", hasItem("Post from user 2"));
   }
 
   @Test
@@ -144,16 +130,11 @@ public class HomeTimelineTest {
 
     publishAndWait("like_command", like);
 
-    Response response = given()
-        .header("Authorization", "Bearer " + TOKEN_USER_1)
-        .when()
-        .get(USER_ID_1);
+    Response response =
+        given().header("Authorization", "Bearer " + TOKEN_USER_1).when().get(USER_ID_1);
 
     System.out.println(response.body().prettyPrint());
-    
-    response
-        .then()
-        .statusCode(200)
-        .body("posts.text", hasItem("Post from user 2"));
+
+    response.then().statusCode(200).body("posts.text", hasItem("Post from user 2"));
   }
 }

@@ -11,12 +11,17 @@ import jakarta.ejb.Startup;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import java.util.function.Consumer;
+import org.eclipse.microprofile.config.inject.ConfigProperty;
 
 @Startup
 @ApplicationScoped
 public class BlockCommandSubscriber implements Consumer<BlockCommand> {
-  @Inject HomeTimelineService homeTimelineService;
+  @Inject
+  @ConfigProperty(name = "repo.social.command.channel", defaultValue = "block_command")
+  String channel;
+
   private final PubSubCommands.RedisSubscriber subscriber;
+  @Inject HomeTimelineService homeTimelineService;
 
   public BlockCommandSubscriber(final RedisDataSource ds) {
     subscriber = ds.pubsub(BlockCommand.class).subscribe("block_command", this);
