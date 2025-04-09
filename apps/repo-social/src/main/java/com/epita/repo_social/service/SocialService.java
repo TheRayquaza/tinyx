@@ -199,9 +199,11 @@ public class SocialService implements Logger {
                 blockedNode.userId());
     }
 
-    // Unfollow the user (Instagram behavior)
-    FollowRelationship followRelationship = new FollowRelationship(blockerNode, blockedNode);
-    neo4jRepository.deleteRelation(followRelationship.deleteCypher());
+    // Delete follow relation with the user (Instagram behavior)
+    FollowRelationship blockerFollowRelationship = new FollowRelationship(blockerNode, blockedNode);
+    neo4jRepository.deleteRelation(blockerFollowRelationship.deleteCypher());
+    FollowRelationship blockedFollowRelationship = new FollowRelationship(blockedNode, blockerNode);
+    neo4jRepository.deleteRelation(blockedFollowRelationship.deleteCypher());
 
     BlockRelationship blockRelationship = new BlockRelationship(blockerNode, blockedNode);
     neo4jRepository.createRelation(blockRelationship.createCypher());
