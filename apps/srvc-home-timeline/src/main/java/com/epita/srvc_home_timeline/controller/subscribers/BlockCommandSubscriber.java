@@ -19,7 +19,7 @@ public class BlockCommandSubscriber implements Consumer<BlockCommand> {
   private final PubSubCommands.RedisSubscriber subscriber;
 
   public BlockCommandSubscriber(final RedisDataSource ds) {
-    subscriber = ds.pubsub(BlockCommand.class).subscribe("block-command", this);
+    subscriber = ds.pubsub(BlockCommand.class).subscribe("block_command", this);
   }
 
   @Override

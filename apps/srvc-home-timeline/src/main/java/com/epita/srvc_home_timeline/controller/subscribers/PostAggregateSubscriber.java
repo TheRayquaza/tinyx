@@ -19,7 +19,7 @@ public class PostAggregateSubscriber implements Consumer<PostAggregate> {
   private final PubSubCommands.RedisSubscriber subscriber;
 
   public PostAggregateSubscriber(final RedisDataSource ds) {
-    subscriber = ds.pubsub(PostAggregate.class).subscribe("post-aggregate", this);
+    subscriber = ds.pubsub(PostAggregate.class).subscribe("post_aggregate", this);
   }
 
   @Override

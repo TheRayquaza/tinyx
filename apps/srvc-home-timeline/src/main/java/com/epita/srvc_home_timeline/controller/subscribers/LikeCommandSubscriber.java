@@ -19,7 +19,7 @@ public class LikeCommandSubscriber implements Consumer<LikeCommand> {
   private final PubSubCommands.RedisSubscriber subscriber;
 
   public LikeCommandSubscriber(final RedisDataSource ds) {
-    subscriber = ds.pubsub(LikeCommand.class).subscribe("like-command", this);
+    subscriber = ds.pubsub(LikeCommand.class).subscribe("like_command", this);
   }
 
   @Override

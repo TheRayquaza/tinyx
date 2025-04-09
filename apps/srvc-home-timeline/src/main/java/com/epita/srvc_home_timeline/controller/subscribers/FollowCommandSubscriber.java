@@ -19,7 +19,7 @@ public class FollowCommandSubscriber implements Consumer<FollowCommand> {
   private final PubSubCommands.RedisSubscriber subscriber;
 
   public FollowCommandSubscriber(final RedisDataSource ds) {
-    subscriber = ds.pubsub(FollowCommand.class).subscribe("follow-command", this);
+    subscriber = ds.pubsub(FollowCommand.class).subscribe("follow_command", this);
   }
 
   @Override
