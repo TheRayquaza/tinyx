@@ -1,0 +1,21 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - secrets.yml
+  - namespace.yml
+  - statefulset.yml
+  - service.yml
+configMapGenerator:
+  - name: neo4j-config
+    namespace: neo4j
+    literals:
+      - |-
+        dbms.memory.heap.initial_size=512m
+        dbms.memory.heap.max_size=2g
+        dbms.memory.pagecache.size=2g
+        dbms.connector.http.enabled=true
+        dbms.connector.http.listen_address=:7474
+        dbms.connector.bolt.enabled=true
+        dbms.connector.bolt.listen_address=:7687
+        PORT.7687.TCP.PORT:=7687
+        PORT.7474.TCP.PORT:=7474
