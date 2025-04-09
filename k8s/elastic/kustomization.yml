@@ -3,12 +3,12 @@ kind: Kustomization
 apiVersion: kustomize.config.k8s.io/v1beta1
 resources:
   - namespace.yml
-  - elasticsearch.yml
   - service.yml
-  - secret.yml
-  - statefulset.yml
+  #- secret.yml
+  #- statefulset.yml
+  - deployment.yml
 
-ConfigMapGenerator:
+configMapGenerator:
   - name: elasticsearch-config
     namespace: elastic
     literals:
