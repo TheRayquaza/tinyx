@@ -8,7 +8,6 @@ import com.epita.repo_user.controller.request.UploadImageRequest;
 import com.epita.repo_user.controller.response.UserLoginResponse;
 import com.epita.repo_user.service.UserService;
 import com.epita.repo_user.service.entity.UserEntity;
-import io.quarkus.security.Authenticated;
 import jakarta.inject.Inject;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
@@ -46,7 +45,6 @@ public class RepoUserController implements RepoUserControllerApi {
 
   @PUT
   @Path("/user")
-  @Authenticated
   @Override
   public UserEntity modifyUser(
       @RequestBody(required = true) @NotNull @Valid ModifyUserRequest request) {
@@ -57,7 +55,6 @@ public class RepoUserController implements RepoUserControllerApi {
 
   @PUT
   @Path("/user/image")
-  @Authenticated
   @Consumes(MediaType.MULTIPART_FORM_DATA)
   @Override
   public @NotNull UserEntity uploadProfileImage(
@@ -69,7 +66,6 @@ public class RepoUserController implements RepoUserControllerApi {
 
   @DELETE
   @Path("/user")
-  @Authenticated
   @Override
   public void deleteUser() {
     String userId = authService.getUserId();
@@ -79,7 +75,6 @@ public class RepoUserController implements RepoUserControllerApi {
 
   @GET
   @Path("/user")
-  @Authenticated
   @Override
   public @NotNull UserEntity getCurrentUserAccount() {
     String userId = authService.getUserId();
@@ -89,7 +84,6 @@ public class RepoUserController implements RepoUserControllerApi {
 
   @GET
   @Path("/user/{id}")
-  @Authenticated
   @Override
   public UserEntity getUserAccount(@PathParam("id") String id) {
     logger().info("GET /user/{}", id);

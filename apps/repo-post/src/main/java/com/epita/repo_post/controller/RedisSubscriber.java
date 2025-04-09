@@ -17,9 +17,7 @@ public class RedisSubscriber implements Logger {
 
   private final PubSubCommands<BlockCommand> subscriber;
 
-  @ConfigProperty(name = "repo.social.block.command.channel", defaultValue = "block-command")
-  @Inject
-  String channel;
+  String channel = System.getenv().getOrDefault("BLOCK_COMMAND_CHANNEL", "block-command");
 
   @Inject PostService postService;
 
