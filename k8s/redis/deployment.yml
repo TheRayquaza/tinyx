@@ -17,7 +17,7 @@ spec:
         - name: redis
           image: redis:8.0-M04-alpine3.21
           imagePullPolicy: IfNotPresent
-          command: ["redis-server", "/conf/redis.conf", "--protected-mode", "yes", "--requirepass", "admin"]
+          command: ["redis-server", "/conf/redis.conf"]
           env:
             - name: NODE_IP
               valueFrom:
@@ -28,11 +28,6 @@ spec:
                 secretKeyRef:
                   name: redis-secret
                   key: REDIS_PASSWORD
-            - name: REDIS_USERNAME
-              valueFrom:
-                secretKeyRef:
-                  name: redis-secret
-                  key: REDIS_USERNAME
           resources:
             requests:
               memory: "1Gi"
@@ -59,5 +54,5 @@ spec:
             failureThreshold: 3
       volumes:
         - name: config
-          configMap:
-            name: redis-config
+          secret:
+            secretName: redis-secret
