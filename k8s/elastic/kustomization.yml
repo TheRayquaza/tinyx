@@ -2,9 +2,7 @@
 kind: Kustomization
 apiVersion: kustomize.config.k8s.io/v1beta1
 resources:
-  - apps/
-  - mongodb
-  - minio-cluster/
-  - elastic/
-  #- redis
-  - neo4j
+  - namespace.yml
+  - service.yml
+  - secrets.yml
+  - statefulset.yml
