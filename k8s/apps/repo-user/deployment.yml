@@ -24,7 +24,7 @@ spec:
         - name: pull-secret
       containers:
         - name: repo-user
-          image: registry.cri.epita.fr/ing/majeures/tc/info/student/2026/2025-epitweet-tinyx-02/repo-user:v2.0.0
+          image: registry.cri.epita.fr/ing/majeures/tc/info/student/2026/2025-epitweet-tinyx-02/repo-user:v1.0.5
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 8080
