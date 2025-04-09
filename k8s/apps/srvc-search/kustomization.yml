@@ -7,3 +7,11 @@ resources:
   - deployment.yml
   - service.yml
   - ingress.yml
+configMapGenerator:
+  - name: srvc-seach-config
+    namespace: apps
+    literals:
+      - ELASTICSEARCH_USERNAME=elastic
+      - ELASTICSEARCH_HOSTS=http://elasticsearch-client.elastic.svc.cluster.local
+      - ELASTICSEARCH_PORT=9200
+      - ELASTICSEARCH_INDEX=srvc_search
