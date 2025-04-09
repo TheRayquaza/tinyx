@@ -28,9 +28,9 @@ public class RedisSubscriber implements Logger {
 
   @Inject
   public RedisSubscriber(RedisDataSource redisDataSource) {
-    postChannel = Optional.ofNullable(System.getenv("SRVC_SEARCH_REPO_POST_AGGREGATE_CHANNEL"))
+    postChannel = Optional.ofNullable(System.getenv("POST_AGGREGATE_CHANNEL"))
             .orElse("post_aggregate");
-    blockChannel = Optional.ofNullable(System.getenv("SRVC_SEARCH_BLOCK_COMMAND_CHANNEL"))
+    blockChannel = Optional.ofNullable(System.getenv("BLOCK_COMMAND_CHANNEL"))
             .orElse("block_command");
     this.subscriberPost = redisDataSource.pubsub(PostAggregate.class);
     this.subscriberBlock = redisDataSource.pubsub(BlockCommand.class);

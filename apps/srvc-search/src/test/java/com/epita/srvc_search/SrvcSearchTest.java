@@ -17,9 +17,7 @@ import io.quarkus.test.security.TestSecurity;
 import io.restassured.http.ContentType;
 import jakarta.inject.Inject;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 import org.bson.types.ObjectId;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.junit.jupiter.api.*;
@@ -36,7 +34,8 @@ public class SrvcSearchTest {
 
   @ConfigProperty(name = "repo.post.aggregate.channel")
   @Inject
-  String postAggregateChannel;
+  String postAggregateChannel = Optional.ofNullable(System.getenv("SRVC_SEARCH_REPO_POST_AGGREGATE_CHANNEL"))
+            .orElse("post_aggregate");
 
   private String token = "";
   private static final String TEST_ID = "15a1a100c293c91129883571";
