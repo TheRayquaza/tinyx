@@ -43,13 +43,13 @@ spec:
               path: /q/health/live
               port: 8080
             initialDelaySeconds: 20
-            periodSeconds: 5
+            periodSeconds: 10
           readinessProbe:
             httpGet:
               path: /q/health/ready
               port: 8080
             initialDelaySeconds: 20
-            periodSeconds: 5
+            periodSeconds: 10
           env:
             ## QUARKUS
             - name: QUARKUS_LOG_LEVEL

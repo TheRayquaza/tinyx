@@ -31,6 +31,7 @@ mvn test
 │   ├── kustomize.yml
 │   ├── mongodb                       # deployment of sharded mongo
 │   ├── neo4j                         # deployment of neo4j
+│   ├── minio-cluster                 # deployment of minio
 │   └── redis                         # deployment of redis
 ├── mvnw
 ├── README.md

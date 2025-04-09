@@ -2,8 +2,9 @@
 kind: Kustomization
 apiVersion: kustomize.config.k8s.io/v1beta1
 resources:
-  - apps
-  - mongodb
-  - redis
+  - apps/
+  - mongodb/
+  - minio-cluster/
   #- elastic
-  #- neo4j
+  #- redis
+  - neo4j

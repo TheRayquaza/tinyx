@@ -13,16 +13,7 @@ configMapGenerator:
     literals:
       - REPO_POST_MONGODB_HOST=mongos.mongo.svc.cluster.local
       - REPO_POST_REDIS_HOST=redis.redis-0.svc.cluster.local,redis-1.redis.svc.cluster.local
-      - REPO_POST_MINIO_ENDPOINT=http://minio-service.minio.svc.cluster.local:9000
+      - REPO_POST_MINIO_ENDPOINT=http://minio.minio.svc.cluster.local:9000
       - REPO_POST_MINIO_BUCKET=RepoPost
       - REPO_POST_MONGODB_DATABASE=RepoPost
       - REPO_POST_APP_PROFILE=prod
-  - name: apps-config
-    namespace: apps
-    literals:
-      - USER_AGGREGATE_CHANNEL=user_aggregate
-      - POST_AGGREGATE_CHANNEL=post_aggregate
-      - LIKE_COMMAND_CHANNEL=like_command
-      - BLOCK_COMMAND_CHANNEL=block_command
-      - FOLLOW_COMMAND_CHANNEL=follow_command
-      - USER_APP_PROFILE=prod
