@@ -24,7 +24,7 @@ spec:
         - name: pull-secret
       containers:
         - name: repo-post
-          image: registry.cri.epita.fr/ing/majeures/tc/info/student/2026/2025-epitweet-tinyx-02/repo-post:v1.0.0
+          image: registry.cri.epita.fr/ing/majeures/tc/info/student/2026/2025-epitweet-tinyx-02/repo-post:v2.0.0
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 8080
@@ -39,14 +39,14 @@ spec:
             httpGet:
               path: /q/health/live
               port: 8080
-            initialDelaySeconds: 5
-            periodSeconds: 10
+            initialDelaySeconds: 20
+            periodSeconds: 5
           readinessProbe:
             httpGet:
               path: /q/health/ready
               port: 8080
-            initialDelaySeconds: 5
-            periodSeconds: 10
+            initialDelaySeconds: 20
+            periodSeconds: 5
           env:
             ## QUARKUS
             - name: QUARKUS_LOG_LEVEL
