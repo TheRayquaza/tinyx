@@ -24,7 +24,7 @@ spec:
         - name: pull-secret
       containers:
         - name: repo-user
-          image: registry.cri.epita.fr/ing/majeures/tc/info/student/2026/2025-epitweet-tinyx-02/repo-user:v2.0.1
+          image: registry.cri.epita.fr/ing/majeures/tc/info/student/2026/2025-epitweet-tinyx-02/repo-user:v2.0.2
           imagePullPolicy: IfNotPresent
           ports:
             - name: http
@@ -75,13 +75,13 @@ spec:
             - name: QUARKUS_REDIS_HOSTS
               valueFrom:
                 configMapKeyRef:
-                  name: repo-user-config
+                  name: apps-config
                   key: QUARKUS_REDIS_HOSTS
             - name: QUARKUS_REDIS_PASSWORD
               valueFrom:
                 secretKeyRef:
                   name: apps-secret
-                  key: REPO_USER_REDIS_PASSWORD
+                  key: QUARKUS_REDIS_PASSWORD
             - name: QUARKUS_REDIS_CLIENT_TYPE
               valueFrom:
                 configMapKeyRef:
