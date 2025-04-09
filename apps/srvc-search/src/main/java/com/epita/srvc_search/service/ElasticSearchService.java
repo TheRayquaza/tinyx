@@ -10,15 +10,13 @@ import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import java.io.IOException;
 import java.util.*;
-import org.eclipse.microprofile.config.inject.ConfigProperty;
 import co.elastic.clients.elasticsearch._types.query_dsl.Query;
 
 @ApplicationScoped
 @Startup
 public class ElasticSearchService {
-  @ConfigProperty(name = "srvc.search.elastic_search")
-  @Inject
-  String searchElasticSearch;
+  String searchElasticSearch = Optional.ofNullable(System.getenv("SRVC_SEARCH_ELASTIC_INDEX"))
+          .orElse("srvc_search");
 
   @Inject ElasticsearchClient elasticsearchClient;
 

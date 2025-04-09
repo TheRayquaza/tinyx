@@ -12,25 +12,26 @@ import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 
+import java.util.Optional;
+
 @Startup
 @ApplicationScoped
 public class RedisSubscriber implements Logger {
 
+  @Inject SearchService searchService;
+
   private final PubSubCommands<PostAggregate> subscriberPost;
   private final PubSubCommands<BlockCommand> subscriberBlock;
 
-  @ConfigProperty(name = "repo.post.aggregate.channel")
-  @Inject
   String postChannel;
-
-  @ConfigProperty(name = "block.command.channel")
-  @Inject
   String blockChannel;
-
-  @Inject SearchService searchService;
 
   @Inject
   public RedisSubscriber(RedisDataSource redisDataSource) {
+    postChannel = Optional.ofNullable(System.getenv("SRVC_SEARCH_REPO_POST_AGGREGATE_CHANNEL"))
+            .orElse("post_aggregate");
+    blockChannel = Optional.ofNullable(System.getenv("SRVC_SEARCH_BLOCK_COMMAND_CHANNEL"))
+            .orElse("block_command");
     this.subscriberPost = redisDataSource.pubsub(PostAggregate.class);
     this.subscriberBlock = redisDataSource.pubsub(BlockCommand.class);
   }

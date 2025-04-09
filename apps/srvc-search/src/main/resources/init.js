@@ -1,3 +1,6 @@
+const dbName = process.env.SRVC_SEARCH_MONGODB_DATABASE || "SrvcSearch";
+const collectionName = process.env.SRVC_SEARCH_MONGODB_COLLECTION || "SearchModel";
+
 db.createUser(
     {
         user: "admin",
@@ -5,9 +8,9 @@ db.createUser(
         roles: [
             {
                 role: "readWrite",
-                db: "SrvcSearch"
+                db: dbName
             }
         ]
     }
 );
-db.createCollection("SearchModel");
+db.createCollection(collectionName);
