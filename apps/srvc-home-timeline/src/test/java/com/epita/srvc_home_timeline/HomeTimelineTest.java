@@ -44,7 +44,6 @@ public class HomeTimelineTest {
 
   void publishAndWait(String channel, Object object) throws InterruptedException {
     redisPublisher.publish(channel, object);
-    Thread.sleep(15000);
   }
 
   @BeforeAll
@@ -69,7 +68,6 @@ public class HomeTimelineTest {
         given().header("Authorization", "Bearer " + TOKEN_USER_1).when().get(USER_ID_1);
 
     System.out.println(response.body().prettyPrint());
-
     response.then().statusCode(200).body("hometimeline.entries", empty());
   }
 
@@ -110,7 +108,12 @@ public class HomeTimelineTest {
     follow.setFollowerId(USER_ID_2);
     follow.setFollowing(true);
 
+    System.out.println("user 1 follows user 2");
+
     publishAndWait("follow_command", follow);
+    Thread.sleep(15000);
+
+    System.out.println("user 1 follows user 2 - done");
 
     Response response =
         given().header("Authorization", "Bearer " + TOKEN_USER_1).when().get(USER_ID_1);

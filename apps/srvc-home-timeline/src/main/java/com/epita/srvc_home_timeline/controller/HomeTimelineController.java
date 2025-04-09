@@ -1,6 +1,7 @@
 package com.epita.srvc_home_timeline.controller;
 
 import com.epita.exchange.auth.service.AuthService;
+import com.epita.srvc_home_timeline.HomeTimelineErrorCode;
 import com.epita.srvc_home_timeline.controller.response.HomeTimelineResponse;
 import com.epita.srvc_home_timeline.service.HomeTimelineService;
 import io.quarkus.security.Authenticated;
@@ -22,6 +23,11 @@ public class HomeTimelineController implements HomeTimelineControllerApi {
   @Override
   public HomeTimelineResponse getHomeTimelineById(@PathParam("id") @Valid String id) {
     logger().info("GET /home-timeline/{} - Retrieve Home Timeline for user {}", id, id);
+
+    // if (authService.getUserId() != id) {
+    //   throw HomeTimelineErrorCode.UNAUTHORIZED.createError(id);
+    // }
+
     return homeTimelineService.getHomeTimelineById(id);
   }
 }
