@@ -48,23 +48,55 @@ spec:
             initialDelaySeconds: 5
             periodSeconds: 10
           env:
-          - name: REPO_POST_QUARKUS_HTTP_PORT
-            value: "8080"
-          - name: REPO_POST_REDIS_HOST
-            valueFrom:
-              configMapKeyRef:
-                name: repo-post-config
-                key: REPO_POST_REDIS_HOST
-          - name: REPO_POST_REDIS_PASSWORD
-            valueFrom:
-              secretKeyRef:
-                name: repo-post-secret
-                key: REPO_POST_REDIS_PASSWORD
-          - name: REPO_POST_MONGODB_HOST
-            valueFrom:
-              configMapKeyRef:
-                name: repo-post-config
-                key: REPO_POST_MONGODB_HOST
+            ## QUARKUS
+            - name: QUARKUS_LOG_LEVEL
+              valueFrom:
+                configMapKeyRef:
+                  name: apps-config
+                  key: LOG_LEVEL
+            - name: QUARKUS_HTTP_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: apps-config
+                  key: QUARKUS_HTTP_PORT
+            - name: QUARKUS_HTTP_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: apps-config
+                  key: QUARKUS_HTTP_HOST
+            - name: QUARKUS_APP_PROFILE
+              valueFrom:
+                configMapKeyRef:
+                  name: apps-config
+                  key: USER_APP_PROFILE
+            ## REDIS
+            - name: QUARKUS_REDIS_HOSTS
+              valueFrom:
+                configMapKeyRef:
+                  name: apps-config
+                  key: QUARKUS_REDIS_HOSTS
+            - name: QUARKUS_REDIS_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: apps-config
+                  key: QUARKUS_REDIS_PASSWORD
+            - name: REPO_USER_AGGREGATE_CHANNEL
+              valueFrom:
+                configMapKeyRef:
+                  name: apps-config
+                  key: USER_AGGREGATE_CHANNEL
+            - name: QUARKUS_REDIS_CLIENT_TYPE
+              value: "cluster"
+            - name: QUARKUS_REDIS_RECONNECT_ATTEMPTS
+              value: "3"
+            - name: QUARKUS_REDIS_AUTO_FAILOVER
+              value: "true"
+            ## MONGODB
+            - name: QUARKUS_MONGODB_CONNECTION_STRING
+              valueFrom:
+                secretKeyRef:
+                  name: repo-user-secret
+                  key: REPO_POST_MONGODB_ENDPOINT
           - name: REPO_POST_APP_PROFILE
             value: "prod"
           - name: REPO_POST_MINIO_ENDPOINT
