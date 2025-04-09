@@ -1,6 +1,7 @@
 include:
   - "ci/common.gitlab-ci.yml"
   - "ci/repo-user.gitlab-ci.yml"
+  - "ci/repo-post.gitlab-ci.yml"
 
 verify-commit-message:
   image: alpine:3.18

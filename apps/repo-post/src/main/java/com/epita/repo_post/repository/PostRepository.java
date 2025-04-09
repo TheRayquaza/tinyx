@@ -5,16 +5,20 @@ import io.quarkus.mongodb.panache.PanacheMongoRepository;
 import jakarta.enterprise.context.ApplicationScoped;
 import java.util.List;
 import java.util.Optional;
+import org.bson.types.ObjectId;
 
 @ApplicationScoped
 public class PostRepository implements PanacheMongoRepository<PostModel> {
-
-  public Optional<PostModel> getById(String id) {
-    return find("id", id).firstResultOptional();
+  public List<PostModel> findAllReplies(String postId) {
+    return find("replyToPostId", postId).list();
   }
 
-  public List<PostModel> findAllReplies(String postId) {
-    return find("replyToPostId", postId).stream().toList();
+  public Optional<PostModel> findByIdStringOptional(String postId) {
+    try {
+      return find("_id", new ObjectId(postId)).firstResultOptional();
+    } catch (IllegalArgumentException exception) {
+      return Optional.empty();
+    }
   }
 
   public void create(PostModel model) {

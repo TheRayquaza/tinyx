@@ -17,6 +17,6 @@ import lombok.*;
 public class LikeCommand implements Serializable {
   private UUID uuid;
   private String userId;
-  private String followerId;
+  private String postId;
   private boolean liked;
 }

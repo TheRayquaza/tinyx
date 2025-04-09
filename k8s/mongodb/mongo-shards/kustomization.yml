@@ -1,0 +1,14 @@
+---
+kind: Kustomization
+apiVersion: kustomize.config.k8s.io/v1beta1
+metadata:
+  name: mongo-shards
+  namespace: mongo
+resources:
+  - service.yml
+  - statefulset.yml
+configMapGenerator:
+  - name: mongo-shard-init
+    namespace: mongo
+    files:
+      - init.js

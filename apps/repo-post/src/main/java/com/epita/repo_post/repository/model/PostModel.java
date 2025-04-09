@@ -2,23 +2,23 @@ package com.epita.repo_post.repository.model;
 
 import io.quarkus.mongodb.panache.common.MongoEntity;
 import java.time.LocalDateTime;
-import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.bson.codecs.pojo.annotations.BsonId;
+import org.bson.types.ObjectId;
 
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-@MongoEntity(collection = "posts", database = "RepoPost")
+@MongoEntity(collection = "PostModel", database = "RepoPost")
 public class PostModel {
-  @BsonId private String id;
+  @BsonId private ObjectId id;
   private String ownerId;
   private String text;
-  private List<String> media;
+  private String media;
   private String repostId;
   private String replyToPostId;
   private Boolean isReply;

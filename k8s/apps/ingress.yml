@@ -1,0 +1,57 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: swaggers
+  namespace: apps
+  labels:
+    app: swaggers
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    nginx.ingress.kubernetes.io/rewrite-target: /q/swagger-ui
+spec:
+  ingressClassName: nginx
+  rules:
+  - http:
+      paths:
+      - path: /repo-user/q/swagger-ui
+        pathType: Exact
+        backend:
+          service:
+            name: repo-user
+            port:
+              number: 8080
+      # - path: /repo-post
+      #   pathType: Prefix
+      #   backend:
+      #     service:
+      #       name: repo-post
+      #       port:
+      #         number: 8080
+      # - path: /repo-social
+      #   pathType: Prefix
+      #   backend:
+      #     service:
+      #       name: repo-social
+      #       port:
+      #         number: 8080
+      # - path: /srvc-search
+      #   pathType: Prefix
+      #   backend:
+      #     service:
+      #       name: srvc-search
+      #       port:
+      #         number: 8080
+      # - path: /srvc-home-timeline
+      #   pathType: Prefix
+      #   backend:
+      #     service:
+      #       name: srvc-home-timeline
+      #       port:
+      #         number: 8080
+      # - path: /srvc-user-timeline
+      #   pathType: Prefix
+      #   backend:
+      #     service:
+      #       name: srvc-user-timeline
+      #       port:
+      #         number: 8080

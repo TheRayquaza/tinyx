@@ -7,7 +7,6 @@ import com.epita.repo_post.controller.request.PostReplyRequest;
 import com.epita.repo_post.controller.response.AllRepliesResponse;
 import com.epita.repo_post.service.PostService;
 import com.epita.repo_post.service.entity.PostEntity;
-import io.quarkus.security.Authenticated;
 import jakarta.inject.Inject;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
@@ -17,7 +16,7 @@ import org.eclipse.microprofile.openapi.annotations.parameters.RequestBody;
 
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
-@Path("/")
+@Path("/post")
 public class RepoPostController implements RepoPostControllerApi {
 
   @Inject AuthService authService;
@@ -25,8 +24,8 @@ public class RepoPostController implements RepoPostControllerApi {
   @Inject PostService postService;
 
   @POST
-  @Path("/create")
-  @Authenticated
+  @Path("/")
+  @Consumes(MediaType.MULTIPART_FORM_DATA)
   @Override
   public PostEntity createPost(
       @RequestBody(required = true) @NotNull @Valid CreatePostRequest request) {
@@ -36,28 +35,27 @@ public class RepoPostController implements RepoPostControllerApi {
   }
 
   @GET
-  @Path("/post/{id}")
+  @Path("/{id}")
   @Override
-  public PostEntity getPostById(@PathParam("id") String id) {
+  public PostEntity getPostById(@PathParam("id") @Valid String id) {
     logger().info("GET /post/{} - Retrieve post n°{}", id, id);
     return postService.getPostById(id);
   }
 
   @PUT
-  @Authenticated
-  @Path("/post/{id}")
+  @Consumes(MediaType.MULTIPART_FORM_DATA)
+  @Path("/{id}")
   @Override
-  public void editPost(
+  public PostEntity editPost(
       @RequestBody(required = true) @NotNull @Valid EditPostRequest request,
       @PathParam("id") String postId) {
     String userId = authService.getUserId();
     logger().info("PUT /post/{} - Edit post {} with user {}", postId, postId, userId);
-    postService.editPost(request, postId);
+    return postService.editPost(request, postId);
   }
 
   @DELETE
-  @Authenticated
-  @Path("/post/{id}")
+  @Path("/{id}")
   @Override
   public void deletePost(@PathParam("id") String postId) {
     String userId = authService.getUserId();
@@ -67,20 +65,19 @@ public class RepoPostController implements RepoPostControllerApi {
   }
 
   @POST
-  @Authenticated
+  @Consumes(MediaType.MULTIPART_FORM_DATA)
   @Override
-  @Path("/post/{id}/reply")
-  public void replyToPost(
+  @Path("/{id}/reply")
+  public PostEntity replyToPost(
       @RequestBody(required = true) @NotNull @Valid PostReplyRequest request,
-      @PathParam("id") String postId) {
+      @PathParam("id") @Valid String postId) {
     String userId = authService.getUserId();
-    logger().info("POST /post/{}/reply - Reply to post {} with user {}", postId, userId);
-    postService.replyToPost(request, postId);
+    logger().info("POST /post/{}/reply - Reply to post {} with user {}", postId, postId, userId);
+    return postService.replyToPost(request, postId);
   }
 
   @GET
-  @Authenticated
-  @Path("/post/{id}/reply")
+  @Path("/{id}/reply")
   @Override
   public AllRepliesResponse getAllRepliesForPost(@PathParam("id") String postId) {
     String userId = authService.getUserId();

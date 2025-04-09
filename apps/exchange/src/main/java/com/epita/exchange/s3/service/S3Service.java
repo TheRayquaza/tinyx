@@ -9,6 +9,11 @@ import java.io.File;
 import java.io.InputStream;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 
+import java.util.AbstractMap;
+import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 @ApplicationScoped
 public class S3Service implements Logger {
   private MinioClient minioClient;
@@ -31,21 +36,18 @@ public class S3Service implements Logger {
 
   @PostConstruct
   public void init() {
-    minioClient =
-        MinioClient.builder().endpoint(endpoint).credentials(accessKey, secretKey).build();
-
+    minioClient = MinioClient.builder().endpoint(endpoint).credentials(accessKey, secretKey).build();
     logger().info("S3Configuration - Endpoint: {}", endpoint);
     logger().info("S3Configuration - Bucket: {}", bucketName);
     logger().info("S3Configuration - AccessKey: {}", accessKey);
-    logger().info("S3Configuration - Bucket: {}", bucketName);
-
     ensureBucketExists();
   }
 
   public void ensureBucketExists() {
     try {
+      logger().info("Verification if bucket {} exist", bucketName);
       boolean found =
-          minioClient.bucketExists(BucketExistsArgs.builder().bucket(bucketName).build());
+              minioClient.bucketExists(BucketExistsArgs.builder().bucket(bucketName).build());
       if (!found) {
         minioClient.makeBucket(MakeBucketArgs.builder().bucket(bucketName).build());
         logger().info("Bucket created: {}", bucketName);
@@ -58,16 +60,30 @@ public class S3Service implements Logger {
     }
   }
 
-  public void uploadFile(String key, InputStream inputStream, long size) {
+  public String uploadFile(String key, InputStream inputStream, long size) {
     try {
       minioClient.putObject(
           PutObjectArgs.builder().bucket(bucketName).object(key).stream(inputStream, size, -1)
               .contentType("application/octet-stream")
               .build());
-      logger().info("File uploaded: {}", key);
+      logger().info("File uploaded : {}", key);
+      return key;
     } catch (Exception e) {
       logger().error("Failed to upload file to MinIO");
       throw new RuntimeException("Failed to upload file to MinIO", e);
+    }
+  }
+
+  private Map.Entry<Integer, String> extractMinioData(String input) {
+    Pattern pattern = Pattern.compile("minio-(\\d+)/(.*)");
+    Matcher matcher = pattern.matcher(input);
+
+    if (matcher.matches()) {
+      int minioNumber = Integer.parseInt(matcher.group(1));
+      String path = matcher.group(2);
+      return new AbstractMap.SimpleEntry<>(minioNumber, path);
+    } else {
+      throw new IllegalArgumentException("Input does not match expected pattern: " + input);
     }
   }
 

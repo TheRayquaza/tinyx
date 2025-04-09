@@ -13,7 +13,7 @@ import org.bson.types.ObjectId;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-@MongoEntity(collection = "users", database = "")
+@MongoEntity(collection = "UserModel", database = "RepoUser")
 public class UserModel {
   @BsonId private ObjectId id;
   private String username;
