@@ -41,7 +41,7 @@ spec:
                   name: elasticsearch-secret
                   key: ELASTIC_SEARCH_PASSWORD
             - name: ES_JAVA_OPTS
-              value: "-Xms512m -Xmx512m" # May need 1G
+              value: "-Xms1G -Xmx1G"
             - name: xpack.security.enabled
               value: "true" # Change false if you no authentication
             - name: bootstrap.memory_lock
