@@ -15,7 +15,7 @@ import co.elastic.clients.elasticsearch._types.query_dsl.Query;
 @ApplicationScoped
 @Startup
 public class ElasticSearchService {
-  String searchElasticSearch = Optional.ofNullable(System.getenv("SRVC_SEARCH_ELASTIC_INDEX"))
+  String searchElasticSearch = Optional.ofNullable(System.getenv("ELASTICSEARCH_INDEX"))
           .orElse("srvc_search");
 
   @Inject ElasticsearchClient elasticsearchClient;

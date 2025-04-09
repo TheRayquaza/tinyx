@@ -10,7 +10,7 @@ resources:
   - repo-user
   #- repo-social
   - repo-post
-  #- srvc-search
+  - srvc-search
   #- srvc-user-timeline
   #- srvc-home-timeline
 configMapGenerator:
