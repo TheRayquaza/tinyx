@@ -1,0 +1,16 @@
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: srvc-home-timeline
+  namespace: apps
+  labels:
+    app: srvc-home-timeline
+spec:
+    type: ClusterIP
+    selector:
+      app: srvc-home-timeline
+    ports:
+      - protocol: TCP
+        port: 8080
+        targetPort: 8080
