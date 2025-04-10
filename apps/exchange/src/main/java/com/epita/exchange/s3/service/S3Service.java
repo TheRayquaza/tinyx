@@ -4,12 +4,7 @@ import com.epita.exchange.utils.Logger;
 import io.minio.*;
 import jakarta.annotation.PostConstruct;
 import jakarta.enterprise.context.ApplicationScoped;
-import java.io.File;
 import java.io.InputStream;
-import java.util.AbstractMap;
-import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 @ApplicationScoped
 public class S3Service implements Logger {
@@ -67,39 +62,10 @@ public class S3Service implements Logger {
               .contentType("application/octet-stream")
               .build());
       logger().info("File uploaded : {}", key);
-      return "/minio" + key;
+      return "/minio/" + key;
     } catch (Exception e) {
       logger().error("Failed to upload file to MinIO");
       throw new RuntimeException("Failed to upload file to MinIO", e);
-    }
-  }
-
-  private Map.Entry<Integer, String> extractMinioData(String input) {
-    Pattern pattern = Pattern.compile("minio-(\\d+)/(.*)");
-    Matcher matcher = pattern.matcher(input);
-
-    if (matcher.matches()) {
-      int minioNumber = Integer.parseInt(matcher.group(1));
-      String path = matcher.group(2);
-      return new AbstractMap.SimpleEntry<>(minioNumber, path);
-    } else {
-      throw new IllegalArgumentException("Input does not match expected pattern: " + input);
-    }
-  }
-
-  public File downloadFile(String key, String downloadPath) {
-    try {
-      minioClient.downloadObject(
-          DownloadObjectArgs.builder()
-              .bucket(bucketName)
-              .object(key)
-              .filename(downloadPath)
-              .build());
-      logger().info("File downloaded: {}", key);
-      return new File(downloadPath);
-    } catch (Exception e) {
-      logger().error("Failed to download file from MinIO");
-      throw new RuntimeException("Failed to download file from MinIO", e);
     }
   }
 
