@@ -4,7 +4,6 @@ import com.epita.exchange.auth.service.AuthService;
 import com.epita.srvc_search.controller.request.SearchRequest;
 import com.epita.srvc_search.service.SearchService;
 import com.epita.srvc_search.service.entity.SearchEntity;
-import io.quarkus.security.Authenticated;
 import jakarta.inject.Inject;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;

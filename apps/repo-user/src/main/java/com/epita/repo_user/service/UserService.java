@@ -18,9 +18,9 @@ import com.epita.repo_user.repository.model.UserModel;
 import com.epita.repo_user.service.entity.UserEntity;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
+import java.io.*;
 import java.time.LocalDateTime;
 import java.util.*;
-import java.io.*;
 import org.bson.types.ObjectId;
 import org.mindrot.jbcrypt.BCrypt;
 
