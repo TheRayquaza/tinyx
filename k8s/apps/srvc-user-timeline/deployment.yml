@@ -1,12 +1,12 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: user-timeline
+  name: srvc-user-timeline
   namespace: apps
   labels:
-    app: user-timeline
+    app: srvc-user-timeline
 spec:
-  replicas: 1 # TODO: make it 3
+  replicas: 1 # Number of replicas
   strategy:
     type: RollingUpdate
     rollingUpdate:
@@ -14,81 +14,101 @@ spec:
       maxSurge: 1
   selector:
     matchLabels:
-      app: user-timeline
+      app: srvc-user-timeline
   template:
     metadata:
       labels:
-        app: user-timeline
+        app: srvc-user-timeline
     spec:
       imagePullSecrets:
         - name: pull-secret
       containers:
-        - name: user-timeline
-          image: registry.cri.epita.fr/ing/majeures/tc/info/student/2026/2025-epitweet-tinyx-02/repo-post:v1.0.0
+        - name: srvc-user-timeline
+          image: registry.cri.epita.fr/ing/majeures/tc/info/student/2026/2025-epitweet-tinyx-02/repo-user:v2.0.2
           imagePullPolicy: IfNotPresent
           ports:
-            - containerPort: 8080
+            - name: http
+              containerPort: 8080
+              protocol: TCP
           resources:
             requests:
               memory: "256Mi"
-              cpu: "125m"
+              cpu: "250m"
             limits:
               memory: "512Mi"
-              cpu: "250m"
+              cpu: "500m"
           livenessProbe:
             httpGet:
               path: /q/health/live
               port: 8080
-            initialDelaySeconds: 5
+            initialDelaySeconds: 20
             periodSeconds: 10
           readinessProbe:
             httpGet:
               path: /q/health/ready
               port: 8080
-            initialDelaySeconds: 5
+            initialDelaySeconds: 20
             periodSeconds: 10
           env:
-          - name: REPO_POST_QUARKUS_HTTP_PORT
-            value: "8080"
-          - name: REPO_POST_REDIS_HOST
-            valueFrom:
-              configMapKeyRef:
-                name: repo-post-config
-                key: REPO_POST_REDIS_HOST
-          - name: REPO_POST_REDIS_PASSWORD
-            valueFrom:
-              secretKeyRef:
-                name: repo-post-secret
-                key: REPO_POST_REDIS_PASSWORD
-          - name: REPO_POST_MONGODB_HOST
-            valueFrom:
-              configMapKeyRef:
-                name: repo-post-config
-                key: REPO_POST_MONGODB_HOST
-          - name: REPO_POST_APP_PROFILE
-            value: "prod"
-          - name: REPO_POST_MINIO_ENDPOINT
-            valueFrom:
+            ## QUARKUS
+            - name: QUARKUS_LOG_LEVEL
+              valueFrom:
                 configMapKeyRef:
-                  name: repo-post-config
-                  key: REPO_POST_MINIO_ENDPOINT
-          - name: REPO_POST_MINIO_BUCKET
-            valueFrom:
+                  name: apps-config
+                  key: QUARKUS_LOG_LEVEL
+            - name: QUARKUS_HTTP_PORT
+              valueFrom:
                 configMapKeyRef:
-                  name: repo-post-config
-                  key: REPO_POST_MINIO_BUCKET
-          - name: REPO_POST_MINIO_ACCESS_KEY
-            valueFrom:
+                  name: apps-config
+                  key: QUARKUS_HTTP_PORT
+            - name: QUARKUS_HTTP_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: apps-config
+                  key: QUARKUS_HTTP_HOST
+            - name: QUARKUS_APP_PROFILE
+              valueFrom:
+                configMapKeyRef:
+                  name: apps-config
+                  key: QUARKUS_APP_PROFILE
+            
+                  
+            ## REDIS
+            - name: QUARKUS_REDIS_HOSTS
+              valueFrom:
+                configMapKeyRef:
+                  name: apps-config
+                  key: QUARKUS_REDIS_HOSTS
+            - name: QUARKUS_REDIS_PASSWORD
+              valueFrom:
                 secretKeyRef:
-                  name: repo-post-secret
-                  key: REPO_POST_MINIO_ACCESS_KEY
-          - name: REPO_POST_MINIO_SECRET_KEY
-            valueFrom:
-                secretKeyRef:
-                  name: repo-post-secret
-                  key: REPO_POST_MINIO_SECRET_KEY
-          - name: REPO_POST_MONGODB_DATABASE
-            valueFrom:
+                  name: apps-secret
+                  key: QUARKUS_REDIS_PASSWORD
+            - name: QUARKUS_REDIS_CLIENT_TYPE
+              valueFrom:
                 configMapKeyRef:
-                  name: repo-post-config
-                  key: REPO_POST_MONGODB_DATABASE
+                  name: apps-config
+                  key: QUARKUS_REDIS_CLIENT_TYPE
+            - name: QUARKUS_REDIS_RECONNECT_ATTEMPTS
+              valueFrom:
+                configMapKeyRef:
+                  name: apps-config
+                  key: QUARKUS_REDIS_RECONNECT_ATTEMPTS
+            - name: QUARKUS_REDIS_AUTO_FAILOVER
+              valueFrom:
+                configMapKeyRef:
+                  name: apps-config
+                  key: QUARKUS_REDIS_AUTO_FAILOVER
+            - name: USER_AGGREGATE_CHANNEL
+              valueFrom:
+                configMapKeyRef:
+                  name: apps-config
+                  key: USER_AGGREGATE_CHANNEL
+            
+                  
+            ## MONGODB
+            - name: QUARKUS_MONGODB_CONNECTION_STRING
+              valueFrom:
+                secretKeyRef:
+                  name: srvc-user-timeline-secret
+                  key: SRVC_USER_TIMELINE_MONGODB_ENDPOINT

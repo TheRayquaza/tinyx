@@ -3,11 +3,16 @@
 
 pkgs.mkShell {
   buildInputs = [
+    # Python environment
     pkgs.python312
     pkgs.python312Packages.pip
     pkgs.python312Packages.setuptools
     pkgs.python312Packages.pre-commit-hooks
     pkgs.pre-commit
+
+    # Java + Maven
+    pkgs.openjdk17
+    pkgs.maven
   ];
 
   shellHook = ''

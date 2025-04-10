@@ -4,78 +4,55 @@ import com.epita.exchange.utils.Logger;
 import io.minio.*;
 import jakarta.annotation.PostConstruct;
 import jakarta.enterprise.context.ApplicationScoped;
-import jakarta.inject.Inject;
 import java.io.File;
 import java.io.InputStream;
-import java.security.InvalidParameterException;
 import java.util.AbstractMap;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ThreadLocalRandom;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import org.eclipse.microprofile.config.inject.ConfigProperty;
 
 @ApplicationScoped
 public class S3Service implements Logger {
-  // private MinioClient minioClient;
-  private List<MinioClient> minioClientList;
+  private MinioClient minioClient;
 
-  @Inject
-  @ConfigProperty(name = "s3.endpoints", defaultValue = "http://localhost:9000")
-  List<String> endpoints;
+  String endpoint;
 
-  @Inject
-  @ConfigProperty(name = "s3.accessKeys", defaultValue = "minioadmin")
-  List<String> accessKeys;
+  String accessKey;
 
-  @Inject
-  @ConfigProperty(name = "s3.secretKeys", defaultValue = "minioadmin")
-  List<String> secretKeys;
+  String secretKey;
 
-  @Inject
-  @ConfigProperty(name = "s3.bucketName", defaultValue = "default")
   String bucketName;
 
-  @Inject
-  @ConfigProperty(name = "s3.minio_number", defaultValue = "1")
-  int minio_number;
+  public static String getEnv(String key, String defaultValue) {
+    String value = System.getenv(key);
+    return value != null ? value : defaultValue;
+  }
 
   @PostConstruct
   public void init() {
-    if (secretKeys.size() != minio_number
-        || accessKeys.size() != minio_number
-        || endpoints.size() != minio_number)
-      throw new RuntimeException("Minio instantiation failed: size of list do not match");
-    minioClientList = new ArrayList<>();
-    for (int i = 0; i < minio_number; i++) {
-      minioClientList.add(
-          MinioClient.builder()
-              .endpoint(endpoints.get(i))
-              .credentials(accessKeys.get(i), secretKeys.get(i))
-              .build());
-      logger().info("S3Configuration {} - Endpoint: {}", i, endpoints.get(i));
-      logger().info("S3Configuration {} - Bucket: {}", i, bucketName);
-      logger().info("S3Configuration {} - AccessKey: {}", i, accessKeys.get(i));
-    }
+    endpoint = getEnv("S3_ENDPOINT", "http://localhost:9000");
+    accessKey = getEnv("S3_ACCESS_KEY", "minioadmin");
+    secretKey = getEnv("S3_SECRET_KEY", "minioadmin");
+    bucketName = getEnv("S3_BUCKET", "default");
+
+    minioClient =
+        MinioClient.builder().endpoint(endpoint).credentials(accessKey, secretKey).build();
+    logger().info("S3Configuration - Endpoint: {}", endpoint);
+    logger().info("S3Configuration - Bucket: {}", bucketName);
+    logger().info("S3Configuration - AccessKey: {}", accessKey);
     ensureBucketExists();
   }
 
   public void ensureBucketExists() {
     try {
-      for (int i = 0; i < minio_number; i++) {
-        logger().info("Verification if bucket {} exist for minio-{}", bucketName, i);
-        boolean found =
-            minioClientList
-                .get(i)
-                .bucketExists(BucketExistsArgs.builder().bucket(bucketName).build());
-        if (!found) {
-          minioClientList.get(i).makeBucket(MakeBucketArgs.builder().bucket(bucketName).build());
-          logger().info("Bucket created: {}", bucketName);
-        } else {
-          logger().info("Bucket already exists: {}", bucketName);
-        }
+      logger().info("Verification if bucket {} exist", bucketName);
+      boolean found =
+          minioClient.bucketExists(BucketExistsArgs.builder().bucket(bucketName).build());
+      if (!found) {
+        minioClient.makeBucket(MakeBucketArgs.builder().bucket(bucketName).build());
+        logger().info("Bucket created: {}", bucketName);
+      } else {
+        logger().info("Bucket already exists: {}", bucketName);
       }
     } catch (Exception e) {
       logger().error("Failed to verify or create bucket: {}", e.getMessage());
@@ -83,16 +60,14 @@ public class S3Service implements Logger {
     }
   }
 
-  public void uploadFile(String key, InputStream inputStream, long size) {
+  public String uploadFile(String key, InputStream inputStream, long size) {
     try {
-      int n = ThreadLocalRandom.current().nextInt(0, minio_number);
-      minioClientList
-          .get(n)
-          .putObject(
-              PutObjectArgs.builder().bucket(bucketName).object(key).stream(inputStream, size, -1)
-                  .contentType("application/octet-stream")
-                  .build());
-      logger().info("File uploaded : {} in minio {}", key, n);
+      minioClient.putObject(
+          PutObjectArgs.builder().bucket(bucketName).object(key).stream(inputStream, size, -1)
+              .contentType("application/octet-stream")
+              .build());
+      logger().info("File uploaded : {}", key);
+      return key;
     } catch (Exception e) {
       logger().error("Failed to upload file to MinIO");
       throw new RuntimeException("Failed to upload file to MinIO", e);
@@ -100,7 +75,7 @@ public class S3Service implements Logger {
   }
 
   private Map.Entry<Integer, String> extractMinioData(String input) {
-    Pattern pattern = Pattern.compile("minio-(\\d+)/(user/[^/]+/image/.+)");
+    Pattern pattern = Pattern.compile("minio-(\\d+)/(.*)");
     Matcher matcher = pattern.matcher(input);
 
     if (matcher.matches()) {
@@ -114,18 +89,13 @@ public class S3Service implements Logger {
 
   public File downloadFile(String key, String downloadPath) {
     try {
-      Map.Entry<Integer, String> values = this.extractMinioData(key);
-      if (values.getKey() < 0 || values.getKey() >= minio_number)
-        throw new InvalidParameterException("");
-      minioClientList
-          .get(values.getKey())
-          .downloadObject(
-              DownloadObjectArgs.builder()
-                  .bucket(bucketName)
-                  .object(values.getValue())
-                  .filename(downloadPath)
-                  .build());
-      logger().info("File downloaded: {}", values.getValue());
+      minioClient.downloadObject(
+          DownloadObjectArgs.builder()
+              .bucket(bucketName)
+              .object(key)
+              .filename(downloadPath)
+              .build());
+      logger().info("File downloaded: {}", key);
       return new File(downloadPath);
     } catch (Exception e) {
       logger().error("Failed to download file from MinIO");
@@ -135,14 +105,8 @@ public class S3Service implements Logger {
 
   public void deleteFile(String key) {
     try {
-      Map.Entry<Integer, String> values = this.extractMinioData(key);
-      if (values.getKey() < 0 || values.getKey() >= minio_number)
-        throw new InvalidParameterException("");
-      minioClientList
-          .get(values.getKey())
-          .removeObject(
-              RemoveObjectArgs.builder().bucket(bucketName).object(values.getValue()).build());
-      logger().info("File deleted: {}", values.getValue());
+      minioClient.removeObject(RemoveObjectArgs.builder().bucket(bucketName).object(key).build());
+      logger().info("File deleted: {}", key);
     } catch (Exception e) {
       logger().error("Failed to delete file from MinIO");
       throw new RuntimeException("Failed to delete file from MinIO", e);
