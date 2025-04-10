@@ -1,9 +1,7 @@
 package com.epita.repo_social.service.entity;
 
-import lombok.*;
-import org.bson.types.ObjectId;
-
 import java.time.LocalDateTime;
+import lombok.*;
 
 @Getter
 @Setter
@@ -11,14 +9,14 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @With
 public class PostEntity {
-    private String id;
-    private String ownerId;
-    private String text;
-    private String media;
-    private String repostId;
-    private String replyToPostId;
-    private Boolean isReply;
-    private LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
-    private boolean deleted;
+  private String id;
+  private String ownerId;
+  private String text;
+  private String media;
+  private String repostId;
+  private String replyToPostId;
+  private Boolean isReply;
+  private LocalDateTime createdAt;
+  private LocalDateTime updatedAt;
+  private boolean deleted;
 }

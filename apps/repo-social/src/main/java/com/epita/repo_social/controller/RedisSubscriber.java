@@ -16,39 +16,39 @@ import org.eclipse.microprofile.config.inject.ConfigProperty;
 @ApplicationScoped
 public class RedisSubscriber implements Logger {
 
-    private final PubSubCommands<PostAggregate> postSubscriber;
-    private final PubSubCommands<UserAggregate> userSubscriber;
+  private final PubSubCommands<PostAggregate> postSubscriber;
+  private final PubSubCommands<UserAggregate> userSubscriber;
 
-    @ConfigProperty(name = "repo.post.aggregate.channel", defaultValue = "post-aggregate")
-    @Inject
-    String postChannel;
+  @ConfigProperty(name = "repo.post.aggregate.channel", defaultValue = "post-aggregate")
+  @Inject
+  String postChannel;
 
-    @ConfigProperty(name = "repo.user.aggregate.channel", defaultValue = "user-aggregate")
-    @Inject
-    String userChannel;
+  @ConfigProperty(name = "repo.user.aggregate.channel", defaultValue = "user-aggregate")
+  @Inject
+  String userChannel;
 
-    @Inject SocialService socialService;
+  @Inject SocialService socialService;
 
-    @Inject
-    public RedisSubscriber(RedisDataSource redisDataSource) {
-        this.postSubscriber = redisDataSource.pubsub(PostAggregate.class);
-        this.userSubscriber = redisDataSource.pubsub(UserAggregate.class);
-    }
+  @Inject
+  public RedisSubscriber(RedisDataSource redisDataSource) {
+    this.postSubscriber = redisDataSource.pubsub(PostAggregate.class);
+    this.userSubscriber = redisDataSource.pubsub(UserAggregate.class);
+  }
 
-    @PostConstruct
-    void initialize() {
-        postSubscriber.subscribe(postChannel, this::handlePostAggregate);
-        userSubscriber.subscribe(userChannel, this::handleUserAggregate);
-        logger().info("Subscribed to channels: {}, {}", postChannel, userChannel);
-    }
+  @PostConstruct
+  void initialize() {
+    postSubscriber.subscribe(postChannel, this::handlePostAggregate);
+    userSubscriber.subscribe(userChannel, this::handleUserAggregate);
+    logger().info("Subscribed to channels: {}, {}", postChannel, userChannel);
+  }
 
-    private void handlePostAggregate(PostAggregate message) {
-        logger().info("Received PostAggregate: {}", message);
-        socialService.createOrUpdatePostFromAggregate(message);
-    }
+  private void handlePostAggregate(PostAggregate message) {
+    logger().info("Received PostAggregate: {}", message);
+    socialService.createOrUpdatePostFromAggregate(message);
+  }
 
-    private void handleUserAggregate(UserAggregate message) {
-        logger().info("Received UserAggregate: {}", message);
-        socialService.createOrUpdateUserFromAggregate(message);
-    }
+  private void handleUserAggregate(UserAggregate message) {
+    logger().info("Received UserAggregate: {}", message);
+    socialService.createOrUpdateUserFromAggregate(message);
+  }
 }

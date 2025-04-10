@@ -7,16 +7,16 @@ import jakarta.enterprise.context.ApplicationScoped;
 
 @ApplicationScoped
 public class UserEntityToUserResponse implements Converter<UserEntity, UserResponse> {
-    @Override
-    public UserResponse convertNotNull(UserEntity input) {
-        return new UserResponse()
-                .withId(input.getId())
-                .withUsername(input.getUsername())
-                .withEmail(input.getEmail())
-                .withBio(input.getBio())
-                .withProfileImage(input.getProfileImage())
-                .withCreatedAt(input.getCreatedAt())
-                .withUpdatedAt(input.getUpdatedAt())
-                .withDeleted(input.isDeleted());
-    }
+  @Override
+  public UserResponse convertNotNull(UserEntity input) {
+    return new UserResponse()
+        .withId(input.getId())
+        .withUsername(input.getUsername())
+        .withEmail(input.getEmail())
+        .withBio(input.getBio())
+        .withProfileImage(input.getProfileImage())
+        .withCreatedAt(input.getCreatedAt())
+        .withUpdatedAt(input.getUpdatedAt())
+        .withDeleted(input.isDeleted());
+  }
 }
