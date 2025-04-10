@@ -67,7 +67,7 @@ public class S3Service implements Logger {
               .contentType("application/octet-stream")
               .build());
       logger().info("File uploaded : {}", key);
-      return key;
+      return "/minio" + key;
     } catch (Exception e) {
       logger().error("Failed to upload file to MinIO");
       throw new RuntimeException("Failed to upload file to MinIO", e);
