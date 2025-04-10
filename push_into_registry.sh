@@ -20,7 +20,7 @@ usage_check() {
 check_service_name()
 {
     local service_name=$1
-    local valid_services=("repo-post" "repo-user" "repo-social" "srvc-search" "srvc-home-timeline" "srvc-user-timeline")
+    local valid_services=("repo-post" "repo-user" "repo-social" "srvc-search" "srvc-home-timeline" "srvc-user-timeline" "srvc-media")
     for service in "${valid_services[@]}"; do
         if [ "$service_name" == "$service" ]; then
         return 0

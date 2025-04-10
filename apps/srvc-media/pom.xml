@@ -11,7 +11,7 @@
         <version>1.0.0-SNAPSHOT</version>
     </parent>
 
-    <artifactId>svc-media</artifactId>
+    <artifactId>srvc-media</artifactId>
     <packaging>jar</packaging>
 
     <properties>

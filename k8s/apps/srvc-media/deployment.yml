@@ -24,7 +24,7 @@ spec:
         - name: pull-secret
       containers:
         - name: srvc-media
-          image: registry.cri.epita.fr/ing/majeures/tc/info/student/2026/2025-epitweet-tinyx-02/srvc-media:v1.0.0
+          image: registry.cri.epita.fr/ing/majeures/tc/info/student/2026/2025-epitweet-tinyx-02/srvc-media:v1.0.1
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 8080
