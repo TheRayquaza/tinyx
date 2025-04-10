@@ -4,7 +4,7 @@ import com.epita.exchange.utils.Logger;
 import com.epita.srvc_search.controller.request.SearchRequest;
 import com.epita.srvc_search.service.entity.SearchEntity;
 import jakarta.ws.rs.Consumes;
-import jakarta.ws.rs.POST;
+import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
 import java.util.List;
@@ -18,7 +18,8 @@ import org.eclipse.microprofile.openapi.annotations.responses.APIResponses;
 @Path("/")
 public interface SrvcSearchControllerApi extends Logger {
 
-  @POST
+  @GET
+  @Path("/search")
   @Consumes(MediaType.APPLICATION_JSON)
   @Produces(MediaType.APPLICATION_JSON)
   @Operation(summary = "Search for posts")
