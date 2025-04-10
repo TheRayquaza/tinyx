@@ -1,7 +1,8 @@
 package com.epita.srvc_media;
 
+import com.epita.exchange.s3.service.S3Service;
 import com.epita.exchange.utils.Logger;
-import jakarta.ws.rs.*;
+import jakarta.inject.Inject;
 import jakarta.ws.rs.container.ContainerRequestContext;
 import jakarta.ws.rs.container.ContainerRequestFilter;
 import jakarta.ws.rs.core.MediaType;
@@ -13,26 +14,28 @@ import java.net.URLConnection;
 @Provider
 public class SrvcMediaFilter implements ContainerRequestFilter, Logger {
 
+  @Inject S3Service s3Service;
+
   @Override
-  public void filter(ContainerRequestContext requestContext) throws IOException {
+  public void filter(ContainerRequestContext requestContext) {
     String path = requestContext.getUriInfo().getPath();
 
-    if (path.startsWith("minio/")) {
-      String id = path.substring("minio/".length());
+    if (path.startsWith("/minio")) {
+      String id = path.substring("/minio/".length());
 
-      logger.info("GET /minio/{}", id);
+      logger().info("GET /minio/{}", id);
 
       try {
         requestContext.abortWith(handleMinioRequest(id));
       } catch (Exception e) {
-        logger.error("Error processing Minio request", e);
+        logger().error("Error processing Minio request", e);
         requestContext.abortWith(Response.serverError().entity("Internal server error").build());
       }
     }
   }
 
   private Response handleMinioRequest(String id) {
-    InputStream stream = mediaService.downloadMedia(id);
+    InputStream stream = s3Service.downloadFileAsStream(id);
     if (stream == null) {
       return Response.status(Response.Status.NOT_FOUND).entity("File not found").build();
     }
@@ -51,12 +54,11 @@ public class SrvcMediaFilter implements ContainerRequestFilter, Logger {
         stream.reset();
       }
 
-      String fileName = id;
       return Response.ok(stream, mimeType)
-          .header("Content-Disposition", "inline; filename=\"" + fileName + "\"")
+          .header("Content-Disposition", "inline; filename=\"" + id + "\"")
           .build();
     } catch (Exception e) {
-      logger.error("Failed to read stream or detect MIME type", e);
+      logger().error("Failed to read stream or detect MIME type", e);
       return Response.serverError().entity("Error while reading the file").build();
     }
   }

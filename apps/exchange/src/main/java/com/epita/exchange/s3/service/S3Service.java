@@ -103,6 +103,15 @@ public class S3Service implements Logger {
     }
   }
 
+  public InputStream downloadFileAsStream(String key) {
+    try {
+      return minioClient.getObject(GetObjectArgs.builder().bucket(bucketName).object(key).build());
+    } catch (Exception e) {
+      logger().error("Failed to get file stream from MinIO", e);
+      return null;
+    }
+  }
+
   public void deleteFile(String key) {
     try {
       minioClient.removeObject(RemoveObjectArgs.builder().bucket(bucketName).object(key).build());
