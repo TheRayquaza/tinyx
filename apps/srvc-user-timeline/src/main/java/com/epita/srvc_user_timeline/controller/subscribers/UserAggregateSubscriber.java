@@ -10,24 +10,20 @@ import io.quarkus.runtime.Startup;
 import jakarta.annotation.PreDestroy;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
-import org.eclipse.microprofile.config.inject.ConfigProperty;
-
 import java.util.function.Consumer;
 
 @Startup
 @ApplicationScoped
 public class UserAggregateSubscriber implements Consumer<UserAggregate> {
 
-  @Inject
-  @ConfigProperty(name = "repo.user.aggregate.channel", defaultValue = "user_aggregate")
-  String channel;
+  String channel = System.getenv().getOrDefault("USER_AGGREGATE_CHANNEL", "user_aggregate");
 
   private final PubSubCommands.RedisSubscriber subscriber;
   @Inject UserTimelineService userTimelineService;
 
   public UserAggregateSubscriber(
       final RedisDataSource ds, UserTimelineService userTimelineService) {
-    subscriber = ds.pubsub(UserAggregate.class).subscribe("user_aggregate", this);
+    subscriber = ds.pubsub(UserAggregate.class).subscribe(channel, this);
     this.userTimelineService = userTimelineService;
   }
 

@@ -10,23 +10,19 @@ import io.quarkus.runtime.Startup;
 import jakarta.annotation.PreDestroy;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
-import org.eclipse.microprofile.config.inject.ConfigProperty;
-
 import java.util.function.Consumer;
 
 @Startup
 @ApplicationScoped
 public class LikeCommandSubscriber implements Consumer<LikeCommand> {
 
-  @Inject
-  @ConfigProperty(name = "repo.social.like.command.channel", defaultValue = "like_command")
-  String channel;
+  String channel = System.getenv().getOrDefault("LIKE_COMMAND_CHANNEL", "like_command");
 
   private final PubSubCommands.RedisSubscriber subscriber;
   @Inject UserTimelineService userTimelineService;
 
   public LikeCommandSubscriber(final RedisDataSource ds, UserTimelineService userTimelineService) {
-    subscriber = ds.pubsub(LikeCommand.class).subscribe("like_command", this);
+    subscriber = ds.pubsub(LikeCommand.class).subscribe(channel, this);
     this.userTimelineService = userTimelineService;
   }
 
