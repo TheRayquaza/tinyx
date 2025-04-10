@@ -85,3 +85,30 @@ try {
 } catch (e) {
     print("Collection already sharded or error:", e.message);
 }
+
+// === SRVC USER TIMELINE SETUP ===
+let srvcUserDb = db.getSiblingDB("SrvcUserTimeline");
+
+if (!srvcUserDb.getUser("admin")) {
+    srvcUserDb.createUser({
+        user: "admin",
+        pwd: "admin",
+        roles: [{ role: "readWrite", db: "SrvcUserTimeline" }]
+    });
+}
+
+if (!srvcUserDb.getCollectionNames().includes("UserTimelinePost")) {
+    srvcUserDb.createCollection("UserTimelinePost");
+}
+
+try {
+    sh.enableSharding("SrvcUserTimeline");
+} catch (e) {
+    print("Sharding already enabled or error:", e.message);
+}
+
+try {
+    sh.shardCollection("SrvcUserTimeline.UserTimelinePost", { "_id": "hashed" });
+} catch (e) {
+    print("Collection already sharded or error:", e.message);
+}

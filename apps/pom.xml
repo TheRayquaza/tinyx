@@ -21,6 +21,7 @@
         <module>srvc-home-timeline</module>
         <module>srvc-search</module>
         <module>srvc-user-timeline</module>
+        <module>srvc-media</module>
     </modules>
 
     <properties>

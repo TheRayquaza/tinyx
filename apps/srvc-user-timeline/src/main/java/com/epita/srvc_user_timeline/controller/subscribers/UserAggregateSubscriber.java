@@ -1,0 +1,43 @@
+package com.epita.srvc_user_timeline.controller.subscribers;
+
+import static io.quarkus.mongodb.runtime.dns.MongoDnsClientProvider.vertx;
+
+import com.epita.exchange.redis.aggregate.UserAggregate;
+import com.epita.srvc_user_timeline.service.UserTimelineService;
+import io.quarkus.redis.datasource.RedisDataSource;
+import io.quarkus.redis.datasource.pubsub.PubSubCommands;
+import io.quarkus.runtime.Startup;
+import jakarta.annotation.PreDestroy;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
+import java.util.function.Consumer;
+
+@Startup
+@ApplicationScoped
+public class UserAggregateSubscriber implements Consumer<UserAggregate> {
+
+  String channel = System.getenv().getOrDefault("USER_AGGREGATE_CHANNEL", "user_aggregate");
+
+  private final PubSubCommands.RedisSubscriber subscriber;
+  @Inject UserTimelineService userTimelineService;
+
+  public UserAggregateSubscriber(
+      final RedisDataSource ds, UserTimelineService userTimelineService) {
+    subscriber = ds.pubsub(UserAggregate.class).subscribe(channel, this);
+    this.userTimelineService = userTimelineService;
+  }
+
+  @Override
+  public void accept(final UserAggregate command) {
+    vertx.executeBlocking(
+        future -> {
+          this.userTimelineService.handleUserAggregate(command);
+          future.complete();
+        });
+  }
+
+  @PreDestroy
+  public void terminate() {
+    subscriber.unsubscribe();
+  }
+}

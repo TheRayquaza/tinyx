@@ -1,14 +1,15 @@
+---
 kind: Service
 apiVersion: v1
 metadata:
-  name: srvc-user-timeline
+  name: srvc-media
   namespace: apps
   labels:
-    app: srvc-user-timeline
+    app: srvc-media
 spec:
     type: ClusterIP
     selector:
-      app: srvc-user-timeline
+      app: srvc-media
     ports:
       - protocol: TCP
         port: 8080

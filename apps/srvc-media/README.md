@@ -1,4 +1,4 @@
-# srvc-user-timeline
+# srvc-media
 
 ## Requirements
 
@@ -42,15 +42,14 @@ The application, packaged as an _über-jar_, is now runnable using `java -jar ta
 For a deployment in production, you must configure the following environment
 variables.
 
-| Variable                               | Description                          |
-|----------------------------------------|--------------------------------------|
-| `SRVC_USER_TIMELINE_REDIS_HOST`        | Redis host                           |
-| `SRVC_USER_TIMELINE_REDIS_PASSWORD`    | Redis Password                       |
-| `SRVC_USER_TIMELINE_MONGODB_HOST`      | MongoDB server host                  |
-| `SRVC_USER_TIMELINE_MONGODB_DATABASE`  | MongoDB database name                |
-| `SRVC_USER_TIMELINE_QUARKUS_HTTP_PORT` | Quarkus HTTP port (e.g., `8080`)     |
-| `SRVC_USER_TIMELINE_APP_PROFILE`       | Application profile (`dev` / `prod`) |
-| `POST_AGGREGATE_CHANNEL`               | Redis channel to sync post info      |
-| `USER_AGGREGATE_CHANNEL`               | Redis channel to sync user info      |
-| `BLOCK_COMMAND_CHANNEL`                | Redis channel to sync block info     |
-| `LIKE_COMMAND_CHANNEL`                 | Redis channel to sync like info      |
+| Variable                        | Description                                         |
+|----------------------------------|-----------------------------------------------------|
+| `QUARKUS_LOG_LEVEL`             | Log level                                           |
+| `QUARKUS_HTTP_PORT`             | Quarkus HTTP port (e.g., `8080`)                    |
+| `QUARKUS_HTTP_HOST`             | Quarkus HTTP host (e.g., `0.0.0.0` or `localhost`)  |
+| `QUARKUS_APP_PROFILE`           | Application profile (`dev` or `prod`)               |
+| `S3_ENDPOINT`                   | MinIO endpoint (e.g., `http://localhost:9000`)       |
+| `S3_BUCKET`                     | MinIO bucket name (e.g., `default`)                 |
+| `S3_ACCESS_KEY`                 | MinIO access key (e.g., `minioadmin`)               |
+| `S3_SECRET_KEY`                 | MinIO secret key (e.g., `minioadmin`)               |
+

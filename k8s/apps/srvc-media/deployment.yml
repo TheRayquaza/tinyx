@@ -1,10 +1,10 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: repo-post
+  name: srvc-media
   namespace: apps
   labels:
-    app: repo-post
+    app: srvc-media
 spec:
   replicas: 1 # TODO: make it 3
   strategy:
@@ -14,17 +14,17 @@ spec:
       maxSurge: 1
   selector:
     matchLabels:
-      app: repo-post
+      app: srvc-media
   template:
     metadata:
       labels:
-        app: repo-post
+        app: srvc-media
     spec:
       imagePullSecrets:
         - name: pull-secret
       containers:
-        - name: repo-post
-          image: registry.cri.epita.fr/ing/majeures/tc/info/student/2026/2025-epitweet-tinyx-02/repo-post:v1.0.0
+        - name: srvc-media
+          image: registry.cri.epita.fr/ing/majeures/tc/info/student/2026/2025-epitweet-tinyx-02/srvc-media:v1.0.4
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 8080
@@ -35,18 +35,6 @@ spec:
             limits:
               memory: "512Mi"
               cpu: "250m"
-          livenessProbe:
-            httpGet:
-              path: /q/health/live
-              port: 8080
-            initialDelaySeconds: 20
-            periodSeconds: 5
-          readinessProbe:
-            httpGet:
-              path: /q/health/ready
-              port: 8080
-            initialDelaySeconds: 20
-            periodSeconds: 5
           env:
             ## QUARKUS
             - name: QUARKUS_LOG_LEVEL
@@ -70,7 +58,6 @@ spec:
                   name: apps-config
                   key: QUARKUS_APP_PROFILE
             
-
             ## REDIS
             - name: QUARKUS_REDIS_HOSTS
               valueFrom:
@@ -113,10 +100,9 @@ spec:
             - name: QUARKUS_MONGODB_CONNECTION_STRING
               valueFrom:
                 secretKeyRef:
-                  name: repo-post-secret
-                  key: REPO_POST_MONGODB_ENDPOINT
-          
-        
+                  name: srvc-media-secret
+                  key: SRVC_MEDIA_MONGODB_ENDPOINT
+
             ## MINIO 
             - name: S3_ENDPOINT
               valueFrom:
