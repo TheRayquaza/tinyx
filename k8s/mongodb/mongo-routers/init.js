@@ -58,3 +58,30 @@ try {
 } catch (e) {
     print("Collection already sharded or error:", e.message);
 }
+
+// === SRVC SEARCH SETUP ===
+let searchDb = db.getSiblingDB("SrvcSearch");
+
+if (!searchDb.getUser("admin")) {
+    searchDb.createUser({
+        user: "admin",
+        pwd: "admin",
+        roles: [{ role: "readWrite", db: "SrvcSearch" }]
+    });
+}
+
+if (!searchDb.getCollectionNames().includes("SearchModel")) {
+    searchDb.createCollection("SearchModel");
+}
+
+try {
+    sh.enableSharding("SrvcSearch");
+} catch (e) {
+    print("Sharding already enabled or error:", e.message);
+}
+
+try {
+    sh.shardCollection("SrvcSearch.SearchModel", { "_id": "hashed" });
+} catch (e) {
+    print("Collection already sharded or error:", e.message);
+}

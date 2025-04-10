@@ -7,13 +7,13 @@
 
 # ========== SERVICES ==========
 
-/apps/srvc-search/         @armand.blin @mateo.lelong @gabriel.monteillard
+/apps/srvc-search/         @armand.blin @mateo.lelong @gabriel.monteillard @timothe.merle
 /apps/srvc-home-timeline/  @anton.vella @baptiste.arnold
 /apps/srvc-user-timeline/  @alexis.pinson @gabriel.toledano @timothe.merle @noe.susset
 
 # ========== INFRA ==========
 
-/k8s/mongodb/              @mateo.lelong @samy.yacef @khaled.mili
+/k8s/mongodb/              @mateo.lelong @samy.yacef @khaled.mili @timothe.merle
 /k8s/redis/                @mateo.lelong @samy.yacef @baptiste.arnold
 /k8s/neo4j/                @achille.guerard @mateo.lelong @samy.yacef @baptiste.arnold
 /k8s/elastic/              @mateo.lelong @timothe.merle  # (à compléter si d’autres y touchent)
