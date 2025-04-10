@@ -1,8 +1,8 @@
 package com.epita.srvc_media.service;
 
 import com.epita.exchange.s3.service.S3Service;
-import com.epita.srvc_media.SrvcMediaErrorCode;
 import com.epita.exchange.utils.Logger;
+import com.epita.srvc_media.SrvcMediaErrorCode;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import java.io.*;
@@ -10,8 +10,7 @@ import java.io.*;
 @ApplicationScoped
 public class MediaService implements Logger {
 
-  @Inject
-  S3Service s3Service;
+  @Inject S3Service s3Service;
 
   private static final String tmpDir = "/tmp";
 

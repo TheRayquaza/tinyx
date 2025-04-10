@@ -10,8 +10,6 @@ import io.quarkus.runtime.Startup;
 import jakarta.annotation.PostConstruct;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
-import org.eclipse.microprofile.config.inject.ConfigProperty;
-
 import java.util.Optional;
 
 @Startup
@@ -28,10 +26,10 @@ public class RedisSubscriber implements Logger {
 
   @Inject
   public RedisSubscriber(RedisDataSource redisDataSource) {
-    postChannel = Optional.ofNullable(System.getenv("POST_AGGREGATE_CHANNEL"))
-            .orElse("post_aggregate");
-    blockChannel = Optional.ofNullable(System.getenv("BLOCK_COMMAND_CHANNEL"))
-            .orElse("block_command");
+    postChannel =
+        Optional.ofNullable(System.getenv("POST_AGGREGATE_CHANNEL")).orElse("post_aggregate");
+    blockChannel =
+        Optional.ofNullable(System.getenv("BLOCK_COMMAND_CHANNEL")).orElse("block_command");
     this.subscriberPost = redisDataSource.pubsub(PostAggregate.class);
     this.subscriberBlock = redisDataSource.pubsub(BlockCommand.class);
   }

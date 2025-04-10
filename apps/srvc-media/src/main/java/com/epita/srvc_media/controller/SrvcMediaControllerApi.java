@@ -2,22 +2,19 @@ package com.epita.srvc_media.controller;
 
 import com.epita.exchange.utils.Logger;
 import com.epita.srvc_media.SrvcMediaErrorCode;
-import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.*;
 import org.eclipse.microprofile.openapi.annotations.Operation;
 import org.eclipse.microprofile.openapi.annotations.media.Content;
 import org.eclipse.microprofile.openapi.annotations.media.Schema;
-import org.eclipse.microprofile.openapi.annotations.parameters.RequestBody;
 import org.eclipse.microprofile.openapi.annotations.responses.APIResponse;
 import org.eclipse.microprofile.openapi.annotations.responses.APIResponses;
 
-@Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_OCTET_STREAM)
 @Path("/minio")
 public interface SrvcMediaControllerApi extends Logger {
-  @POST
+  @GET
   @Path("/{id}")
   @Operation(summary = "Get media object")
   @APIResponses({

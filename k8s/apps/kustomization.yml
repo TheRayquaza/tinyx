@@ -12,7 +12,7 @@ resources:
   #- repo-social
   - repo-post
   - srvc-search
-  #- srvc-user-timeline
+  - srvc-user-timeline
   #- srvc-home-timeline
 configMapGenerator:
   - name: apps-config

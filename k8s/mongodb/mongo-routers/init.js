@@ -89,8 +89,8 @@ try {
 // === SRVC USER TIMELINE SETUP ===
 let srvcUserDb = db.getSiblingDB("SrvcUserTimeline");
 
-if (!searchDb.getUser("admin")) {
-    searchDb.createUser({
+if (!srvcUserDb.getUser("admin")) {
+    srvcUserDb.createUser({
         user: "admin",
         pwd: "admin",
         roles: [{ role: "readWrite", db: "SrvcUserTimeline" }]

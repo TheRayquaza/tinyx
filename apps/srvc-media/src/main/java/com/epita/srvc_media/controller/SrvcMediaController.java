@@ -1,22 +1,14 @@
 package com.epita.srvc_media.controller;
 
-import com.epita.exchange.auth.service.AuthService;
 import com.epita.srvc_media.service.MediaService;
 import jakarta.inject.Inject;
-import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
-import org.bson.types.ObjectId;
-import org.eclipse.microprofile.openapi.annotations.parameters.RequestBody;
-
 import java.io.InputStream;
 import java.net.URLConnection;
 
-import com.epita.srvc_media.controller.SrvcMediaControllerApi;
-
-@Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_OCTET_STREAM)
 @Path("/minio")
 public class SrvcMediaController implements SrvcMediaControllerApi {
@@ -24,7 +16,7 @@ public class SrvcMediaController implements SrvcMediaControllerApi {
   @Inject MediaService mediaService;
 
   @GET
-  @Path("/{id}")
+  @Path("/{id: .+}}")
   @Override
   public @NotNull Response downloadObject(@PathParam("id") @NotNull String id) {
     logger().info("GET /minio/{}", id);
