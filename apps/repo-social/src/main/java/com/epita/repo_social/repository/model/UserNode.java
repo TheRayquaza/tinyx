@@ -81,6 +81,12 @@ public record UserNode(
         );
     }
 
+    public String getLikedPostsCypher() {
+        return String.format(
+                "MATCH (n:User {userId:\"%s\"})-[:HAS_LIKED]->(p:Post) RETURN p",
+                this.userId);
+    }
+
     public String getFollowersCypher() {
         return String.format(
                 "MATCH (n:User {userId:\"%s\"})<-[:HAS_FOLLOWED]-(u:User) RETURN u",

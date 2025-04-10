@@ -2,6 +2,7 @@ package com.epita.repo_social.controller;
 
 import com.epita.exchange.utils.Logger;
 import com.epita.repo_social.RepoSocialErrorCode;
+import com.epita.repo_social.controller.response.PostResponse;
 import com.epita.repo_social.controller.response.UserResponse;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
@@ -206,6 +207,35 @@ public interface RepoSocialControllerApi extends Logger {
   })
   @NotNull
   List<UserResponse> getLikes(@PathParam("postId") @NotNull @Valid String postId);
+
+  @GET
+  @Path("/user/{userId}/like")
+    @Operation(summary = "Get the posts liked by a user")
+    @APIResponses({
+            @APIResponse(responseCode = "200", description = "Posts liked retrieved"),
+            @APIResponse(
+                    responseCode = "400",
+                    description = "Invalid input",
+                    content = @Content(schema = @Schema(implementation = RepoSocialErrorCode.class))),
+            @APIResponse(
+                    responseCode = "401",
+                    description = "User not authorized",
+                    content = @Content(schema = @Schema(implementation = RepoSocialErrorCode.class))),
+            @APIResponse(
+                    responseCode = "403",
+                    description = "User blocked",
+                    content = @Content(schema = @Schema(implementation = RepoSocialErrorCode.class))),
+            @APIResponse(
+                    responseCode = "404",
+                    description = "User not found",
+                    content = @Content(schema = @Schema(implementation = RepoSocialErrorCode.class))),
+            @APIResponse(
+                    responseCode = "500",
+                    description = "Error during the cypher script execution",
+                    content = @Content(schema = @Schema(implementation = RepoSocialErrorCode.class))),
+    })
+    @NotNull
+    List<PostResponse> getUserLikedPosts(@PathParam("userId") @NotNull @Valid String userId);
 
   @GET
   @Path("/user/{userId}/follower")

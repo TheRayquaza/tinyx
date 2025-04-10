@@ -22,6 +22,7 @@ import io.restassured.http.ContentType;
 import io.restassured.response.Response;
 import jakarta.inject.Inject;
 
+import jakarta.ws.rs.GET;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
@@ -111,11 +112,25 @@ class RepoSocialControllerTest {
                 "CREATE (p1:Post {" +
                         "  postId: \"post-1\"," +
                         "  ownerId: \"user-1\"," +
+                        "  text: \"Hello, world!\"," +
+                        "  media: \"image.jpg\"," +
+                        "  repostId: null," +
+                        "  replyToPostId: null," +
+                        "  isReply: false," +
+                        "  createdAt: datetime(\"2024-04-01T10:00:00\")," +
+                        "  updatedAt: datetime(\"2024-04-01T10:00:00\")," +
                         "  deleted: false" +
                         "})" +
                         "CREATE (p2:Post {" +
                         "  postId: \"post-2\"," +
                         "  ownerId: \"user-2\"," +
+                        "  text: \"Goodbye, world!\"," +
+                        "  media: \"image2.jpg\"," +
+                        "  repostId: null," +
+                        "  replyToPostId: null," +
+                        "  isReply: false," +
+                        "  createdAt: datetime(\"2024-04-01T10:00:00\")," +
+                        "  updatedAt: datetime(\"2024-04-01T10:00:00\")," +
                         "  deleted: false" +
                         "})"
         );
@@ -351,6 +366,28 @@ class RepoSocialControllerTest {
     }
 
     @Test
+    @Order(10)
+    void getLikedPostsOfBlockedUser(){
+        // Tenter de récupérer les posts likés d'un user bloqué
+        String token = AuthService.generateToken(USER_ID_1, USERNAME_1);
+        AuthEntity authEntity = new AuthEntity(USER_ID_1, USERNAME_1);
+        authContext.setAuthEntity(authEntity);
+
+        Response response =
+                given()
+                        .contentType(ContentType.JSON)
+                        .header("Authorization", "Bearer " + token)
+                        .when()
+                        .get("/user/" + USER_ID_2 + "/like")
+                        .then()
+                        .extract()
+                        .response();
+
+        System.out.println(response.body().prettyPrint());
+        response.then().statusCode(403).extract().response();
+    }
+
+    @Test
     @Order(11)
     void getPostLikesBlockedByUser() {
         // Tenter de récupérer les likes d'un post en étant bloqué
@@ -562,6 +599,58 @@ class RepoSocialControllerTest {
 
     @Test
     @Order(21)
+    void getUsersWhoLikedPostEmpty() {
+        String token = AuthService.generateToken(USER_ID_1, USERNAME_1);
+        AuthEntity authEntity = new AuthEntity(USER_ID_1, USERNAME_1);
+        authContext.setAuthEntity(authEntity);
+
+        Response response =
+                given()
+                        .contentType(ContentType.JSON)
+                        .header("Authorization", "Bearer " + token)
+                        .when()
+                        .get("/post/" + POST_ID_2 + "/like")
+                        .then()
+                        .extract()
+                        .response();
+
+        System.out.println(response.body().prettyPrint());
+        response
+                .then()
+                .statusCode(200)
+                .body("size()", is(0))
+                .extract()
+                .response();
+    }
+
+    @Test
+    @Order(20)
+    void getPostsLikedByUserEmpty(){
+        String token = AuthService.generateToken(USER_ID_1, USERNAME_1);
+        AuthEntity authEntity = new AuthEntity(USER_ID_1, USERNAME_1);
+        authContext.setAuthEntity(authEntity);
+
+        Response response =
+                given()
+                        .contentType(ContentType.JSON)
+                        .header("Authorization", "Bearer " + token)
+                        .when()
+                        .get("/user/" + USER_ID_1 + "/like")
+                        .then()
+                        .extract()
+                        .response();
+
+        System.out.println(response.body().prettyPrint());
+        response
+                .then()
+                .statusCode(200)
+                .body("size()", is(0))
+                .extract()
+                .response();
+    }
+
+    @Test
+    @Order(21)
     void getUserFollowersEmpty() {
         String token = AuthService.generateToken(USER_ID_1, USERNAME_1);
         AuthEntity authEntity = new AuthEntity(USER_ID_1, USERNAME_1);
@@ -581,8 +670,7 @@ class RepoSocialControllerTest {
         response
                 .then()
                 .statusCode(200)
-                .body("followers", notNullValue())
-                .body("followers", hasSize(0))
+                .body("size()", is(0))
                 .extract()
                 .response();
     }
@@ -608,8 +696,7 @@ class RepoSocialControllerTest {
         response
                 .then()
                 .statusCode(200)
-                .body("following", notNullValue())
-                .body("following", hasSize(0))
+                .body("size()", is(0))
                 .extract()
                 .response();
     }
@@ -635,8 +722,7 @@ class RepoSocialControllerTest {
         response
                 .then()
                 .statusCode(200)
-                .body("blocked", notNullValue())
-                .body("blocked", hasSize(0))
+                .body("size()", is(0))
                 .extract()
                 .response();
     }
@@ -662,8 +748,7 @@ class RepoSocialControllerTest {
         response
                 .then()
                 .statusCode(200)
-                .body("blockedBy", notNullValue())
-                .body("blockedBy", hasSize(0))
+                .body("size()", is(0))
                 .extract()
                 .response();
     }
@@ -853,6 +938,34 @@ class RepoSocialControllerTest {
                 .statusCode(200)
                 .body("size()", is(1))
                 .body("[0].id", is(USER_ID_1))
+                .extract()
+                .response();
+    }
+
+    @Test
+    @Order(31)
+    void getLikedPostsOfUserOne(){
+        String token = AuthService.generateToken(USER_ID_1, USERNAME_1);
+        AuthEntity authEntity = new AuthEntity(USER_ID_1, USERNAME_1);
+        authContext.setAuthEntity(authEntity);
+
+        Response response =
+                given()
+                        .contentType(ContentType.JSON)
+                        .header("Authorization", "Bearer " + token)
+                        .when()
+                        .get("/user/" + USER_ID_1 + "/like")
+                        .then()
+                        .extract()
+                        .response();
+
+        System.out.println(response.body().prettyPrint());
+        //verify if the response is a list of posts of size one with the id of post-2
+        response
+                .then()
+                .statusCode(200)
+                .body("size()", is(1))
+                .body("[0].id", is(POST_ID_2))
                 .extract()
                 .response();
     }

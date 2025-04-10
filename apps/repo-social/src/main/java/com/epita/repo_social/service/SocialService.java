@@ -11,9 +11,11 @@ import com.epita.exchange.redis.command.LikeCommand;
 import com.epita.exchange.redis.service.RedisPublisher;
 import com.epita.exchange.utils.Logger;
 import com.epita.repo_social.RepoSocialErrorCode;
+import com.epita.repo_social.converter.PostNodeToPostEntity;
 import com.epita.repo_social.converter.UserNodeToUserEntity;
 import com.epita.repo_social.repository.Neo4jRepository;
 import com.epita.repo_social.repository.model.*;
+import com.epita.repo_social.service.entity.PostEntity;
 import com.epita.repo_social.service.entity.UserEntity;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
@@ -48,6 +50,8 @@ public class SocialService implements Logger {
     @ConfigProperty(name = "repo.social.follow.command.channel")
     @Inject
     String followCommandChannel;
+    @Inject
+    PostNodeToPostEntity postNodeToPostEntity;
 
     private boolean isUserBlocked(UserNode source, UserNode target) {
         BlockRelationship blockRelationship = new BlockRelationship(source, target);
@@ -85,6 +89,13 @@ public class SocialService implements Logger {
     public void createOrUpdatePostFromAggregate(PostAggregate postAggregate) {
         PostNode postNode = new PostNode(postAggregate.getId(),
                 postAggregate.getOwnerId(),
+                postAggregate.getText(),
+                postAggregate.getMedia(),
+                postAggregate.getRepostId(),
+                postAggregate.getReplyToPostId(),
+                postAggregate.isReply(),
+                postAggregate.getCreatedAt(),
+                postAggregate.getUpdatedAt(),
                 postAggregate.isDeleted());
         if (postNode.deleted()) {
             neo4jRepository.deleteNode(postNode.deleteCypher());
@@ -312,6 +323,21 @@ public class SocialService implements Logger {
 
         return neo4jRepository.getUsers(postNode.getLikesCypher()).stream()
                 .map(userNodeToUserEntity::convertNotNull)
+                .toList();
+    }
+
+    public List<PostEntity> getUserLikedPosts(String userId) {
+        logger().info("Running getUserLikedPosts cypher script with : \n userId: {}\n", userId);
+
+        UserNode userNode = new UserNode(userId);
+        if (!neo4jRepository.checkNodeExists(userNode.findCypher())) {
+            throw RepoSocialErrorCode.NOT_FOUND.createError("User not found");
+        }
+        UserNode currentUserNode = new UserNode(authService.getUserId());
+        throwErrorIfBlockRelationshipExists(currentUserNode, userNode, "get liked posts of");
+
+        return neo4jRepository.getPosts(userNode.getLikedPostsCypher()).stream()
+                .map(postNodeToPostEntity::convertNotNull)
                 .toList();
     }
 
