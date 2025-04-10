@@ -18,14 +18,14 @@ public class Neo4jRepository {
     public Driver driver;
 
     // create a node
-    public void createNode(String cypherRequest) {
+    public void createOrUpdateNode(String cypherRequest) {
         try (Session session = driver.session()) {
             session.executeWrite(tx -> {
                 tx.run(cypherRequest);
                 return null;
             });
         } catch (Exception e) {
-            throw RepoSocialErrorCode.ERROR_DURING_CYPHER_EXEC.createError("Error while creating node", e);
+            throw RepoSocialErrorCode.ERROR_DURING_CYPHER_EXEC.createError("Error while creating or updating node", e);
         }
     }
 

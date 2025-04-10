@@ -35,22 +35,42 @@ public record UserNode(
 
     public String findCypher() {
         return String.format(
-                "MATCH (n:User{userId:\"%s\"}) RETURN n",
+                "MATCH (u:User{userId:\"%s\"}) RETURN u",
                 this.userId
         );
     }
 
-    public String createCypher() {
+    public String createOrUpdateCypher() {
         return String.format(
-                "CREATE (n:User {userId: \"%s\"%s%s%s%s%s%s%s}) RETURN n",
-                userId,
-                username != null ? String.format(", username: \"%s\"", username) : "",
-                email != null ? String.format(", email: \"%s\"", email) : "",
-                bio != null ? String.format(", bio: \"%s\"", bio) : "",
-                profileImage != null ? String.format(", profileImage: \"%s\"", profileImage) : "",
-                createdAt != null ? String.format(", createdAt: datetime(\"%s\")", createdAt) : "",
-                updatedAt != null ? String.format(", updatedAt: datetime(\"%s\")", updatedAt) : "",
-                deleted ? ", deleted: true" : ""
+                """
+                Merge (u:User {userId: "%s"})
+                On create set
+                    u.username = "%s",
+                    u.email = "%s",
+                    u.bio = "%s",
+                    u.profileImage = "%s",
+                    u.createdAt = datetime("%s"),
+                    u.updatedAt = datetime("%s"),
+                    u.deleted = false
+                On match set
+                    u.username = "%s",
+                    u.email = "%s",
+                    u.bio = "%s",
+                    u.profileImage = "%s",
+                    u.updatedAt = datetime("%s")
+                """,
+                this.userId,
+                this.username,
+                this.email,
+                this.bio,
+                this.profileImage,
+                this.createdAt,
+                this.updatedAt,
+                this.username,
+                this.email,
+                this.bio,
+                this.profileImage,
+                this.updatedAt
         );
     }
 
@@ -82,6 +102,12 @@ public record UserNode(
     public String getBlockedByCypher() {
         return String.format(
                 "MATCH (n:User {userId:\"%s\"})<-[:HAS_BLOCKED]-(u:User) RETURN u",
+                this.userId);
+    }
+
+    public String deleteRelationshipCypher() {
+        return String.format(
+                "MATCH (:User {userId:\"%s\"})-[r]-() DELETE r",
                 this.userId);
     }
 }
