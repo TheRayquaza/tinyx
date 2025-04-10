@@ -3,15 +3,17 @@ package com.epita.repo_social;
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
-import static org.hamcrest.CoreMatchers.hasItems;
 import static org.hamcrest.Matchers.hasSize;
-import static org.hamcrest.CoreMatchers.not;
 
 import com.epita.exchange.auth.service.AuthContext;
 import com.epita.exchange.auth.service.AuthService;
 import com.epita.exchange.auth.service.entity.AuthEntity;
+import com.epita.exchange.redis.aggregate.PostAggregate;
+import com.epita.exchange.redis.aggregate.UserAggregate;
 import com.epita.repo_social.controller.RepoSocialController;
 import com.epita.repo_social.repository.Neo4jRepository;
+import com.epita.repo_social.repository.model.UserNode;
+import com.epita.repo_social.service.SocialService;
 import io.quarkus.arc.Arc;
 import io.quarkus.test.common.http.TestHTTPEndpoint;
 import io.quarkus.test.junit.QuarkusTest;
@@ -21,11 +23,12 @@ import io.restassured.response.Response;
 import jakarta.inject.Inject;
 
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
+
+import java.util.List;
 
 @QuarkusTest
 @TestHTTPEndpoint(RepoSocialController.class)
@@ -49,16 +52,18 @@ class RepoSocialControllerTest {
 
     private static final String POST_ID_1 = "post-1";
     private static final String POST_ID_2 = "post-2";
+    @Inject
+    SocialService socialService;
 
     @BeforeAll
     static void setup() {
         Neo4jRepository repository = Arc.container().instance(Neo4jRepository.class).get();
 
         // Supprimer toutes les données existantes
-        repository.createNode("MATCH (n) DETACH DELETE n");
+        repository.createOrUpdateNode("MATCH (n) DETACH DELETE n");
 
         // Créer les utilisateurs
-        repository.createNode(
+        repository.createOrUpdateNode(
                 "CREATE (u1:User {" +
                         "  userId: \"user-1\"," +
                         "  username: \"alice\"," +
@@ -102,14 +107,16 @@ class RepoSocialControllerTest {
         );
 
         // Créer les posts
-        repository.createNode(
+        repository.createOrUpdateNode(
                 "CREATE (p1:Post {" +
                         "  postId: \"post-1\"," +
-                        "  ownerId: \"user-1\"" +
+                        "  ownerId: \"user-1\"," +
+                        "  deleted: false" +
                         "})" +
                         "CREATE (p2:Post {" +
                         "  postId: \"post-2\"," +
-                        "  ownerId: \"user-2\"" +
+                        "  ownerId: \"user-2\"," +
+                        "  deleted: false" +
                         "})"
         );
     }
@@ -1323,5 +1330,126 @@ class RepoSocialControllerTest {
 
         System.out.println(responseUnblock.body().prettyPrint());
         responseUnblock.then().statusCode(400).extract().response();
+    }
+
+    @Test
+    @Order(50)
+    void DeletedPostBehavior() {
+        String token = AuthService.generateToken(USER_ID_1, USERNAME_1);
+        AuthEntity authEntity = new AuthEntity(USER_ID_1, USERNAME_1);
+        authContext.setAuthEntity(authEntity);
+
+        Response responsePastLike =
+                given()
+                        .contentType(ContentType.JSON)
+                        .header("Authorization", "Bearer " + token)
+                        .when()
+                        .post("/post/" + POST_ID_1 + "/like")
+                        .then()
+                        .extract()
+                        .response();
+
+        socialService.createOrUpdatePostFromAggregate(PostAggregate.builder().build()
+                .withId(POST_ID_1)
+                .withOwnerId(USER_ID_1)
+                .withDeleted(true));
+
+        // Vérifier que le like a été supprimé
+        List<UserNode> likes = neo4jRepository.getUsers("""
+                MATCH (u:User)-[:HAS_LIKED]->(:Post {postId: "%s"})
+                RETURN u
+                """.formatted(POST_ID_1));
+        assert likes.isEmpty();
+
+        Response response =
+                given()
+                        .contentType(ContentType.JSON)
+                        .header("Authorization", "Bearer " + token)
+                        .when()
+                        .post("/post/" + POST_ID_1 + "/like")
+                        .then()
+                        .extract()
+                        .response();
+
+        System.out.println(response.body().prettyPrint());
+        response.then().statusCode(404).extract().response();
+    }
+
+    @Test
+    @Order(51)
+    void deleteUserBehavior(){
+        String token = AuthService.generateToken(USER_ID_1, USERNAME_1);
+        AuthEntity authEntity = new AuthEntity(USER_ID_1, USERNAME_1);
+        authContext.setAuthEntity(authEntity);
+
+        //user-1 block user-2 and follow user-3
+        Response responseBlock =
+                given()
+                        .contentType(ContentType.JSON)
+                        .header("Authorization", "Bearer " + token)
+                        .when()
+                        .post("/user/" + USER_ID_2 + "/block")
+                        .then()
+                        .extract()
+                        .response();
+
+        Response responseFollow =
+                given()
+                        .contentType(ContentType.JSON)
+                        .header("Authorization", "Bearer " + token)
+                        .when()
+                        .post("/user/" + USER_ID_3 + "/follow")
+                        .then()
+                        .extract()
+                        .response();
+
+        //user-3 follow user-1
+        String token2 = AuthService.generateToken(USER_ID_3, USERNAME_3);
+        AuthEntity authEntity2 = new AuthEntity(USER_ID_3, USERNAME_3);
+        authContext.setAuthEntity(authEntity2);
+
+        Response responseFollow2 =
+                given()
+                        .contentType(ContentType.JSON)
+                        .header("Authorization", "Bearer " + token2)
+                        .when()
+                        .post("/user/" + USER_ID_1 + "/follow")
+                        .then()
+                        .extract()
+                        .response();
+
+        //delete user-1
+        socialService.createOrUpdateUserFromAggregate(UserAggregate.builder().build()
+                .withId(USER_ID_1)
+                .withUsername(USERNAME_1)
+                .withDeleted(true));
+
+        // Vérifier que le user n'a plus aucune relation
+        List<UserNode> followers = neo4jRepository.getUsers("""
+                MATCH (:User {userId: "%s"})<-[:HAS_FOLLOWED]-(u:User)
+                RETURN u
+                """.formatted(USER_ID_1));
+        assert followers.isEmpty();
+        List<UserNode> following = neo4jRepository.getUsers("""
+                MATCH (u:User)<-[:HAS_FOLLOWED]-(:User {userId: "%s"})
+                RETURN u
+                """.formatted(USER_ID_1));
+        System.out.println(following);
+        assert following.isEmpty();
+        List<UserNode> blocked = neo4jRepository.getUsers("""
+                MATCH (:User {userId: "%s"})-[:HAS_BLOCKED]->(u:User)
+                RETURN u
+                """.formatted(USER_ID_1));
+        assert blocked.isEmpty();
+        List<UserNode> blockedBy = neo4jRepository.getUsers("""
+                MATCH (u:User)-[:HAS_BLOCKED]->(:User {userId: "%s"})
+                RETURN u
+                """.formatted(USER_ID_1));
+        assert blockedBy.isEmpty();
+        List<UserNode> likes = neo4jRepository.getUsers("""
+                MATCH (u:User)-[:HAS_LIKED]->(:Post {postId: "%s"})
+                RETURN u
+                """.formatted(POST_ID_2));
+        assert likes.isEmpty();
     }
 }
