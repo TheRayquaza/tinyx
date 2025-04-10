@@ -12,7 +12,7 @@ public class HomeTimelinePostRepository implements PanacheMongoRepository<HomeTi
   }
 
   public void update(HomeTimelinePostModel postModel) {
-    this.update(postModel.getPostId(), postModel);
+    this.update(postModel);
   }
 
   public void create(HomeTimelinePostModel postModel) {

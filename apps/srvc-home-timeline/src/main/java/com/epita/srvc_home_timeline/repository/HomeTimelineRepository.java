@@ -13,7 +13,7 @@ public class HomeTimelineRepository implements PanacheMongoRepository<HomeTimeli
   }
 
   public void updateModel(HomeTimelineModel homeTimelineModel) {
-    this.update(homeTimelineModel.getId(), homeTimelineModel);
+    this.update(homeTimelineModel);
   }
 
   public void create(HomeTimelineModel homeTimelineModel) {

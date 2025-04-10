@@ -77,8 +77,8 @@ public class HomeTimelineTest {
   public static void setupAuth() {
     TOKEN_USER_1 = AuthService.generateToken(USER_ID_1, USER_1);
     TOKEN_USER_2 = AuthService.generateToken(USER_ID_2, USER_2);
-    TOKEN_USER_2 = AuthService.generateToken(USER_ID_3, USER_3);
-    TOKEN_USER_2 = AuthService.generateToken(USER_ID_4, USER_4);
+    TOKEN_USER_3 = AuthService.generateToken(USER_ID_3, USER_3);
+    TOKEN_USER_4 = AuthService.generateToken(USER_ID_4, USER_4);
   }
 
   @BeforeEach
@@ -86,7 +86,7 @@ public class HomeTimelineTest {
     AuthEntity authEntity1 = new AuthEntity(USER_ID_1, USER_1);
     authContext.setAuthEntity(authEntity1);
   }
-  
+
   @BeforeEach
   void setupUsers() throws InterruptedException {
     UserAggregate user1 = new UserAggregate();
@@ -240,6 +240,15 @@ public class HomeTimelineTest {
     // User 3 follows user 1
     followUser(USER_ID_1, USER_ID_3, true);
 
+    // Checking user 2 home timelines
+    Response response =
+        given().header("Authorization", "Bearer " + TOKEN_USER_2).when().get(USER_ID_2);
+    System.out.println(response.body().prettyPrint());
+    response
+        .then()
+        .statusCode(200)
+        .body("hometimeline.followers.text", hasItem("15a1a100c293c91129883573"));
+
     // User 2 posts
     String newpostId2 = new ObjectId().toString();
     PostAggregate newpost2 = new PostAggregate();
@@ -252,8 +261,7 @@ public class HomeTimelineTest {
     System.out.println("user 2 posts - done");
 
     // Checking user 1 and user 3 home timelines
-    Response response =
-        given().header("Authorization", "Bearer " + TOKEN_USER_3).when().get(USER_ID_3);
+    response = given().header("Authorization", "Bearer " + TOKEN_USER_3).when().get(USER_ID_3);
 
     System.out.println(response.body().prettyPrint());
 
@@ -391,7 +399,7 @@ public class HomeTimelineTest {
     // User 1 unblocks user 2
     block.setBlocked(false);
     publishAndWait("block_command", block);
-    
+
     // User 2 posts
     String newpostId2_2 = new ObjectId().toString();
     PostAggregate newpost2_2 = new PostAggregate();
