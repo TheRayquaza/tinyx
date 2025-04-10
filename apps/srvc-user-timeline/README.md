@@ -54,4 +54,3 @@ variables.
 | `USER_AGGREGATE_CHANNEL`               | Redis channel to sync user info      |
 | `BLOCK_COMMAND_CHANNEL`                | Redis channel to sync block info     |
 | `LIKE_COMMAND_CHANNEL`                 | Redis channel to sync like info      |
-ADD MORE HERE (CHANNELS)
