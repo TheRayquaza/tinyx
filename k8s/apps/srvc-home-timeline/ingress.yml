@@ -1,0 +1,19 @@
+kind: Ingress
+apiVersion: networking.k8s.io/v1
+metadata:
+  name: srvc-home-timeline
+  namespace: apps
+  labels:
+    app: srvc-home-timeline
+spec:
+  ingressClassName: traefik
+  rules:
+    - http:
+        paths:
+          - path: /home-timeline
+            pathType: Prefix
+            backend:
+              service:
+                name: srvc-home-timeline
+                port:
+                  number: 8080

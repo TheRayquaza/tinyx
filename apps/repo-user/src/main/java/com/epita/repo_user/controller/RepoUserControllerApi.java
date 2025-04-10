@@ -8,7 +8,6 @@ import com.epita.repo_user.controller.request.ModifyUserRequest;
 import com.epita.repo_user.controller.request.UploadImageRequest;
 import com.epita.repo_user.controller.response.UserLoginResponse;
 import com.epita.repo_user.service.entity.UserEntity;
-import io.quarkus.security.Authenticated;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import jakarta.ws.rs.*;
@@ -69,7 +68,6 @@ public interface RepoUserControllerApi extends Logger {
 
   @PUT
   @Path("/user")
-  @Authenticated
   @Operation(summary = "Modify my user's account")
   @APIResponses({
     @APIResponse(
@@ -90,7 +88,6 @@ public interface RepoUserControllerApi extends Logger {
   @PUT
   @Path("/user/image")
   @Consumes(MediaType.MULTIPART_FORM_DATA)
-  @Authenticated
   @Operation(summary = "Upload Profile image for my user's account")
   @APIResponses({
     @APIResponse(
@@ -123,7 +120,6 @@ public interface RepoUserControllerApi extends Logger {
 
   @GET
   @Path("/user")
-  @Authenticated
   @Operation(summary = "Get my user's account")
   @APIResponses({
     @APIResponse(

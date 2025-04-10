@@ -43,13 +43,19 @@ The application, packaged as an _über-jar_, is now runnable using `java -jar ta
 For a deployment in production, you must configure the following environment
 variables.
 
-| Variable                      | Description                                        |
-|-------------------------------|----------------------------------------------------|
-| `SRVC_SEARCH_REDIS_HOST`        | Redis host                                         |
-| `SRVC_SEARCH_REDIS_PASSWORD`    | Redis Password                                     |
-| `SRVC_SEARCH_MONGODB_HOST`      | MongoDB server host                                |
-| `SRVC_SEARCH_MONGODB_DATABASE`  | MongoDB database name                              |
-| `SRVC_SEARCH_QUARKUS_HTTP_PORT` | Quarkus HTTP port (e.g., `8080`)                   |
-| `SRVC_SEARCH_APP_PROFILE`       | Application profile (`dev` / `prod`)               |
-
-ADD MORE HERE (CHANNELS)
+| Variable                                  | Description                          |
+|-------------------------------------------|--------------------------------------|
+| `SRVC_SEARCH_LOG_LEVEL`                   | Log level (e.g., `INFO`)             |
+| `SRVC_SEARCH_QUARKUS_HTTP_PORT`           | Quarkus HTTP port (e.g., `8080`)     |
+| `SRVC_SEARCH_APP_PROFILE`                 | Application profile (`dev` / `prod`) |
+| `SRVC_SEARCH_REPO_POST_AGGREGATE_CHANNEL` | Post aggregate channel               |
+| `SRVC_SEARCH_BLOCK_COMMAND_CHANNEL`       | Block command channel                |
+| `SRVC_SEARCH_REDIS_HOSTS`                 | Redis hosts                          |
+| `SRVC_SEARCH_REDIS_PASSWORD`              | Redis Password                       |
+| `SRVC_SEARCH_MONGODB_ENDPOINTS`           | MongoDB endpoint host(s)             |
+| `SRVC_SEARCH_MONGODB_DATABASE`            | MongoDB database name (`SrvcSearch`) |
+| `SRVC_SEARCH_MONGODB_COLLECTION`          | MongoDB collection (`SearchModel`)   |
+| `SRVC_SEARCH_ELASTIC_INDEX`               | Elastic index                        |
+| `SRVC_SEARCH_ELASTIC_HOST`                | Elastic host                         |
+| `SRVC_SEARCH_ELASTIC_USERNAME`            | Elastic username                     |
+| `SRVC_SEARCH_ELASTIC_PASSWORD`            | Elastic password                     |
