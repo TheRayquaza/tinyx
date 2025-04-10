@@ -10,7 +10,6 @@ import io.quarkus.runtime.Startup;
 import jakarta.annotation.PostConstruct;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
-import org.eclipse.microprofile.config.inject.ConfigProperty;
 
 @Startup
 @ApplicationScoped
@@ -19,13 +18,9 @@ public class RedisSubscriber implements Logger {
   private final PubSubCommands<PostAggregate> postSubscriber;
   private final PubSubCommands<UserAggregate> userSubscriber;
 
-  @ConfigProperty(name = "repo.post.aggregate.channel", defaultValue = "post-aggregate")
-  @Inject
-  String postChannel;
+  String postChannel = System.getenv().getOrDefault("POST_AGGREGATE_CHANNEL", "post_aggregate");
 
-  @ConfigProperty(name = "repo.user.aggregate.channel", defaultValue = "user-aggregate")
-  @Inject
-  String userChannel;
+  String userChannel =System.getenv().getOrDefault("USER_AGGREGATE_CHANNEL", "user_aggregate");
 
   @Inject SocialService socialService;
 

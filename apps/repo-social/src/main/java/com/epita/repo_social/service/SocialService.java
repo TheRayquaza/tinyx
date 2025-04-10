@@ -18,7 +18,6 @@ import com.epita.repo_social.service.entity.UserEntity;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import java.util.*;
-import org.eclipse.microprofile.config.inject.ConfigProperty;
 
 @ApplicationScoped
 public class SocialService implements Logger {
@@ -31,17 +30,11 @@ public class SocialService implements Logger {
 
   @Inject UserNodeToUserEntity userNodeToUserEntity;
 
-  @ConfigProperty(name = "repo.social.like.command.channel")
-  @Inject
-  String likeCommandChannel;
+  String likeCommandChannel = System.getenv().getOrDefault("LIKE_COMMAND_CHANNEL", "like_command");
 
-  @ConfigProperty(name = "repo.social.block.command.channel")
-  @Inject
-  String blockCommandChannel;
+  String blockCommandChannel = System.getenv().getOrDefault("BLOCK_COMMAND_CHANNEL", "block_command");
 
-  @ConfigProperty(name = "repo.social.follow.command.channel")
-  @Inject
-  String followCommandChannel;
+  String followCommandChannel = System.getenv().getOrDefault("FOLLOW_COMMAND_CHANNEL", "follow_command");
 
   @Inject PostNodeToPostEntity postNodeToPostEntity;
 
