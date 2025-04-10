@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import lombok.*;
 import org.bson.codecs.pojo.annotations.BsonId;
+import org.bson.types.ObjectId;
 
 @Getter
 @Setter
@@ -13,7 +14,7 @@ import org.bson.codecs.pojo.annotations.BsonId;
 @MongoEntity(collection = "HomeTimelineModel", database = "SrvcHomeTimeline")
 @With
 public class HomeTimelineModel {
-  @BsonId private String id;
+  @BsonId private ObjectId id;
   private String userId;
   private LocalDateTime createdAt;
   private List<HomeTimelineEntryModel> entries;

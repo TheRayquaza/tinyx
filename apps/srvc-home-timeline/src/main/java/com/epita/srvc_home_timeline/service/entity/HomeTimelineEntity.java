@@ -3,6 +3,10 @@ package com.epita.srvc_home_timeline.service.entity;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.List;
+
+import org.bson.codecs.pojo.annotations.BsonId;
+import org.bson.types.ObjectId;
+
 import lombok.*;
 
 @Getter
@@ -12,7 +16,7 @@ import lombok.*;
 @NoArgsConstructor
 @With
 public class HomeTimelineEntity implements Serializable {
-  private String Id;
+  @BsonId private ObjectId id;
   private String userId;
   private List<HomeTimelineEntryEntity> entries;
   private List<String> followersId;
