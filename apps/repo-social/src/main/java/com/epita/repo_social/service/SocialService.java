@@ -128,7 +128,7 @@ public class SocialService implements Logger {
 
     //Cannot follow yourself
     if (userId.equals(authService.getUserId())) {
-      throw RepoSocialErrorCode.FORBIDDEN.createError("Cannot follow yourself");
+      throw RepoSocialErrorCode.BAD_REQUEST.createError("Cannot follow yourself");
     }
 
     UserNode followerNode = new UserNode(authService.getUserId());
@@ -154,7 +154,7 @@ public class SocialService implements Logger {
 
     //Cannot unfollow yourself
     if (userId.equals(authService.getUserId())) {
-      throw RepoSocialErrorCode.FORBIDDEN.createError("Cannot unfollow yourself");
+      throw RepoSocialErrorCode.BAD_REQUEST.createError("Cannot unfollow yourself");
     }
 
     UserNode followerNode = new UserNode(authService.getUserId());
@@ -180,7 +180,7 @@ public class SocialService implements Logger {
 
     //Cannot block yourself
     if (userId.equals(authService.getUserId())) {
-      throw RepoSocialErrorCode.FORBIDDEN.createError("Cannot block yourself");
+      throw RepoSocialErrorCode.BAD_REQUEST.createError("Cannot block yourself");
     }
 
     UserNode blockerNode = new UserNode(authService.getUserId());
@@ -188,15 +188,6 @@ public class SocialService implements Logger {
 
     if (!neo4jRepository.checkNodeExists(blockedNode.findCypher())) {
       throw RepoSocialErrorCode.NOT_FOUND.createError("User not found");
-    }
-
-    if (isUserBlockedBy(blockerNode, blockedNode)) {
-        logger().info("User {} is blocked by user {}", blockerNode.userId(), blockedNode.userId());
-        throw RepoSocialErrorCode.FORBIDDEN.createError(
-                "User {} is blocked by the User {} - Cannot block user {}",
-                authService.getUserId(),
-                blockedNode.userId(),
-                blockedNode.userId());
     }
 
     // Delete follow relation with the user (Instagram behavior)
@@ -219,7 +210,7 @@ public class SocialService implements Logger {
 
     //Cannot unblock yourself
     if (userId.equals(authService.getUserId())) {
-      throw RepoSocialErrorCode.FORBIDDEN.createError("Cannot unblock yourself");
+      throw RepoSocialErrorCode.BAD_REQUEST.createError("Cannot unblock yourself");
     }
 
     UserNode blockerNode = new UserNode(authService.getUserId());
@@ -227,15 +218,6 @@ public class SocialService implements Logger {
 
     if (!neo4jRepository.checkNodeExists(blockedNode.findCypher())) {
       throw RepoSocialErrorCode.NOT_FOUND.createError("User not found");
-    }
-
-    if (isUserBlockedBy(blockerNode, blockedNode)) {
-      logger().info("User {} is blocked by user {}", blockerNode.userId(), blockedNode.userId());
-      throw RepoSocialErrorCode.FORBIDDEN.createError(
-              "User {} is blocked by the User {} - Cannot unblock user {}",
-              authService.getUserId(),
-              blockedNode.userId(),
-              blockedNode.userId());
     }
 
     BlockRelationship blockRelationship = new BlockRelationship(blockerNode, blockedNode);

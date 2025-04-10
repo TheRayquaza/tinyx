@@ -5,7 +5,7 @@ import lombok.Getter;
 
 @Getter
 public enum RepoSocialErrorCode implements ErrorCode {
-  INVALID_USER_DATA(400, "Invalid user data"),
+  BAD_REQUEST(400, "Bad request"),
   UNAUTHORIZED(401, "Unauthorized access"),
   FORBIDDEN(403, "Forbidden action"),
   NOT_FOUND(404, "Resource not found"),
