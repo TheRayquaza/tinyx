@@ -1,7 +1,9 @@
 package com.epita.repo_social.controller;
 
 import com.epita.exchange.auth.service.AuthService;
+import com.epita.repo_social.controller.response.PostResponse;
 import com.epita.repo_social.controller.response.UserResponse;
+import com.epita.repo_social.converter.PostEntityToPostResponse;
 import com.epita.repo_social.converter.UserEntityToUserResponse;
 import com.epita.repo_social.service.SocialService;
 import jakarta.inject.Inject;
@@ -22,6 +24,8 @@ public class RepoSocialController implements RepoSocialControllerApi {
 
   @Inject
   UserEntityToUserResponse userEntityToUserResponse;
+    @Inject
+    PostEntityToPostResponse postEntityToPostResponse;
 
   @POST
   @Path("/post/{id}/like")
@@ -85,6 +89,15 @@ public class RepoSocialController implements RepoSocialControllerApi {
         .map(userEntityToUserResponse::convertNotNull)
         .toList();
   }
+
+  @GET
+    @Path("/user/{id}/like")
+    public List<PostResponse> getUserLikedPosts (@PathParam("id") String userId) {
+        logger().info("GET /social/user/{}/like", userId);
+        return socialService.getUserLikedPosts(userId).stream()
+                .map(postEntityToPostResponse::convertNotNull)
+                .toList();
+    }
 
   @GET
   @Path("/user/{id}/follower")

@@ -134,4 +134,18 @@ public class Neo4jRepository {
         }
     }
 
+    public List<PostNode> getPosts(String cypherQuery) {
+        try (Session session = driver.session()) {
+            return session.executeRead(tx -> {
+                var result = tx.run(cypherQuery);
+                return result.list(record -> {
+                    var postNode = record.get("p").asNode();
+                    return PostNode.from(postNode);
+                });
+            });
+        } catch (Exception e) {
+            throw RepoSocialErrorCode.ERROR_DURING_CYPHER_EXEC.createError("Error while fetching likes", e);
+        }
+    }
+
 }
