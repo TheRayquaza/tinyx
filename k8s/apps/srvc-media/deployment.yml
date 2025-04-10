@@ -1,0 +1,126 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: srvc-media
+  namespace: apps
+  labels:
+    app: srvc-media
+spec:
+  replicas: 1 # TODO: make it 3
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 1
+      maxSurge: 1
+  selector:
+    matchLabels:
+      app: srvc-media
+  template:
+    metadata:
+      labels:
+        app: srvc-media
+    spec:
+      imagePullSecrets:
+        - name: pull-secret
+      containers:
+        - name: srvc-media
+          image: registry.cri.epita.fr/ing/majeures/tc/info/student/2026/2025-epitweet-tinyx-02/srvc-media:v1.0.0
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8080
+          resources:
+            requests:
+              memory: "256Mi"
+              cpu: "125m"
+            limits:
+              memory: "512Mi"
+              cpu: "250m"
+          env:
+            ## QUARKUS
+            - name: QUARKUS_LOG_LEVEL
+              valueFrom:
+                configMapKeyRef:
+                  name: apps-config
+                  key: QUARKUS_LOG_LEVEL
+            - name: QUARKUS_HTTP_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: apps-config
+                  key: QUARKUS_HTTP_PORT
+            - name: QUARKUS_HTTP_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: apps-config
+                  key: QUARKUS_HTTP_HOST
+            - name: QUARKUS_APP_PROFILE
+              valueFrom:
+                configMapKeyRef:
+                  name: apps-config
+                  key: QUARKUS_APP_PROFILE
+            
+            ## REDIS
+            - name: QUARKUS_REDIS_HOSTS
+              valueFrom:
+                configMapKeyRef:
+                  name: apps-config
+                  key: QUARKUS_REDIS_HOSTS
+            - name: QUARKUS_REDIS_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: apps-secret
+                  key: QUARKUS_REDIS_PASSWORD
+            - name: QUARKUS_REDIS_CLIENT_TYPE
+              valueFrom:
+                configMapKeyRef:
+                  name: apps-config
+                  key: QUARKUS_REDIS_CLIENT_TYPE
+            - name: QUARKUS_REDIS_RECONNECT_ATTEMPTS
+              valueFrom:
+                configMapKeyRef:
+                  name: apps-config
+                  key: QUARKUS_REDIS_RECONNECT_ATTEMPTS
+            - name: QUARKUS_REDIS_AUTO_FAILOVER
+              valueFrom:
+                configMapKeyRef:
+                  name: apps-config
+                  key: QUARKUS_REDIS_AUTO_FAILOVER
+            - name: POST_AGGREGATE_CHANNEL
+              valueFrom:
+                configMapKeyRef:
+                  name: apps-config
+                  key: POST_AGGREGATE_CHANNEL
+            - name: BLOCK_COMMAND_CHANNEL
+              valueFrom:
+                configMapKeyRef:
+                  name: apps-config
+                  key: BLOCK_COMMAND_CHANNEL
+            
+                  
+            ## MONGODB
+            - name: QUARKUS_MONGODB_CONNECTION_STRING
+              valueFrom:
+                secretKeyRef:
+                  name: srvc-media-secret
+                  key: SRVC_MEDIA_MONGODB_ENDPOINT
+
+            ## MINIO 
+            - name: S3_ENDPOINT
+              valueFrom:
+                configMapKeyRef:
+                  name: apps-config
+                  key: S3_ENDPOINT
+            - name: S3_BUCKET
+              valueFrom:
+                configMapKeyRef:
+                  name: apps-config
+                  key: S3_BUCKET
+            - name: S3_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: apps-secret
+                  key: S3_ACCESS_KEY
+            - name: S3_SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: apps-secret
+                  key: S3_SECRET_KEY
