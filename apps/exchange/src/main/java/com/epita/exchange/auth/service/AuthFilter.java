@@ -22,6 +22,7 @@ public class AuthFilter implements ContainerRequestFilter, Logger {
   public void filter(ContainerRequestContext requestContext) {
     String bearerToken = requestContext.getHeaderString("Authorization");
     if (requestContext.getUriInfo().getPath().equals("/login")
+        || requestContext.getUriInfo().getPath().equals("/minio")
         || (requestContext.getUriInfo().getPath().equals("/user")
             && requestContext.getRequest().getMethod().equals("POST"))) {
       logger().info("Ignoring login and account creation requests");
