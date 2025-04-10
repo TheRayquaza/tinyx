@@ -1,0 +1,15 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: repo-social
+  namespace: apps
+  labels:
+    app: repo-social
+spec:
+    type: ClusterIP
+    selector:
+      app: repo-social
+    ports:
+      - protocol: TCP
+        port: 8080
+        targetPort: 8080
