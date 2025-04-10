@@ -6,5 +6,5 @@ resources:
   - mongodb
   - minio-cluster/
   - elastic/
-  #- redis
+  - redis
   - neo4j

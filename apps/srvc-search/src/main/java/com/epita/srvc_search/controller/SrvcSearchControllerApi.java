@@ -18,7 +18,8 @@ import org.eclipse.microprofile.openapi.annotations.responses.APIResponses;
 @Path("/")
 public interface SrvcSearchControllerApi extends Logger {
 
-  @POST
+  @GET
+  @Path("/search")
   @Consumes(MediaType.APPLICATION_JSON)
   @Produces(MediaType.APPLICATION_JSON)
   @Operation(summary = "Search for posts")

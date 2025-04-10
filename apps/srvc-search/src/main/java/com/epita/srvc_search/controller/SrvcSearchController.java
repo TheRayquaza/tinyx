@@ -25,10 +25,8 @@ public class SrvcSearchController implements SrvcSearchControllerApi {
 
   @Inject AuthService authService;
 
-  @POST
+  @GET
   @Path("/search")
-  //    @Authenticated
-  @Authenticated
   @Override
   public List<SearchEntity> searchPosts(
       @RequestBody(required = true) @NotNull @Valid SearchRequest request) {
