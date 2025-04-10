@@ -7,6 +7,7 @@ import com.epita.exchange.auth.service.AuthContext;
 import com.epita.exchange.auth.service.AuthService;
 import com.epita.exchange.auth.service.entity.AuthEntity;
 import com.epita.exchange.redis.aggregate.PostAggregate;
+import com.epita.exchange.redis.aggregate.UserAggregate;
 import com.epita.exchange.redis.command.BlockCommand;
 import com.epita.exchange.redis.command.FollowCommand;
 import com.epita.exchange.redis.command.LikeCommand;
@@ -69,7 +70,7 @@ public class HomeTimelineTest {
 
   void publishAndWait(String channel, Object object) throws InterruptedException {
     redisPublisher.publish(channel, object);
-    Thread.sleep(1000);
+    Thread.sleep(300);
   }
 
   @BeforeAll
@@ -84,6 +85,42 @@ public class HomeTimelineTest {
   public void setupAuthContext() {
     AuthEntity authEntity1 = new AuthEntity(USER_ID_1, USER_1);
     authContext.setAuthEntity(authEntity1);
+  }
+  
+  @BeforeEach
+  void setupUsers() throws InterruptedException {
+    UserAggregate user1 = new UserAggregate();
+    user1.setId(USER_ID_1);
+    user1.setUsername(USER_1);
+    user1.setCreatedAt(LocalDateTime.now());
+    user1.setUpdatedAt(LocalDateTime.now());
+    user1.setDeleted(false);
+    UserAggregate user2 = new UserAggregate();
+    user2.setId(USER_ID_2);
+    user2.setUsername(USER_2);
+    user2.setCreatedAt(LocalDateTime.now());
+    user2.setUpdatedAt(LocalDateTime.now());
+    user2.setDeleted(false);
+    UserAggregate user3 = new UserAggregate();
+    user3.setId(USER_ID_3);
+    user3.setUsername(USER_3);
+    user3.setCreatedAt(LocalDateTime.now());
+    user3.setUpdatedAt(LocalDateTime.now());
+    user3.setDeleted(false);
+    UserAggregate user4 = new UserAggregate();
+    user4.setId(USER_ID_4);
+    user4.setUsername(USER_4);
+    user4.setCreatedAt(LocalDateTime.now());
+    user4.setUpdatedAt(LocalDateTime.now());
+    user4.setDeleted(false);
+    System.out.println("user 1 : " + user1);
+    publishAndWait("user_aggregate", user1);
+    System.out.println("user 2 : " + user2);
+    publishAndWait("user_aggregate", user2);
+    System.out.println("user 3 : " + user3);
+    publishAndWait("user_aggregate", user3);
+    System.out.println("user 4 : " + user4);
+    publishAndWait("user_aggregate", user4);
   }
 
   @Test
