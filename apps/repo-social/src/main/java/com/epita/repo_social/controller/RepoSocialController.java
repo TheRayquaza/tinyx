@@ -7,6 +7,7 @@ import com.epita.repo_social.service.SocialService;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
 
 import java.util.List;
 
@@ -25,49 +26,55 @@ public class RepoSocialController implements RepoSocialControllerApi {
   @POST
   @Path("/post/{id}/like")
   @Override
-  public void likePost(@PathParam("id") String postId) {
+  public Response likePost(@PathParam("id") String postId) {
     logger().info("POST /social/post/{}/like", postId);
     socialService.likePost(postId);
+    return Response.status(Response.Status.CREATED).build();
   }
 
   @DELETE
   @Path("/post/{id}/like")
   @Override
-  public void unlikePost(@PathParam("id") String postId) {
+  public Response unlikePost(@PathParam("id") String postId) {
     logger().info("DELETE /social/post/{}/like", postId);
     socialService.unlikePost(postId);
+    return Response.status(Response.Status.NO_CONTENT).build();
   }
 
   @POST
   @Path("/user/{id}/follow")
   @Override
-  public void followUser(@PathParam("id") String userId) {
+  public Response followUser(@PathParam("id") String userId) {
     logger().info("POST /social/user/{}/follow", userId);
     socialService.followUser(userId);
+    return Response.status(Response.Status.CREATED).build();
   }
 
   @DELETE
   @Path("/user/{id}/follow")
   @Override
-  public void unfollowUser(@PathParam("id") String userId) {
+  public Response unfollowUser(@PathParam("id") String userId) {
     logger().info("DELETE /social/user/{}/follow", userId);
     socialService.unfollowUser(userId);
+    return Response.status(Response.Status.NO_CONTENT).build();
   }
 
   @POST
   @Path("/user/{id}/block")
   @Override
-  public void blockUser(@PathParam("id") String userId) {
+  public Response blockUser(@PathParam("id") String userId) {
     logger().info("POST /social/user/{}/block", userId);
     socialService.blockUser(userId);
+    return Response.status(Response.Status.CREATED).build();
   }
 
   @DELETE
   @Path("/user/{id}/block")
   @Override
-  public void unblockUser(@PathParam("id") String userId) {
+  public Response unblockUser(@PathParam("id") String userId) {
     logger().info("DELETE /social/user/{}/block", userId);
     socialService.unblockUser(userId);
+    return Response.status(Response.Status.NO_CONTENT).build();
   }
 
   @GET
@@ -107,7 +114,7 @@ public class RepoSocialController implements RepoSocialControllerApi {
   }
 
   @GET
-  @Path("/user/{id}/blockedby")
+  @Path("/user/{id}/blockedBy")
   public List<UserResponse> getBlockedBy (@PathParam("id") String userId) {
     logger().info("GET /social/user/block");
     return socialService.getUserBlockedBy(userId).stream()
