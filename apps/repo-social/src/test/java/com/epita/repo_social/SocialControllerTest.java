@@ -300,7 +300,7 @@ class RepoSocialControllerTest {
     }
 
     @Test
-    @Order(8)
+    @Order(9)
     void followUserBlockedby() {
         // Tenter de suivre un user en étant bloqué
         String token = AuthService.generateToken(USER_ID_2, USERNAME_2);
@@ -322,29 +322,7 @@ class RepoSocialControllerTest {
     }
 
     @Test
-    @Order(8)
-    void blockUserBlockedby() {
-        // Tenter de bloquer un user en étant bloqué
-        String token = AuthService.generateToken(USER_ID_2, USERNAME_2);
-        AuthEntity authEntity = new AuthEntity(USER_ID_2, USERNAME_2);
-        authContext.setAuthEntity(authEntity);
-
-        Response response =
-                given()
-                        .contentType(ContentType.JSON)
-                        .header("Authorization", "Bearer " + token)
-                        .when()
-                        .post("/user/" + USER_ID_1 + "/block")
-                        .then()
-                        .extract()
-                        .response();
-
-        System.out.println(response.body().prettyPrint());
-        response.then().statusCode(403).extract().response();
-    }
-
-    @Test
-    @Order(9)
+    @Order(10)
     void getPostLikesOfBlockedUser() {
         // Tenter de récupérer les likes d'un post d'un user bloqué}
         String token = AuthService.generateToken(USER_ID_1, USERNAME_1);
@@ -366,7 +344,7 @@ class RepoSocialControllerTest {
     }
 
     @Test
-    @Order(10)
+    @Order(11)
     void getPostLikesBlockedByUser() {
         // Tenter de récupérer les likes d'un post en étant bloqué
         String token = AuthService.generateToken(USER_ID_2, USERNAME_2);
@@ -386,7 +364,7 @@ class RepoSocialControllerTest {
     }
 
     @Test
-    @Order(11)
+    @Order(12)
     void getFollowersOfBlockedUser() {
         // Tenter de récupérer les followers d'un user bloqué
         String token = AuthService.generateToken(USER_ID_1, USERNAME_1);
@@ -408,7 +386,7 @@ class RepoSocialControllerTest {
     }
 
     @Test
-    @Order(12)
+    @Order(13)
     void getFollowersBlockedByUser() {
         // Tenter de récupérer les followers d'un user en étant bloqué
         String token = AuthService.generateToken(USER_ID_2, USERNAME_2);
@@ -428,7 +406,7 @@ class RepoSocialControllerTest {
     }
 
     @Test
-    @Order(13)
+    @Order(14)
     void getFollowingOfBlockedUser() {
         // Tenter de récupérer les following d'un user bloqué
         String token = AuthService.generateToken(USER_ID_1, USERNAME_1);
@@ -448,7 +426,7 @@ class RepoSocialControllerTest {
     }
 
     @Test
-    @Order(14)
+    @Order(15)
     void getFollowingBlockedByUser() {
         // Tenter de récupérer les following d'un user en étant bloqué
         String token = AuthService.generateToken(USER_ID_2, USERNAME_2);
@@ -468,7 +446,7 @@ class RepoSocialControllerTest {
     }
 
     @Test
-    @Order(15)
+    @Order(16)
     void getBlockedOfBlockedUsers() {
         // Tenter de récupérer les blocked d'un user bloqué
         String token = AuthService.generateToken(USER_ID_1, USERNAME_1);
@@ -488,7 +466,7 @@ class RepoSocialControllerTest {
     }
 
     @Test
-    @Order(16)
+    @Order(17)
     void getBlockedByBlockedUser() {
         // Tenter de récupérer les blocked d'un user en étant bloqué
         String token = AuthService.generateToken(USER_ID_2, USERNAME_2);
@@ -508,7 +486,7 @@ class RepoSocialControllerTest {
     }
 
     @Test
-    @Order(17)
+    @Order(18)
     void getBlockedByOfBlockedUser() {
         // Tenter de récupérer les blockedBy d'un user bloqué
         String token = AuthService.generateToken(USER_ID_1, USERNAME_1);
@@ -528,7 +506,7 @@ class RepoSocialControllerTest {
     }
 
     @Test
-    @Order(18)
+    @Order(19)
     void getBlockedByOfBlockedByUser() {
         // Tenter de récupérer les blockedBy d'un user en étant bloqué
         String token = AuthService.generateToken(USER_ID_2, USERNAME_2);
@@ -549,7 +527,7 @@ class RepoSocialControllerTest {
 
 
     @Test
-    @Order(19)
+    @Order(20)
     void unblockUser() {
         String token = AuthService.generateToken(USER_ID_1, USERNAME_1);
         AuthEntity authEntity = new AuthEntity(USER_ID_1, USERNAME_1);
@@ -573,5 +551,777 @@ class RepoSocialControllerTest {
                 "MATCH (u1:User {userId: \"" + USER_ID_1 + "\"})-[r:BLOCKS]->(u2:User {userId: \"" + USER_ID_2 + "\"}) RETURN r"
         );
         assert !relationExists;
+    }
+
+    @Test
+    @Order(21)
+    void getUserFollowersEmpty() {
+        String token = AuthService.generateToken(USER_ID_1, USERNAME_1);
+        AuthEntity authEntity = new AuthEntity(USER_ID_1, USERNAME_1);
+        authContext.setAuthEntity(authEntity);
+
+        Response response =
+                given()
+                        .contentType(ContentType.JSON)
+                        .header("Authorization", "Bearer " + token)
+                        .when()
+                        .get("/user/" + USER_ID_2 + "/follower")
+                        .then()
+                        .extract()
+                        .response();
+
+        System.out.println(response.body().prettyPrint());
+        response
+                .then()
+                .statusCode(200)
+                .body("followers", notNullValue())
+                .body("followers", hasSize(0))
+                .extract()
+                .response();
+    }
+
+    @Test
+    @Order(22)
+    void getUserFollowingEmpty() {
+        String token = AuthService.generateToken(USER_ID_1, USERNAME_1);
+        AuthEntity authEntity = new AuthEntity(USER_ID_1, USERNAME_1);
+        authContext.setAuthEntity(authEntity);
+
+        Response response =
+                given()
+                        .contentType(ContentType.JSON)
+                        .header("Authorization", "Bearer " + token)
+                        .when()
+                        .get("/user/" + USER_ID_2 + "/following")
+                        .then()
+                        .extract()
+                        .response();
+
+        System.out.println(response.body().prettyPrint());
+        response
+                .then()
+                .statusCode(200)
+                .body("following", notNullValue())
+                .body("following", hasSize(0))
+                .extract()
+                .response();
+    }
+
+    @Test
+    @Order(23)
+    void getUserBlockedEmpty() {
+        String token = AuthService.generateToken(USER_ID_1, USERNAME_1);
+        AuthEntity authEntity = new AuthEntity(USER_ID_1, USERNAME_1);
+        authContext.setAuthEntity(authEntity);
+
+        Response response =
+                given()
+                        .contentType(ContentType.JSON)
+                        .header("Authorization", "Bearer " + token)
+                        .when()
+                        .get("/user/" + USER_ID_2 + "/blocked")
+                        .then()
+                        .extract()
+                        .response();
+
+        System.out.println(response.body().prettyPrint());
+        response
+                .then()
+                .statusCode(200)
+                .body("blocked", notNullValue())
+                .body("blocked", hasSize(0))
+                .extract()
+                .response();
+    }
+
+    @Test
+    @Order(24)
+    void getUserBlockedByEmpty() {
+        String token = AuthService.generateToken(USER_ID_1, USERNAME_1);
+        AuthEntity authEntity = new AuthEntity(USER_ID_1, USERNAME_1);
+        authContext.setAuthEntity(authEntity);
+
+        Response response =
+                given()
+                        .contentType(ContentType.JSON)
+                        .header("Authorization", "Bearer " + token)
+                        .when()
+                        .get("/user/" + USER_ID_2 + "/blockedBy")
+                        .then()
+                        .extract()
+                        .response();
+
+        System.out.println(response.body().prettyPrint());
+        response
+                .then()
+                .statusCode(200)
+                .body("blockedBy", notNullValue())
+                .body("blockedBy", hasSize(0))
+                .extract()
+                .response();
+    }
+
+
+    @Test
+    @Order(25)
+    void likePostAlreadyLiked() {
+        String token = AuthService.generateToken(USER_ID_1, USERNAME_1);
+        AuthEntity authEntity = new AuthEntity(USER_ID_1, USERNAME_1);
+        authContext.setAuthEntity(authEntity);
+
+        Response responseFirstLike =
+                given()
+                        .contentType(ContentType.JSON)
+                        .header("Authorization", "Bearer " + token)
+                        .when()
+                        .post("/post/" + POST_ID_2 + "/like")
+                        .then()
+                        .extract()
+                        .response();
+
+        System.out.println(responseFirstLike.body().prettyPrint());
+        responseFirstLike.then().statusCode(201).extract().response();
+
+        Response responseSecondLike =
+                given()
+                        .contentType(ContentType.JSON)
+                        .header("Authorization", "Bearer " + token)
+                        .when()
+                        .post("/post/" + POST_ID_2 + "/like")
+                        .then()
+                        .extract()
+                        .response();
+        System.out.println(responseSecondLike.body().prettyPrint());
+        responseSecondLike.then().statusCode(201).extract().response();
+    }
+
+    @Test
+    @Order(26)
+    void unlikePostNotLiked() {
+        String token = AuthService.generateToken(USER_ID_2, USERNAME_2);
+        AuthEntity authEntity = new AuthEntity(USER_ID_2, USERNAME_2);
+        authContext.setAuthEntity(authEntity);
+        Response response =
+                given()
+                        .contentType(ContentType.JSON)
+                        .header("Authorization", "Bearer " + token)
+                        .when()
+                        .delete("/post/" + POST_ID_1 + "/like")
+                        .then()
+                        .extract()
+                        .response();
+        System.out.println(response.body().prettyPrint());
+        response.then().statusCode(204).extract().response();
+    }
+
+    @Test
+    @Order(27)
+    void followUserAlreadyFollowed() {
+        String token = AuthService.generateToken(USER_ID_1, USERNAME_1);
+        AuthEntity authEntity = new AuthEntity(USER_ID_1, USERNAME_1);
+        authContext.setAuthEntity(authEntity);
+
+        Response responseFirstFollow =
+                given()
+                        .contentType(ContentType.JSON)
+                        .header("Authorization", "Bearer " + token)
+                        .when()
+                        .post("/user/" + USER_ID_2 + "/follow")
+                        .then()
+                        .extract()
+                        .response();
+
+        System.out.println(responseFirstFollow.body().prettyPrint());
+        responseFirstFollow.then().statusCode(201).extract().response();
+
+        Response responseSecondFollow =
+                given()
+                        .contentType(ContentType.JSON)
+                        .header("Authorization", "Bearer " + token)
+                        .when()
+                        .post("/user/" + USER_ID_2 + "/follow")
+                        .then()
+                        .extract()
+                        .response();
+        System.out.println(responseSecondFollow.body().prettyPrint());
+        responseSecondFollow.then().statusCode(201).extract().response();
+    }
+
+    @Test
+    @Order(28)
+    void unfollowUserNotFollowed() {
+        String token = AuthService.generateToken(USER_ID_2, USERNAME_2);
+        AuthEntity authEntity = new AuthEntity(USER_ID_2, USERNAME_2);
+        authContext.setAuthEntity(authEntity);
+
+        Response response =
+                given()
+                        .contentType(ContentType.JSON)
+                        .header("Authorization", "Bearer " + token)
+                        .when()
+                        .delete("/user/" + USER_ID_1 + "/follow")
+                        .then()
+                        .extract()
+                        .response();
+
+        System.out.println(response.body().prettyPrint());
+        response.then().statusCode(204).extract().response();
+    }
+
+    @Test
+    @Order(29)
+    void blockUserAlreadyBlocked() {
+        String token = AuthService.generateToken(USER_ID_3, USERNAME_3);
+        AuthEntity authEntity = new AuthEntity(USER_ID_3, USERNAME_3);
+        authContext.setAuthEntity(authEntity);
+
+        Response responseFirstBlock =
+                given()
+                        .contentType(ContentType.JSON)
+                        .header("Authorization", "Bearer " + token)
+                        .when()
+                        .post("/user/" + USER_ID_4 + "/block")
+                        .then()
+                        .extract()
+                        .response();
+
+        System.out.println(responseFirstBlock.body().prettyPrint());
+        responseFirstBlock.then().statusCode(201).extract().response();
+
+        Response responseSecondBlock =
+                given()
+                        .contentType(ContentType.JSON)
+                        .header("Authorization", "Bearer " + token)
+                        .when()
+                        .post("/user/" + USER_ID_4 + "/block")
+                        .then()
+                        .extract()
+                        .response();
+        System.out.println(responseSecondBlock.body().prettyPrint());
+        responseSecondBlock.then().statusCode(201).extract().response();
+    }
+
+    @Test
+    @Order(30)
+    void unblockUserNotBlocked() {
+        String token = AuthService.generateToken(USER_ID_4, USERNAME_4);
+        AuthEntity authEntity = new AuthEntity(USER_ID_4, USERNAME_4);
+        authContext.setAuthEntity(authEntity);
+
+        Response response =
+                given()
+                        .contentType(ContentType.JSON)
+                        .header("Authorization", "Bearer " + token)
+                        .when()
+                        .delete("/user/" + USER_ID_3 + "/block")
+                        .then()
+                        .extract()
+                        .response();
+
+        System.out.println(response.body().prettyPrint());
+        response.then().statusCode(204).extract().response();
+    }
+
+    @Test
+    @Order(31)
+    void getPostLikesOne() {
+        String token = AuthService.generateToken(USER_ID_1, USERNAME_1);
+        AuthEntity authEntity = new AuthEntity(USER_ID_1, USERNAME_1);
+        authContext.setAuthEntity(authEntity);
+
+        Response response =
+                given()
+                        .contentType(ContentType.JSON)
+                        .header("Authorization", "Bearer " + token)
+                        .when()
+                        .get("/post/" + POST_ID_2 + "/like")
+                        .then()
+                        .extract()
+                        .response();
+
+        System.out.println(response.body().prettyPrint());
+        //verify if the response is a list of users of size one with the id of user-1
+        response
+                .then()
+                .statusCode(200)
+                .body("size()", is(1))
+                .body("[0].id", is(USER_ID_1))
+                .extract()
+                .response();
+    }
+
+    @Test
+    @Order(32)
+    void getUserFollowersOne() {
+        String token = AuthService.generateToken(USER_ID_1, USERNAME_1);
+        AuthEntity authEntity = new AuthEntity(USER_ID_1, USERNAME_1);
+        authContext.setAuthEntity(authEntity);
+
+        Response response =
+                given()
+                        .contentType(ContentType.JSON)
+                        .header("Authorization", "Bearer " + token)
+                        .when()
+                        .get("/user/" + USER_ID_2 + "/follower")
+                        .then()
+                        .extract()
+                        .response();
+
+        System.out.println(response.body().prettyPrint());
+        response
+                .then()
+                .statusCode(200)
+                .body("size()", is(1))
+                .body("[0].id", is(USER_ID_1))
+                .extract()
+                .response();
+    }
+
+    @Test
+    @Order(33)
+    void getUserFollowingOne() {
+        String token = AuthService.generateToken(USER_ID_1, USERNAME_1);
+        AuthEntity authEntity = new AuthEntity(USER_ID_1, USERNAME_1);
+        authContext.setAuthEntity(authEntity);
+
+        Response response =
+                given()
+                        .contentType(ContentType.JSON)
+                        .header("Authorization", "Bearer " + token)
+                        .when()
+                        .get("/user/" + USER_ID_1 + "/following")
+                        .then()
+                        .extract()
+                        .response();
+
+        System.out.println(response.body().prettyPrint());
+        response
+                .then()
+                .statusCode(200)
+                .body("size()", is(1))
+                .body("[0].id", is(USER_ID_2))
+                .extract()
+                .response();
+    }
+
+    @Test
+    @Order(34)
+    void getUserBlockedOne() {
+        String token = AuthService.generateToken(USER_ID_1, USERNAME_1);
+        AuthEntity authEntity = new AuthEntity(USER_ID_1, USERNAME_1);
+        authContext.setAuthEntity(authEntity);
+
+        Response response =
+                given()
+                        .contentType(ContentType.JSON)
+                        .header("Authorization", "Bearer " + token)
+                        .when()
+                        .get("/user/" + USER_ID_3 + "/blocked")
+                        .then()
+                        .extract()
+                        .response();
+
+        System.out.println(response.body().prettyPrint());
+        response
+                .then()
+                .statusCode(200)
+                .body("size()", is(1))
+                .body("[0].id", is(USER_ID_4))
+                .extract()
+                .response();
+    }
+
+    @Test
+    @Order(35)
+    void getUserBlockedByOne() {
+        String token = AuthService.generateToken(USER_ID_1, USERNAME_1);
+        AuthEntity authEntity = new AuthEntity(USER_ID_1, USERNAME_1);
+        authContext.setAuthEntity(authEntity);
+
+        Response response =
+                given()
+                        .contentType(ContentType.JSON)
+                        .header("Authorization", "Bearer " + token)
+                        .when()
+                        .get("/user/" + USER_ID_4 + "/blockedBy")
+                        .then()
+                        .extract()
+                        .response();
+
+        System.out.println(response.body().prettyPrint());
+        response
+                .then()
+                .statusCode(200)
+                .body("size()", is(1))
+                .body("[0].id", is(USER_ID_3))
+                .extract()
+                .response();
+    }
+
+    // test every endpoints with unexisting post / user id
+    @Test
+    @Order(36)
+    void likePostUnexisting() {
+        String token = AuthService.generateToken(USER_ID_1, USERNAME_1);
+        AuthEntity authEntity = new AuthEntity(USER_ID_1, USERNAME_1);
+        authContext.setAuthEntity(authEntity);
+
+        Response response =
+                given()
+                        .contentType(ContentType.JSON)
+                        .header("Authorization", "Bearer " + token)
+                        .when()
+                        .post("/post/" + "unexisting" + "/like")
+                        .then()
+                        .extract()
+                        .response();
+
+        System.out.println(response.body().prettyPrint());
+        response.then().statusCode(404).extract().response();
+    }
+
+    @Test
+    @Order(37)
+    void unlikePostUnexisting() {
+        String token = AuthService.generateToken(USER_ID_1, USERNAME_1);
+        AuthEntity authEntity = new AuthEntity(USER_ID_1, USERNAME_1);
+        authContext.setAuthEntity(authEntity);
+
+        Response response =
+                given()
+                        .contentType(ContentType.JSON)
+                        .header("Authorization", "Bearer " + token)
+                        .when()
+                        .delete("/post/" + "unexisting" + "/like")
+                        .then()
+                        .extract()
+                        .response();
+
+        System.out.println(response.body().prettyPrint());
+        response.then().statusCode(404).extract().response();
+    }
+
+    @Test
+    @Order(38)
+    void followUserUnexisting() {
+        String token = AuthService.generateToken(USER_ID_1, USERNAME_1);
+        AuthEntity authEntity = new AuthEntity(USER_ID_1, USERNAME_1);
+        authContext.setAuthEntity(authEntity);
+
+        Response response =
+                given()
+                        .contentType(ContentType.JSON)
+                        .header("Authorization", "Bearer " + token)
+                        .when()
+                        .post("/user/" + "unexisting" + "/follow")
+                        .then()
+                        .extract()
+                        .response();
+
+        System.out.println(response.body().prettyPrint());
+        response.then().statusCode(404).extract().response();
+    }
+
+    @Test
+    @Order(39)
+    void unfollowUserUnexisting() {
+        String token = AuthService.generateToken(USER_ID_1, USERNAME_1);
+        AuthEntity authEntity = new AuthEntity(USER_ID_1, USERNAME_1);
+        authContext.setAuthEntity(authEntity);
+
+        Response response =
+                given()
+                        .contentType(ContentType.JSON)
+                        .header("Authorization", "Bearer " + token)
+                        .when()
+                        .delete("/user/" + "unexisting" + "/follow")
+                        .then()
+                        .extract()
+                        .response();
+
+        System.out.println(response.body().prettyPrint());
+        response.then().statusCode(404).extract().response();
+    }
+
+    @Test
+    @Order(40)
+    void blockUserUnexisting() {
+        String token = AuthService.generateToken(USER_ID_1, USERNAME_1);
+        AuthEntity authEntity = new AuthEntity(USER_ID_1, USERNAME_1);
+        authContext.setAuthEntity(authEntity);
+
+        Response response =
+                given()
+                        .contentType(ContentType.JSON)
+                        .header("Authorization", "Bearer " + token)
+                        .when()
+                        .post("/user/" + "unexisting" + "/block")
+                        .then()
+                        .extract()
+                        .response();
+
+        System.out.println(response.body().prettyPrint());
+        response.then().statusCode(404).extract().response();
+    }
+
+    @Test
+    @Order(41)
+    void unblockUserUnexisting() {
+        String token = AuthService.generateToken(USER_ID_1, USERNAME_1);
+        AuthEntity authEntity = new AuthEntity(USER_ID_1, USERNAME_1);
+        authContext.setAuthEntity(authEntity);
+
+        Response response =
+                given()
+                        .contentType(ContentType.JSON)
+                        .header("Authorization", "Bearer " + token)
+                        .when()
+                        .delete("/user/" + "unexisting" + "/block")
+                        .then()
+                        .extract()
+                        .response();
+
+        System.out.println(response.body().prettyPrint());
+        response.then().statusCode(404).extract().response();
+    }
+
+    @Test
+    @Order(42)
+    void getPostLikesUnexisting() {
+        String token = AuthService.generateToken(USER_ID_1, USERNAME_1);
+        AuthEntity authEntity = new AuthEntity(USER_ID_1, USERNAME_1);
+        authContext.setAuthEntity(authEntity);
+
+        Response response =
+                given()
+                        .contentType(ContentType.JSON)
+                        .header("Authorization", "Bearer " + token)
+                        .when()
+                        .get("/post/" + "unexisting" + "/like")
+                        .then()
+                        .extract()
+                        .response();
+
+        System.out.println(response.body().prettyPrint());
+        response.then().statusCode(404).extract().response();
+    }
+
+    @Test
+    @Order(43)
+    void getUserFollowersUnexisting() {
+        String token = AuthService.generateToken(USER_ID_1, USERNAME_1);
+        AuthEntity authEntity = new AuthEntity(USER_ID_1, USERNAME_1);
+        authContext.setAuthEntity(authEntity);
+
+        Response response =
+                given()
+                        .contentType(ContentType.JSON)
+                        .header("Authorization", "Bearer " + token)
+                        .when()
+                        .get("/user/" + "unexisting" + "/follower")
+                        .then()
+                        .extract()
+                        .response();
+
+        System.out.println(response.body().prettyPrint());
+        response.then().statusCode(404).extract().response();
+    }
+
+    @Test
+    @Order(44)
+    void getUserFollowingUnexisting() {
+        String token = AuthService.generateToken(USER_ID_1, USERNAME_1);
+        AuthEntity authEntity = new AuthEntity(USER_ID_1, USERNAME_1);
+        authContext.setAuthEntity(authEntity);
+
+        Response response =
+                given()
+                        .contentType(ContentType.JSON)
+                        .header("Authorization", "Bearer " + token)
+                        .when()
+                        .get("/user/" + "unexisting" + "/following")
+                        .then()
+                        .extract()
+                        .response();
+
+        System.out.println(response.body().prettyPrint());
+        response.then().statusCode(404).extract().response();
+    }
+
+    @Test
+    @Order(45)
+    void getUserBlockedUnexisting() {
+        String token = AuthService.generateToken(USER_ID_1, USERNAME_1);
+        AuthEntity authEntity = new AuthEntity(USER_ID_1, USERNAME_1);
+        authContext.setAuthEntity(authEntity);
+
+        Response response =
+                given()
+                        .contentType(ContentType.JSON)
+                        .header("Authorization", "Bearer " + token)
+                        .when()
+                        .get("/user/" + "unexisting" + "/blocked")
+                        .then()
+                        .extract()
+                        .response();
+
+        System.out.println(response.body().prettyPrint());
+        response.then().statusCode(404).extract().response();
+    }
+
+    @Test
+    @Order(46)
+    void getUserBlockedByUnexisting() {
+        String token = AuthService.generateToken(USER_ID_1, USERNAME_1);
+        AuthEntity authEntity = new AuthEntity(USER_ID_1, USERNAME_1);
+        authContext.setAuthEntity(authEntity);
+
+        Response response =
+                given()
+                        .contentType(ContentType.JSON)
+                        .header("Authorization", "Bearer " + token)
+                        .when()
+                        .get("/user/" + "unexisting" + "/blockedBy")
+                        .then()
+                        .extract()
+                        .response();
+
+        System.out.println(response.body().prettyPrint());
+        response.then().statusCode(404).extract().response();
+    }
+
+    @Test
+    @Order(47)
+    void blockingDeletesFollowRelationship() {
+        String token = AuthService.generateToken(USER_ID_2, USERNAME_2);
+        AuthEntity authEntity = new AuthEntity(USER_ID_2, USERNAME_2);
+        authContext.setAuthEntity(authEntity);
+
+        // follow user 1
+        Response responseFollow =
+                given()
+                        .contentType(ContentType.JSON)
+                        .header("Authorization", "Bearer " + token)
+                        .when()
+                        .post("/user/" + USER_ID_1 + "/follow")
+                        .then()
+                        .extract()
+                        .response();
+
+        Response responseBlock =
+                given()
+                        .contentType(ContentType.JSON)
+                        .header("Authorization", "Bearer " + token)
+                        .when()
+                        .post("/user/" + USER_ID_1 + "/block")
+                        .then()
+                        .extract()
+                        .response();
+
+        //get the followers and following of user 2
+        Response responseFollower =
+                given()
+                        .contentType(ContentType.JSON)
+                        .header("Authorization", "Bearer " + token)
+                        .when()
+                        .get("/user/" + USER_ID_2 + "/follower")
+                        .then()
+                        .extract()
+                        .response();
+
+        responseFollower
+                .then()
+                .statusCode(200)
+                .body("size()", is(0))
+                .extract()
+                .response();
+
+        Response responseFollowing =
+                given()
+                        .contentType(ContentType.JSON)
+                        .header("Authorization", "Bearer " + token)
+                        .when()
+                        .get("/user/" + USER_ID_2 + "/following")
+                        .then()
+                        .extract()
+                        .response();
+        responseFollowing
+                .then()
+                .statusCode(200)
+                .body("size()", is(0))
+                .extract()
+                .response();
+    }
+
+    @Test
+    @Order(48)
+    void cannotFollowOrUnfollowYourself() {
+        String token = AuthService.generateToken(USER_ID_1, USERNAME_1);
+        AuthEntity authEntity = new AuthEntity(USER_ID_1, USERNAME_1);
+        authContext.setAuthEntity(authEntity);
+
+        // Tenter de suivre soi-même
+        Response responseFollow =
+                given()
+                        .contentType(ContentType.JSON)
+                        .header("Authorization", "Bearer " + token)
+                        .when()
+                        .post("/user/" + USER_ID_1 + "/follow")
+                        .then()
+                        .extract()
+                        .response();
+
+        System.out.println(responseFollow.body().prettyPrint());
+        responseFollow.then().statusCode(400).extract().response();
+
+        // Tenter de ne plus suivre soi-même
+        Response responseUnfollow =
+                given()
+                        .contentType(ContentType.JSON)
+                        .header("Authorization", "Bearer " + token)
+                        .when()
+                        .delete("/user/" + USER_ID_1 + "/follow")
+                        .then()
+                        .extract()
+                        .response();
+
+        System.out.println(responseUnfollow.body().prettyPrint());
+        responseUnfollow.then().statusCode(400).extract().response();
+    }
+
+    @Test
+    @Order(49)
+    void cannotBlockOrUnblockYourself() {
+        String token = AuthService.generateToken(USER_ID_1, USERNAME_1);
+        AuthEntity authEntity = new AuthEntity(USER_ID_1, USERNAME_1);
+        authContext.setAuthEntity(authEntity);
+
+        // Tenter de bloquer soi-même
+        Response responseBlock =
+                given()
+                        .contentType(ContentType.JSON)
+                        .header("Authorization", "Bearer " + token)
+                        .when()
+                        .post("/user/" + USER_ID_1 + "/block")
+                        .then()
+                        .extract()
+                        .response();
+
+        System.out.println(responseBlock.body().prettyPrint());
+        responseBlock.then().statusCode(400).extract().response();
+
+        // Tenter de ne plus bloquer soi-même
+        Response responseUnblock =
+                given()
+                        .contentType(ContentType.JSON)
+                        .header("Authorization", "Bearer " + token)
+                        .when()
+                        .delete("/user/" + USER_ID_1 + "/block")
+                        .then()
+                        .extract()
+                        .response();
+
+        System.out.println(responseUnblock.body().prettyPrint());
+        responseUnblock.then().statusCode(400).extract().response();
     }
 }
