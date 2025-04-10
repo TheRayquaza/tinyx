@@ -7,7 +7,7 @@ import com.epita.srvc_home_timeline.service.HomeTimelineService;
 import io.quarkus.redis.datasource.RedisDataSource;
 import io.quarkus.redis.datasource.pubsub.PubSubCommands;
 import jakarta.annotation.PreDestroy;
-import jakarta.ejb.Startup;
+import io.quarkus.runtime.Startup;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import java.util.function.Consumer;

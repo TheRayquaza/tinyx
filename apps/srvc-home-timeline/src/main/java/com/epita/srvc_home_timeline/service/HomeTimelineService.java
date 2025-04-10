@@ -13,6 +13,8 @@ import com.epita.srvc_home_timeline.repository.model.HomeTimelinePostModel;
 import com.epita.srvc_home_timeline.service.entity.HomeTimelineEntity;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
+import org.jboss.logging.Logger;
+
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -27,6 +29,8 @@ public class HomeTimelineService {
   @Inject HomeTimelinePostModelToHomeTimelinePostEntity homeTimelinePostModelToEntity;
   @Inject HomeTimelineEntityToHomeTimelineModel homeTimelineEnityToModel;
   @Inject HomeTimelinePostRepository homeTimelinePostRepository;
+    @Inject
+    Logger logger;
 
   HomeTimelineModel initHomeTimeline(String userId) {
     HomeTimelineModel homeTimelineModel = new HomeTimelineModel();
@@ -129,6 +133,7 @@ public class HomeTimelineService {
   }
 
   public void handleFollow(String userId, String followerId) {
+    logger.info("received follow with user id: %s and follower id: %s".formatted(userId, followerId));
     Optional<HomeTimelineModel> homeTimeline = homeTimelineRepository.findByUserId(userId);
     if (homeTimeline.isPresent()) {
       HomeTimelineModel homeTimelineModel = homeTimeline.get();
