@@ -16,9 +16,7 @@ import org.eclipse.microprofile.config.inject.ConfigProperty;
 @Startup
 @ApplicationScoped
 public class FollowCommandSubscriber implements Consumer<FollowCommand> {
-  @Inject
-  @ConfigProperty(name = "repo.social.command.channel", defaultValue = "follow_command")
-  String channel;
+  String channel = System.getenv().getOrDefault("FOLLOW_COMMAND_CHANNEL", "follow_command");
 
   private final PubSubCommands.RedisSubscriber subscriber;
   @Inject HomeTimelineService homeTimelineService;

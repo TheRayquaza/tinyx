@@ -16,9 +16,7 @@ import org.eclipse.microprofile.config.inject.ConfigProperty;
 @Startup
 @ApplicationScoped
 public class BlockCommandSubscriber implements Consumer<BlockCommand> {
-  @Inject
-  @ConfigProperty(name = "repo.social.command.channel", defaultValue = "block_command")
-  String channel;
+  String channel = System.getenv().getOrDefault("BLOCK_COMMAND_CHANNEL", "block_command");
 
   private final PubSubCommands.RedisSubscriber subscriber;
   @Inject HomeTimelineService homeTimelineService;

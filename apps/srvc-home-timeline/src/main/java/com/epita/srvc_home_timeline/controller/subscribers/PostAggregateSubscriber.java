@@ -16,9 +16,7 @@ import org.eclipse.microprofile.config.inject.ConfigProperty;
 @Startup
 @ApplicationScoped
 public class PostAggregateSubscriber implements Consumer<PostAggregate> {
-  @Inject
-  @ConfigProperty(name = "repo.post.aggregate.channel", defaultValue = "post_aggregate")
-  String channel;
+  String channel = System.getenv().getOrDefault("POST_AGGREGATE_CHANNEL", "post_aggregate");
 
   private final PubSubCommands.RedisSubscriber subscriber;
   @Inject HomeTimelineService homeTimelineService;

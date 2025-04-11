@@ -16,9 +16,7 @@ import org.eclipse.microprofile.config.inject.ConfigProperty;
 @Startup
 @ApplicationScoped
 public class LikeCommandSubscriber implements Consumer<LikeCommand> {
-  @Inject
-  @ConfigProperty(name = "repo.social.command.channel", defaultValue = "like_command")
-  String channel;
+  String channel = System.getenv().getOrDefault("LIKE_COMMAND_CHANNEL", "like_command");
 
   private final PubSubCommands.RedisSubscriber subscriber;
   @Inject HomeTimelineService homeTimelineService;

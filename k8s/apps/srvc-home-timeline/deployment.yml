@@ -59,7 +59,9 @@ spec:
                 configMapKeyRef:
                   name: apps-config
                   key: QUARKUS_APP_PROFILE
-            ## REDIS
+             
+                 
+             ## REDIS
             - name: QUARKUS_REDIS_HOSTS
               valueFrom:
                 configMapKeyRef:
@@ -110,30 +112,11 @@ spec:
                 configMapKeyRef:
                   name: apps-config
                   key: FOLLOW_COMMAND_CHANNEL
+            
+                  
             ## MONGODB
             - name: QUARKUS_MONGODB_CONNECTION_STRING
               valueFrom:
                 secretKeyRef:
                   name: srvc-home-timeline-secret
                   key: SRVC_HOME_TIMELINE_MONGODB_ENDPOINT
-            ## MINIO
-            - name: S3_ENDPOINT
-              valueFrom:
-                configMapKeyRef:
-                  name: apps-config
-                  key: S3_ENDPOINT
-            - name: S3_BUCKET
-              valueFrom:
-                configMapKeyRef:
-                  name: apps-config
-                  key: S3_BUCKET
-            - name: S3_ACCESS_KEY
-              valueFrom:
-                secretKeyRef:
-                  name: apps-secret
-                  key: S3_ACCESS_KEY
-            - name: S3_SECRET_KEY
-              valueFrom:
-                secretKeyRef:
-                  name: apps-secret
-                  key: S3_SECRET_KEY

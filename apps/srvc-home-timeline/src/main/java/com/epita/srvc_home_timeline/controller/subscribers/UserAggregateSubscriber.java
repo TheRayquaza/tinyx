@@ -16,9 +16,7 @@ import org.eclipse.microprofile.config.inject.ConfigProperty;
 @Startup
 @ApplicationScoped
 public class UserAggregateSubscriber implements Consumer<UserAggregate> {
-  @Inject
-  @ConfigProperty(name = "repo.user.aggregate.channel", defaultValue = "user_aggregate")
-  String channel;
+  String channel = System.getenv().getOrDefault("USER_AGGREGATE_CHANNEL", "user_aggregate");
 
   private final PubSubCommands.RedisSubscriber subscriber;
   @Inject HomeTimelineService homeTimelineService;
