@@ -1,0 +1,105 @@
+{
+  "openapi" : "3.0.3",
+  "info" : {
+    "title" : "srvc-user-timeline API",
+    "version" : "1.0.0-SNAPSHOT"
+  },
+  "paths" : {
+    "/user-timeline/{id}" : {
+      "get" : {
+        "tags" : [ "User Timeline Controller" ],
+        "parameters" : [ {
+          "name" : "id",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/UserTimelineResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components" : {
+    "schemas" : {
+      "LocalDateTime" : {
+        "format" : "date-time",
+        "type" : "string",
+        "example" : "2022-03-10T12:15:50"
+      },
+      "UserTimelinePostResponse" : {
+        "type" : "object",
+        "properties" : {
+          "id" : {
+            "type" : "string"
+          },
+          "postId" : {
+            "type" : "string"
+          },
+          "userId" : {
+            "type" : "string"
+          },
+          "ownerId" : {
+            "type" : "string"
+          },
+          "text" : {
+            "type" : "string"
+          },
+          "media" : {
+            "type" : "string"
+          },
+          "repostId" : {
+            "type" : "string"
+          },
+          "replyToPostId" : {
+            "type" : "string"
+          },
+          "isReply" : {
+            "type" : "boolean"
+          },
+          "likedAt" : {
+            "$ref" : "#/components/schemas/LocalDateTime"
+          },
+          "createdAt" : {
+            "$ref" : "#/components/schemas/LocalDateTime"
+          },
+          "updatedAt" : {
+            "$ref" : "#/components/schemas/LocalDateTime"
+          },
+          "deleted" : {
+            "type" : "boolean"
+          }
+        }
+      },
+      "UserTimelineResponse" : {
+        "type" : "object",
+        "properties" : {
+          "posts" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/UserTimelinePostResponse"
+            }
+          }
+        }
+      }
+    },
+    "securitySchemes" : {
+      "SecurityScheme" : {
+        "type" : "http",
+        "description" : "Authentication",
+        "scheme" : "basic"
+      }
+    }
+  }
+}

@@ -1,0 +1,90 @@
+---
+openapi: 3.0.3
+info:
+  title: srvc-search API
+  version: 1.0.0-SNAPSHOT
+paths:
+  "/":
+    post:
+      summary: Search for posts
+      requestBody:
+        content:
+          application/json:
+            schema:
+              "$ref": "#/components/schemas/SearchRequest"
+      responses:
+        '200':
+          description: Posts found
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/SearchEntity"
+        '400':
+          description: Invalid input
+        '500':
+          description: Internal server error
+  "/search":
+    post:
+      tags:
+      - Srvc Search Controller
+      requestBody:
+        content:
+          application/json:
+            schema:
+              "$ref": "#/components/schemas/SearchRequest"
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  "$ref": "#/components/schemas/SearchEntity"
+        '401':
+          description: Not Authorized
+        '403':
+          description: Not Allowed
+      security:
+      - SecurityScheme: []
+components:
+  schemas:
+    LocalDateTime:
+      format: date-time
+      type: string
+      example: '2022-03-10T12:15:50'
+    SearchEntity:
+      type: object
+      properties:
+        id:
+          type: string
+        ownerId:
+          type: string
+        text:
+          type: string
+        media:
+          type: string
+        repostId:
+          type: string
+        replyToPostId:
+          type: string
+        isReply:
+          type: boolean
+        createdAt:
+          "$ref": "#/components/schemas/LocalDateTime"
+        updatedAt:
+          "$ref": "#/components/schemas/LocalDateTime"
+        deleted:
+          type: boolean
+    SearchRequest:
+      type: object
+      properties:
+        query:
+          type: string
+  securitySchemes:
+    SecurityScheme:
+      type: http
+      description: Authentication
+      scheme: basic
+

@@ -1,0 +1,167 @@
+{
+  "openapi" : "3.0.3",
+  "info" : {
+    "title" : "srvc-home-timeline API",
+    "version" : "1.0.0-SNAPSHOT"
+  },
+  "paths" : {
+    "/home-timeline/{id}" : {
+      "get" : {
+        "summary" : "extract the home feed",
+        "parameters" : [ {
+          "name" : "id",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Get a list of posts related to a specific user's follows",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/HomeTimelineResponse"
+                }
+              }
+            }
+          },
+          "400" : {
+            "description" : "Invalid Input"
+          },
+          "401" : {
+            "description" : "User not authorized"
+          },
+          "404" : {
+            "description" : "User not Found"
+          },
+          "403" : {
+            "description" : "Not Allowed"
+          }
+        },
+        "security" : [ {
+          "SecurityScheme" : [ ]
+        } ]
+      }
+    }
+  },
+  "components" : {
+    "schemas" : {
+      "Date" : {
+        "format" : "date",
+        "type" : "string",
+        "example" : "2022-03-10"
+      },
+      "HomeTimelineEntity" : {
+        "type" : "object",
+        "properties" : {
+          "id" : {
+            "$ref" : "#/components/schemas/ObjectId"
+          },
+          "userId" : {
+            "type" : "string"
+          },
+          "entries" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/HomeTimelineEntryEntity"
+            }
+          },
+          "followersId" : {
+            "type" : "array",
+            "items" : {
+              "type" : "string"
+            }
+          },
+          "blockedUsersId" : {
+            "type" : "array",
+            "items" : {
+              "type" : "string"
+            }
+          }
+        }
+      },
+      "HomeTimelineEntryEntity" : {
+        "type" : "object",
+        "properties" : {
+          "postId" : {
+            "type" : "string"
+          },
+          "authorId" : {
+            "type" : "string"
+          },
+          "content" : {
+            "type" : "string"
+          },
+          "likedBy" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/HomeTimelineLikedByEntity"
+            }
+          },
+          "type" : {
+            "type" : "string"
+          },
+          "timestamp" : {
+            "$ref" : "#/components/schemas/LocalDateTime"
+          }
+        }
+      },
+      "HomeTimelineLikedByEntity" : {
+        "type" : "object",
+        "properties" : {
+          "userId" : {
+            "type" : "string"
+          },
+          "likedAt" : {
+            "$ref" : "#/components/schemas/LocalDateTime"
+          }
+        }
+      },
+      "HomeTimelineResponse" : {
+        "type" : "object",
+        "properties" : {
+          "hometimeline" : {
+            "$ref" : "#/components/schemas/HomeTimelineEntity"
+          }
+        }
+      },
+      "LocalDateTime" : {
+        "format" : "date-time",
+        "type" : "string",
+        "example" : "2022-03-10T12:15:50"
+      },
+      "ObjectId" : {
+        "type" : "object",
+        "properties" : {
+          "timestamp" : {
+            "format" : "int32",
+            "type" : "integer"
+          },
+          "counter" : {
+            "format" : "int32",
+            "type" : "integer"
+          },
+          "randomValue1" : {
+            "format" : "int32",
+            "type" : "integer"
+          },
+          "randomValue2" : {
+            "type" : "integer"
+          },
+          "date" : {
+            "$ref" : "#/components/schemas/Date"
+          }
+        }
+      }
+    },
+    "securitySchemes" : {
+      "SecurityScheme" : {
+        "type" : "http",
+        "description" : "Authentication",
+        "scheme" : "basic"
+      }
+    }
+  }
+}
