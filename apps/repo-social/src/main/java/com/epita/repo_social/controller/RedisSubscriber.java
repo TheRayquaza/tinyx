@@ -20,7 +20,7 @@ public class RedisSubscriber implements Logger {
 
   String postChannel = System.getenv().getOrDefault("POST_AGGREGATE_CHANNEL", "post_aggregate");
 
-  String userChannel =System.getenv().getOrDefault("USER_AGGREGATE_CHANNEL", "user_aggregate");
+  String userChannel = System.getenv().getOrDefault("USER_AGGREGATE_CHANNEL", "user_aggregate");
 
   @Inject SocialService socialService;
 
