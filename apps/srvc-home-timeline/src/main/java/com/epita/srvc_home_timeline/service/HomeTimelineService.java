@@ -163,7 +163,7 @@ public class HomeTimelineService {
       homeTimelineEntity.setEntries(newEntries);
       for (HomeTimelineEntity.HomeTimelineEntryEntity homeTimelineEntryEntity :
           homeTimelineEntity.getEntries()) {
-        if (homeTimelineEntryEntity.getLikedBy().contains(followerId)) {
+        if (homeTimelineEntryEntity.getLikedBy().stream().anyMatch(likedBy -> likedBy.getUserId().equals(followerId))) {
           homeTimelineEntryEntity.setLikedBy(
               homeTimelineEntryEntity.getLikedBy().stream()
                   .filter(likedBy -> !likedBy.equals(followerId))
