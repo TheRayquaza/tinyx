@@ -125,6 +125,7 @@ public class HomeTimelineService {
               .withType(postAggregate.getMedia())
               .withTimestamp(LocalDateTime.now());
       entries.add(toAdd);
+      homeTimelineEntity.setEntries(entries);
       homeTimelineRepository.updateModel(
           homeTimelineEnityToModel.convertNotNull(homeTimelineEntity));
     }
