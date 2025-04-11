@@ -22,7 +22,7 @@ public class PostAggregateSubscriber implements Consumer<PostAggregate> {
 
   public PostAggregateSubscriber(
       final RedisDataSource ds, HomeTimelineService homeTimelineService) {
-    subscriber = ds.pubsub(PostAggregate.class).subscribe("post_aggregate", this);
+    subscriber = ds.pubsub(PostAggregate.class).subscribe(channel, this);
     this.homeTimelineService = homeTimelineService;
   }
 
