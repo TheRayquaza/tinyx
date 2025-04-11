@@ -107,7 +107,14 @@ public class HomeTimelineService {
   }
 
   public void homeTimelineAdd(PostAggregate postAggregate) {
-    List<HomeTimelineModel> homeTimelinesModel = homeTimelineRepository.getHomeTimelineContainingUserId(postAggregate.getOwnerId());
+    System.out.println("home post owner id: " + postAggregate.getOwnerId());
+    List<HomeTimelineModel> homeTimelinesModel = homeTimelineRepository.getHomeTimelineContainingUserId(postAggregate.getOwnerId(), "0");
+    if (homeTimelinesModel.isEmpty()) {
+      logger.error("no home timeline found for post %s".formatted(postAggregate.getId()));
+      return;
+    } else {
+      logger.error("multiple home timelines found for post %s".formatted(postAggregate.getId()));
+    }
     for (HomeTimelineModel homeTimelineModel : homeTimelinesModel) {
       if (homeTimelineModel.getBlockedUsersId().contains(postAggregate.getOwnerId())) {
         continue;
@@ -246,6 +253,13 @@ public class HomeTimelineService {
     String followerId = homeTimelinePostModel.get().getOwnerId();
     List<HomeTimelineModel> hometimelinesModel =
         homeTimelineRepository.getHomeTimelineContainingUserId(UserId, followerId);
+    if (hometimelinesModel.isEmpty()) {
+      logger.error("no home timeline found for post %s".formatted(postId));
+      return;
+    }
+    else {
+      logger.error("multiple home timelines found for post %s".formatted(postId));
+    }
     HomeTimelinePostModel PostModel = homeTimelinePostModel.get();
     for (HomeTimelineModel homeTimelineModel : hometimelinesModel) {
       HomeTimelineEntity homeTimelineEntity =

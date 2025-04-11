@@ -70,7 +70,7 @@ public class HomeTimelineTest {
 
   void publishAndWait(String channel, Object object) throws InterruptedException {
     redisPublisher.publish(channel, object);
-    Thread.sleep(300);
+    Thread.sleep(3000);
   }
 
   @BeforeAll
@@ -245,9 +245,11 @@ public class HomeTimelineTest {
     // User 3 follows user 1
     followUser(USER_ID_1, USER_ID_3, true);
 
-    // Checking user 2 home timelines
+    Thread.sleep(1000);
+
+    // Checking user 3 home timelines
     Response response =
-        given().header("Authorization", "Bearer " + TOKEN_USER_2).when().get(USER_ID_2);
+        given().header("Authorization", "Bearer " + TOKEN_USER_2).when().get(USER_ID_3);
     System.out.println(response.body().prettyPrint());
     response.then().statusCode(200);
     // .body("hometimeline.followers.text", hasItem("15a1a100c293c91129883573"));
@@ -260,8 +262,10 @@ public class HomeTimelineTest {
     newpost2.setText("new Post from user 2");
     newpost2.setCreatedAt(LocalDateTime.now());
     newpost2.setUpdatedAt(LocalDateTime.now());
+    newpost2.setDeleted(false);
     publishAndWait("post_aggregate", newpost2);
     System.out.println("user 2 posts - done");
+    Thread.sleep(1000);
 
     // Checking user 3 home timelines
     response = given().header("Authorization", "Bearer " + TOKEN_USER_3).when().get(USER_ID_3);
@@ -274,6 +278,9 @@ public class HomeTimelineTest {
     // User 1 likes post from user 2
     likePost(USER_ID_1, newpostId2, true);
 
+    System.out.println("user 1 likes post from user 2 - done");
+    Thread.sleep(1000);
+
     // Checking user 3 home timelines
     response = given().header("Authorization", "Bearer " + TOKEN_USER_3).when().get(USER_ID_3);
     System.out.println(response.body().prettyPrint());
@@ -281,7 +288,11 @@ public class HomeTimelineTest {
     // .body("hometimeline.entries.text", hasItem("new Post from user 2"));
 
     // User 3 unfollows user 1
+    
+    System.out.println("user 3 unfollows user 1 - done");
+
     followUser(USER_ID_1, USER_ID_3, false);
+    Thread.sleep(1000);
 
     // Checking user 3 home timelines
     response = given().header("Authorization", "Bearer " + TOKEN_USER_3).when().get(USER_ID_3);
@@ -289,8 +300,11 @@ public class HomeTimelineTest {
     response.then().statusCode(200);
     // .body("hometimeline.entries.text", hasItem("new Post from user 2"));
 
+    System.out.println("user 3 unfollows user 2 - done");
+
     // User 3 unfollows user 2
     followUser(USER_ID_2, USER_ID_3, false);
+    Thread.sleep(1000);
 
     // Checking user 3 home timelines
     response = given().header("Authorization", "Bearer " + TOKEN_USER_3).when().get(USER_ID_3);
