@@ -116,8 +116,8 @@ try {
 // === SRVC HOME TIMELINE SETUP ===
 let srvcHomeDb = db.getSiblingDB("SrvcHomeTimeline");
 
-if (!srvcUserDb.getUser("admin")) {
-    srvcUserDb.createUser({
+if (!srvcHomeDb.getUser("admin")) {
+    srvcHomeDb.createUser({
         user: "admin",
         pwd: "admin",
         roles: [{ role: "readWrite", db: "SrvcHomeTimeline" }]
