@@ -6,14 +6,15 @@ resources:
   - pull-secrets.yml
   - secrets.yml
   - srvc-media
-  #- https://raw.githubusercontent.com/kubernetes/ingress-nginx/main/deploy/static/provider/kind/deploy.yaml
-  #- ingress.yml  # global ingress for endpoints
   - repo-user
   - repo-social
   - repo-post
   - srvc-search
   - srvc-user-timeline
   - srvc-home-timeline
+  - port-frontend
+  #- https://raw.githubusercontent.com/kubernetes/ingress-nginx/main/deploy/static/provider/kind/deploy.yaml
+  #- ingress.yml  # global ingress for endpoints
 configMapGenerator:
   - name: apps-config
     namespace: apps
