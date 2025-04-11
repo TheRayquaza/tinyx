@@ -22,7 +22,7 @@ public class FollowCommandSubscriber implements Consumer<FollowCommand> {
 
   public FollowCommandSubscriber(
       final RedisDataSource ds, HomeTimelineService homeTimelineService) {
-    subscriber = ds.pubsub(FollowCommand.class).subscribe("follow_command", this);
+    subscriber = ds.pubsub(FollowCommand.class).subscribe(channel, this);
     this.homeTimelineService = homeTimelineService;
   }
 
