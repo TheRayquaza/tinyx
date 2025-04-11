@@ -131,8 +131,6 @@ public class HomeTimelineService {
   }
 
   public void handleFollow(String userId, String followerId) {
-    logger.info(
-        "received follow with user id: %s and follower id: %s".formatted(userId, followerId));
     Optional<HomeTimelineModel> homeTimeline = homeTimelineRepository.findByUserId(userId);
     if (homeTimeline.isPresent()) {
       HomeTimelineModel homeTimelineModel = homeTimeline.get();
