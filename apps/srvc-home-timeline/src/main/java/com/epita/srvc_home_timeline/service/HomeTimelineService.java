@@ -100,26 +100,15 @@ public class HomeTimelineService {
       if (toDelete != null) {
         entries.remove(toDelete);
       }
+      homeTimelineEntity.setEntries(entries);
       homeTimelineRepository.updateModel(
           homeTimelineEnityToModel.convertNotNull(homeTimelineEntity));
     }
   }
 
   public void homeTimelineAdd(PostAggregate postAggregate) {
-    Optional<HomeTimelineModel> optionalAuthorHometimelineModel =
-        homeTimelineRepository.findByUserId(postAggregate.getOwnerId());
-
-    if (optionalAuthorHometimelineModel.isEmpty()) {
-      logger.error("user %s does not exist".formatted(postAggregate.getOwnerId()));
-      return;
-    }
-    
-    HomeTimelineModel authorHometimelineModel = optionalAuthorHometimelineModel.get();
-
-    List<HomeTimelineModel> hometimelinesModel =
-        homeTimelineRepository.getFollowersHomeTimelines(authorHometimelineModel.getFollowersId());
-
-    for (HomeTimelineModel homeTimelineModel : hometimelinesModel) {
+    List<HomeTimelineModel> homeTimelinesModel = homeTimelineRepository.getHomeTimelineContainingUserId(postAggregate.getId());
+    for (HomeTimelineModel homeTimelineModel : homeTimelinesModel) {
       if (homeTimelineModel.getBlockedUsersId().contains(postAggregate.getOwnerId())) {
         continue;
       }
