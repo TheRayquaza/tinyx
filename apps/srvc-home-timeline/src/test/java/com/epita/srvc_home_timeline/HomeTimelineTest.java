@@ -59,7 +59,7 @@ public class HomeTimelineTest {
     publishAndWait("like_command", like);
   }
 
-  void followUser(String userFollowing, String UserFollowed, boolean following) throws InterruptedException {
+  void followUser(String UserFollowed, String userFollowing, boolean following) throws InterruptedException {
     FollowCommand follow = new FollowCommand();
     follow.setUserId(userFollowing);
     follow.setFollowerId(UserFollowed);
