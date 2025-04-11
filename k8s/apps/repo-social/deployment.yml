@@ -1,0 +1,129 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: repo-social
+  namespace: apps
+  labels:
+    app: repo-social
+spec:
+  replicas: 1 # Number of replicas
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 1
+      maxSurge: 1
+  selector:
+    matchLabels:
+      app: repo-social
+  template:
+    metadata:
+      labels:
+        app: repo-social
+    spec:
+      imagePullSecrets:
+        - name: pull-secret
+      containers:
+        - name: repo-social
+          image: registry.cri.epita.fr/ing/majeures/tc/info/student/2026/2025-epitweet-tinyx-02/repo-social:v1.0.0
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: http
+              containerPort: 8080
+              protocol: TCP
+          resources:
+            requests:
+              memory: "256Mi"
+              cpu: "250m"
+            limits:
+              memory: "512Mi"
+              cpu: "500m"
+          livenessProbe:
+            httpGet:
+              path: /q/health/live
+              port: 8080
+            initialDelaySeconds: 20
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /q/health/ready
+              port: 8080
+            initialDelaySeconds: 20
+            periodSeconds: 10
+          env:
+            ## QUARKUS
+            - name: QUARKUS_LOG_LEVEL
+              valueFrom:
+                configMapKeyRef:
+                  name: apps-config
+                  key: QUARKUS_LOG_LEVEL
+            - name: QUARKUS_HTTP_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: apps-config
+                  key: QUARKUS_HTTP_PORT
+            - name: QUARKUS_HTTP_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: apps-config
+                  key: QUARKUS_HTTP_HOST
+            - name: QUARKUS_APP_PROFILE
+              valueFrom:
+                configMapKeyRef:
+                  name: apps-config
+                  key: QUARKUS_APP_PROFILE
+            
+                  
+            ## REDIS
+            - name: QUARKUS_REDIS_HOSTS
+              valueFrom:
+                configMapKeyRef:
+                  name: apps-config
+                  key: QUARKUS_REDIS_HOSTS
+            - name: QUARKUS_REDIS_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: apps-secret
+                  key: QUARKUS_REDIS_PASSWORD
+            - name: QUARKUS_REDIS_CLIENT_TYPE
+              valueFrom:
+                configMapKeyRef:
+                  name: apps-config
+                  key: QUARKUS_REDIS_CLIENT_TYPE
+            - name: QUARKUS_REDIS_RECONNECT_ATTEMPTS
+              valueFrom:
+                configMapKeyRef:
+                  name: apps-config
+                  key: QUARKUS_REDIS_RECONNECT_ATTEMPTS
+            - name: QUARKUS_REDIS_AUTO_FAILOVER
+              valueFrom:
+                configMapKeyRef:
+                  name: apps-config
+                  key: QUARKUS_REDIS_AUTO_FAILOVER
+            - name: USER_AGGREGATE_CHANNEL
+              valueFrom:
+                configMapKeyRef:
+                  name: apps-config
+                  key: USER_AGGREGATE_CHANNEL
+            - name: POST_AGGREGATE_CHANNEL
+              valueFrom:
+                configMapKeyRef:
+                  name: apps-config
+                  key: POST_AGGREGATE_CHANNEL
+
+
+            ## NEO4J
+            - name: QUARKUS_NEO4J_URI
+              valueFrom:
+                configMapKeyRef:
+                  name: repo-social-config
+                  key: QUARKUS_NEO4J_URI
+            - name: QUARKUS_NEO4J_AUTHENTICATION_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: repo-social-secret
+                  key: QUARKUS_NEO4J_AUTHENTICATION_USERNAME
+            - name: QUARKUS_NEO4J_AUTHENTICATION_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: repo-social-secret
+                  key: QUARKUS_NEO4J_AUTHENTICATION_PASSWORD

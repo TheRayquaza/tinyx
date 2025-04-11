@@ -9,10 +9,10 @@ resources:
   #- https://raw.githubusercontent.com/kubernetes/ingress-nginx/main/deploy/static/provider/kind/deploy.yaml
   #- ingress.yml  # global ingress for endpoints
   - repo-user
-  #- repo-social
+  - repo-social
   - repo-post
   - srvc-search
-  #-srvc-user-timeline
+  - srvc-user-timeline
   - srvc-home-timeline
 configMapGenerator:
   - name: apps-config
