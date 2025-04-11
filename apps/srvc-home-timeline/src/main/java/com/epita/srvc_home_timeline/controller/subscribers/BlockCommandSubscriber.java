@@ -21,7 +21,7 @@ public class BlockCommandSubscriber implements Consumer<BlockCommand> {
   @Inject HomeTimelineService homeTimelineService;
 
   public BlockCommandSubscriber(final RedisDataSource ds, HomeTimelineService homeTimelineService) {
-    subscriber = ds.pubsub(BlockCommand.class).subscribe("block_command", this);
+    subscriber = ds.pubsub(BlockCommand.class).subscribe(channel, this);
     this.homeTimelineService = homeTimelineService;
   }
 
