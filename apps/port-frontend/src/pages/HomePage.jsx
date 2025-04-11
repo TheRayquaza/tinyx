@@ -117,7 +117,7 @@ const HomePage = () => {
               <input
                 type="file"
                 className="hidden"
-                accept="image/*"
+                accept="*/*"
                 onChange={(e) => setPostMedia(e.target.files[0])}
               />
             </label>

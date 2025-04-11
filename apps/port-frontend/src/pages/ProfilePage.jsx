@@ -26,17 +26,14 @@ const ProfilePage = () => {
         const userData = await api.get(`/user/${id}`);
         setUser(userData);
         
-        // Check if current user is following this profile
         if (currentUser) {
           const followStatus = await api.get(`/social/follows/${userData.id}`); // TODO: fix this
           setIsFollowing(followStatus.isFollowing);
         }
         
-        // Fetch user's posts
         const userPosts = await postService.getUserTimeline(userData.id);
         setPosts(userPosts);
         
-        // Fetch followers and following
         const followersData = await api.get(`/social/followers/${userData.id}`);
         const followingData = await api.get(`/social/following/${userData.id}`);
         setFollowers(followersData);

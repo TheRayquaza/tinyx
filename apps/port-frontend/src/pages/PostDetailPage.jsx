@@ -22,11 +22,9 @@ const PostDetailPage = () => {
         const postData = await postService.getPost(postId);
         setPost(postData);
         
-        // Fetch replies
         const repliesData = await postService.getReplies(postId);
         setReplies(repliesData);
         
-        // Fetch likes
         const likesData = await postService.getLikes(postId);
         setLikes(likesData);
         
@@ -46,7 +44,6 @@ const PostDetailPage = () => {
     if (!newReply.trim()) return;
 
     try {
-      // Create FormData for the reply
       const formData = new FormData();
       formData.append('content', newReply);
       
@@ -63,7 +60,6 @@ const PostDetailPage = () => {
     try {
       if (isLiked) {
         await postService.unlikePost(postId);
-        // Update likes state
         setLikes(likes.filter(like => like.userId !== currentUser.id));
       } else {
         const response = await postService.likePost(postId);
@@ -84,7 +80,7 @@ const PostDetailPage = () => {
     <div className="container mx-auto max-w-2xl p-4">
       <div className="mb-6">
         <Link to="/" className="text-blue-500 hover:underline mb-4 inline-block">
-          &larr; Back to Timeline
+          &larr; Back to Home
         </Link>
         
         <div className="border rounded-lg p-4 mb-6 bg-white shadow">

@@ -14,7 +14,7 @@ const UserProfile = ({ user, onFollowToggle, isFollowing, followersCount, follow
           {user.profileImage ? (
             <img
               src={`/minio/${user.profileImage}`}
-              alt={`${user.username}'s profile`}
+              alt={`${user.username}'s image`}
               className="w-24 h-24 rounded-full object-cover border-2 border-blue-500"
             />
           ) : (

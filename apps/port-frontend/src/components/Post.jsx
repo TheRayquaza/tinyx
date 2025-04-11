@@ -9,7 +9,6 @@ const Post = ({ post, showActions = true, onDelete }) => {
   const [likes, setLikes] = useState([]);
   const [loading, setLoading] = useState(false);
 
-  // useCallback ensures that the fetchLikes function doesn't change on every render
   const fetchLikes = useCallback(async () => {
     if (post?.id) {
       try {

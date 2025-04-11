@@ -1,28 +1,36 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
+import { AuthContext } from '../context/AuthContext';
+import api from '../services/api';
 
 const LoginPage = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  
-  const { login } = useAuth();
+  const { setCurrentUser } = useContext(AuthContext);
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
     if (!username || !password) {
       setError('Please enter both username and password');
       return;
     }
-    
+
     try {
       setLoading(true);
       setError('');
-      await login(username, password);
+      
+      const response = await api.post('/login', {
+        username: username,
+        password: password
+      });
+      
+      localStorage.setItem('token', response.token);
+      
+      setCurrentUser(response.user);
+      
       navigate('/');
     } catch (err) {
       setError('Failed to login. Please check your credentials.');
@@ -63,32 +71,32 @@ const LoginPage = () => {
               Password
             </label>
             <input
-                type="password"
-                id="password"
-                className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-              />
-            </div>
-
-            <button
-              type="submit"
-              className="w-full bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600 transition-colors disabled:opacity-50"
-              disabled={loading}
-            >
-              {loading ? 'Logging in...' : 'Log In'}
-            </button>
-          </form>
-
-          <p className="mt-6 text-center text-sm text-gray-600">
-            Don't have an account?{' '}
-            <Link to="/ui/signup" className="text-blue-500 hover:underline">
-              Sign up
-            </Link>
-          </p>
-        </div>
+              type="password"
+              id="password"
+              className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+            />
+          </div>
+          
+          <button
+            type="submit"
+            className="w-full bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600 transition-colors disabled:opacity-50"
+            disabled={loading}
+          >
+            {loading ? 'Logging in...' : 'Log In'}
+          </button>
+        </form>
+        
+        <p className="mt-6 text-center text-sm text-gray-600">
+          Don't have an account?{' '}
+          <Link to="/signup" className="text-blue-500 hover:underline">
+            Sign up
+          </Link>
+        </p>
       </div>
+    </div>
   );
 };
 
