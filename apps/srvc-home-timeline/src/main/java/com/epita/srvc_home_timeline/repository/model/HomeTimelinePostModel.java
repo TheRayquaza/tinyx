@@ -11,7 +11,7 @@ import org.bson.types.ObjectId;
 @AllArgsConstructor
 @NoArgsConstructor
 @With
-@MongoEntity(collection = "HomeTimelineModel", database = "SrvcHomeTimeline")
+@MongoEntity(collection = "HomeTimelinePostModel", database = "SrvcHomeTimeline")
 public class HomeTimelinePostModel {
   @BsonId private ObjectId id;
   private String postId;
