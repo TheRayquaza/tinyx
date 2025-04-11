@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import postService from '../services/postService';
@@ -9,23 +9,24 @@ const Post = ({ post, showActions = true, onDelete }) => {
   const [likes, setLikes] = useState([]);
   const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
+  // useCallback ensures that the fetchLikes function doesn't change on every render
+  const fetchLikes = useCallback(async () => {
     if (post?.id) {
-      fetchLikes();
+      try {
+        setLoading(true);
+        const likesData = await postService.getLikes(post.id);
+        setLikes(likesData);
+      } catch (error) {
+        console.error('Error fetching likes:', error);
+      } finally {
+        setLoading(false);
+      }
     }
   }, [post?.id]);
 
-  const fetchLikes = async () => {
-    try {
-      setLoading(true);
-      const likesData = await postService.getLikes(post.id);
-      setLikes(likesData);
-    } catch (error) {
-      console.error('Error fetching likes:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
+  useEffect(() => {
+    fetchLikes();
+  }, [fetchLikes]);
 
   const handleDelete = async () => {
     if (window.confirm('Are you sure you want to delete this post?')) {
@@ -95,6 +96,12 @@ const Post = ({ post, showActions = true, onDelete }) => {
               Delete
             </button>
           )}
+        </div>
+      )}
+      
+      {loading && (
+        <div className="text-center py-4 text-gray-500">
+          <p>Loading likes...</p>
         </div>
       )}
     </div>
