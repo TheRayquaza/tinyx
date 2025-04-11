@@ -22,7 +22,7 @@ public class UserAggregateSubscriber implements Consumer<UserAggregate> {
 
   public UserAggregateSubscriber(
       final RedisDataSource ds, HomeTimelineService homeTimelineService) {
-    subscriber = ds.pubsub(UserAggregate.class).subscribe("user_aggregate", this);
+    subscriber = ds.pubsub(UserAggregate.class).subscribe(channel, this);
     this.homeTimelineService = homeTimelineService;
   }
 
