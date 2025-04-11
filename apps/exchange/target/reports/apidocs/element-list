@@ -1,0 +1,10 @@
+com.epita.exchange.auth.service
+com.epita.exchange.auth.service.entity
+com.epita.exchange.error
+com.epita.exchange.error.controller.response
+com.epita.exchange.error.service
+com.epita.exchange.redis.aggregate
+com.epita.exchange.redis.command
+com.epita.exchange.redis.service
+com.epita.exchange.s3.service
+com.epita.exchange.utils

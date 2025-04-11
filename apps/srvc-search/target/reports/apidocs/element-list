@@ -1,0 +1,8 @@
+com.epita.srvc_search
+com.epita.srvc_search.controller
+com.epita.srvc_search.controller.request
+com.epita.srvc_search.converter
+com.epita.srvc_search.repository
+com.epita.srvc_search.repository.model
+com.epita.srvc_search.service
+com.epita.srvc_search.service.entity

@@ -5,22 +5,40 @@
 *.ear
 *.iml
 
-# Maven
+# Maven (excluding Javadoc)
 .mvn/
-target/
+# target/
+!target/reports/apidocs/**
+spotless-index
+javadoc-bundle-options/
+maven-archiver/
+maven-status/
+generated-sources/
+generated-test-sources/
+maven-javadoc-plugin-stale-data.txt
+surefire-reports/
+build-metrics.json
+spotless-index/
 
-# Gradle
-.gradle/
-build/
-!gradle/wrapper/
+# Quarkus specific
+quarkus/
+quarkus-app/
+quarkus-artifact.properties
+
+# Compiled classes and bytecode
+classes/
+test-classes/
+
+# Temporary files
+*.log
+*.tmp
+*.bak
+*.swp
+*.swo
 
 # IDEs and Editors
 */.idea/
 .idea/
-*.swp
-*.swo
-*.bak
-*.tmp
 .vscode/
 
 # Kubernetes
@@ -39,6 +57,9 @@ docker-compose.override.yml
 
 # Vagrant
 .vagrant/
+
+# OS specific
+.DS_Store
 
 # Frontend
 node_modules/
