@@ -21,7 +21,7 @@ public class LikeCommandSubscriber implements Consumer<LikeCommand> {
   @Inject HomeTimelineService homeTimelineService;
 
   public LikeCommandSubscriber(final RedisDataSource ds, HomeTimelineService homeTimelineService) {
-    subscriber = ds.pubsub(LikeCommand.class).subscribe("like_command", this);
+    subscriber = ds.pubsub(LikeCommand.class).subscribe(channel, this);
     this.homeTimelineService = homeTimelineService;
   }
 
