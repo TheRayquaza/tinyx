@@ -42,14 +42,14 @@ POST_ID=$(uuidgen)
 # ✅ Step 1: Publish + Search success
 publish_post "$POST_ID" false
 log "Searching for existing post..."
-curl -s -X POST "$SEARCH_ENDPOINT" \
+curl -s -X GET "$SEARCH_ENDPOINT" \
   -H "Content-Type: application/json" \
   -H "$AUTH_HEADER" \
   -d '{"query": "Post"}' | jq .
 
 # ✅ Step 2: Search for non-existent content
 log "Searching for non-existent post..."
-curl -s -X POST "$SEARCH_ENDPOINT" \
+curl -s -X GET "$SEARCH_ENDPOINT" \
   -H "Content-Type: application/json" \
   -H "$AUTH_HEADER" \
   -d '{"query": "ShouldNotExist"}' | jq .
@@ -57,7 +57,7 @@ curl -s -X POST "$SEARCH_ENDPOINT" \
 # ✅ Step 3: Simulate deletion and verify removal
 publish_post "$POST_ID" true
 log "Searching after post deletion..."
-curl -s -X POST "$SEARCH_ENDPOINT" \
+curl -s -X GET "$SEARCH_ENDPOINT" \
   -H "Content-Type: application/json" \
   -H "$AUTH_HEADER" \
   -d '{"query": "Post"}' | jq .

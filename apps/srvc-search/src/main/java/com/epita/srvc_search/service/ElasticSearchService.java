@@ -2,6 +2,7 @@ package com.epita.srvc_search.service;
 
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import co.elastic.clients.elasticsearch._types.query_dsl.MatchQuery;
+import co.elastic.clients.elasticsearch._types.query_dsl.Query;
 import co.elastic.clients.elasticsearch.core.SearchRequest;
 import co.elastic.clients.elasticsearch.core.search.Hit;
 import com.epita.srvc_search.service.entity.SearchEntity;
@@ -10,38 +11,27 @@ import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import java.io.IOException;
 import java.util.*;
-import co.elastic.clients.elasticsearch._types.query_dsl.Query;
 
 @ApplicationScoped
 @Startup
 public class ElasticSearchService {
-  String searchElasticSearch = Optional.ofNullable(System.getenv("ELASTICSEARCH_INDEX"))
-          .orElse("srvc_search");
+  String searchElasticSearch =
+      Optional.ofNullable(System.getenv("ELASTICSEARCH_INDEX")).orElse("srvc_search");
 
   @Inject ElasticsearchClient elasticsearchClient;
 
   public List<SearchEntity> search(final String searchString) throws IOException {
     final var searchTerms =
-            Arrays.stream(searchString.split("\\s+")).filter(term -> !term.isEmpty()).toList();
+        Arrays.stream(searchString.split("\\s+")).filter(term -> !term.isEmpty()).toList();
 
-    final List<Query> shouldQueries = searchTerms.stream()
-            .map(term ->
-                    Query.of(q -> q.match(
-                            MatchQuery.of(m -> m
-                                    .field("text")
-                                    .query(term)
-                            )
-                    ))
-            ).toList();
+    final List<Query> shouldQueries =
+        searchTerms.stream()
+            .map(term -> Query.of(q -> q.match(MatchQuery.of(m -> m.field("text").query(term)))))
+            .toList();
 
-    final var request = SearchRequest.of(req -> req
-            .index(searchElasticSearch)
-            .query(q -> q
-                    .bool(b -> b
-                            .should(shouldQueries)
-                    )
-            )
-    );
+    final var request =
+        SearchRequest.of(
+            req -> req.index(searchElasticSearch).query(q -> q.bool(b -> b.should(shouldQueries))));
 
     final var response = elasticsearchClient.search(request, SearchEntity.class);
     return response.hits().hits().stream().map(Hit::source).toList();

@@ -1,4 +1,4 @@
-# srvc-home-timeline
+# srvc-user-timeline
 
 ## Requirements
 
@@ -42,13 +42,15 @@ The application, packaged as an _über-jar_, is now runnable using `java -jar ta
 For a deployment in production, you must configure the following environment
 variables.
 
-| Variable                        | Description                                        |
-|---------------------------------|----------------------------------------------------|
-| `SRVC_USER_TIMELINE_REDIS_HOST` | Redis host                                         |
-| `SRVC_USER_TIMELINE_REDIS_PASSWORD`    | Redis Password                                     |
-| `SRVC_USER_TIMELINE_MONGODB_HOST`      | MongoDB server host                                |
-| `SRVC_USER_TIMELINE_MONGODB_DATABASE`  | MongoDB database name                              |
-| `SRVC_USER_TIMELINE_QUARKUS_HTTP_PORT` | Quarkus HTTP port (e.g., `8080`)                   |
-| `SRVC_USER_TIMELINE_APP_PROFILE`       | Application profile (`dev` / `prod`)               |
-
-ADD MORE HERE (CHANNELS)
+| Variable                               | Description                          |
+|----------------------------------------|--------------------------------------|
+| `SRVC_USER_TIMELINE_REDIS_HOST`        | Redis host                           |
+| `SRVC_USER_TIMELINE_REDIS_PASSWORD`    | Redis Password                       |
+| `SRVC_USER_TIMELINE_MONGODB_HOST`      | MongoDB server host                  |
+| `SRVC_USER_TIMELINE_MONGODB_DATABASE`  | MongoDB database name                |
+| `SRVC_USER_TIMELINE_QUARKUS_HTTP_PORT` | Quarkus HTTP port (e.g., `8080`)     |
+| `SRVC_USER_TIMELINE_APP_PROFILE`       | Application profile (`dev` / `prod`) |
+| `POST_AGGREGATE_CHANNEL`               | Redis channel to sync post info      |
+| `USER_AGGREGATE_CHANNEL`               | Redis channel to sync user info      |
+| `BLOCK_COMMAND_CHANNEL`                | Redis channel to sync block info     |
+| `LIKE_COMMAND_CHANNEL`                 | Redis channel to sync like info      |

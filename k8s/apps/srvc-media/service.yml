@@ -1,0 +1,16 @@
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: srvc-media
+  namespace: apps
+  labels:
+    app: srvc-media
+spec:
+    type: ClusterIP
+    selector:
+      app: srvc-media
+    ports:
+      - protocol: TCP
+        port: 8080
+        targetPort: 8080

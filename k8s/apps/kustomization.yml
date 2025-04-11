@@ -5,6 +5,7 @@ resources:
   - namespace.yml
   - pull-secrets.yml
   - secrets.yml
+  - srvc-media
   #- https://raw.githubusercontent.com/kubernetes/ingress-nginx/main/deploy/static/provider/kind/deploy.yaml
   #- ingress.yml  # global ingress for endpoints
   - repo-user

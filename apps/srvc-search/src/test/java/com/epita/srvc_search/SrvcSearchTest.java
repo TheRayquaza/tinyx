@@ -34,15 +34,15 @@ public class SrvcSearchTest {
 
   @ConfigProperty(name = "repo.post.aggregate.channel")
   @Inject
-  String postAggregateChannel = Optional.ofNullable(System.getenv("SRVC_SEARCH_REPO_POST_AGGREGATE_CHANNEL"))
-            .orElse("post_aggregate");
+  String postAggregateChannel =
+      Optional.ofNullable(System.getenv("SRVC_SEARCH_REPO_POST_AGGREGATE_CHANNEL"))
+          .orElse("post_aggregate");
 
   private String token = "";
   private static final String TEST_ID = "15a1a100c293c91129883571";
   private static final String TEST_USERNAME = "testuser";
 
   private static final List<String> postIds = new ArrayList<>();
-
 
   private void publishPostAggregate(String postId, boolean deleted) {
     PostAggregate postAggregate = new PostAggregate();
@@ -85,17 +85,18 @@ public class SrvcSearchTest {
   @Order(1)
   void testGetPost() {
     String postId = new ObjectId().toString();
-    publishPostAggregate(postId,false);
+    publishPostAggregate(postId, false);
     SearchRequest searchRequest = new SearchRequest();
     searchRequest.setQuery("Post");
 
     // Extract the response as an array of SearchEntity
-    SearchEntity[] searchResults = given()
+    SearchEntity[] searchResults =
+        given()
             .contentType(ContentType.JSON)
             .header("Authorization", "Bearer " + token)
             .body(searchRequest)
             .when()
-            .post("/search")
+            .get("/search")
             .then()
             .statusCode(200)
             .extract()
@@ -112,12 +113,13 @@ public class SrvcSearchTest {
     searchRequest.setQuery("ShouldNotExist");
 
     // Extract the response as an array of SearchEntity
-    SearchEntity[] searchResults = given()
+    SearchEntity[] searchResults =
+        given()
             .contentType(ContentType.JSON)
             .header("Authorization", "Bearer " + token)
             .body(searchRequest)
             .when()
-            .post("/search")
+            .get("/search")
             .then()
             .statusCode(200)
             .extract()
@@ -134,12 +136,13 @@ public class SrvcSearchTest {
     searchRequest.setQuery("Post");
 
     // Extract the response as an array of SearchEntity
-    SearchEntity[] searchResults = given()
+    SearchEntity[] searchResults =
+        given()
             .contentType(ContentType.JSON)
             .header("Authorization", "Bearer " + token)
             .body(searchRequest)
             .when()
-            .post("/search")
+            .get("/search")
             .then()
             .statusCode(200)
             .extract()
