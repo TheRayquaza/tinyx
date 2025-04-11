@@ -1,0 +1,59 @@
+---
+openapi: 3.0.3
+info:
+  title: srvc-media API
+  version: 1.0.0-SNAPSHOT
+paths:
+  "/minio/{id}":
+    get:
+      tags:
+      - Srvc Media Controller
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+    post:
+      summary: Get media object
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Media Object
+          content:
+            application/octet-stream:
+              schema: {}
+        '400':
+          description: Invalid input
+          content:
+            application/octet-stream:
+              schema:
+                "$ref": "#/components/schemas/SrvcMediaErrorCode"
+        '404':
+          description: Object Not Found
+          content:
+            application/octet-stream:
+              schema:
+                "$ref": "#/components/schemas/SrvcMediaErrorCode"
+components:
+  schemas:
+    SrvcMediaErrorCode:
+      enum:
+      - INVALID_MEDIA_ID
+      - MEDIA_DOWNLOAD_FAILED
+      - INTERNAL_SERVER_ERROR
+      type: string
+  securitySchemes:
+    SecurityScheme:
+      type: http
+      description: Authentication
+      scheme: basic
+

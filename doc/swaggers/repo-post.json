@@ -1,0 +1,346 @@
+{
+  "openapi" : "3.0.3",
+  "info" : {
+    "title" : "repo-post API",
+    "version" : "1.0.0-SNAPSHOT"
+  },
+  "tags" : [ {
+    "name" : "RepoPost",
+    "description" : "RepoPost"
+  } ],
+  "paths" : {
+    "/post" : {
+      "post" : {
+        "tags" : [ "RepoPost" ],
+        "summary" : "Create a new post",
+        "requestBody" : {
+          "content" : {
+            "multipart/form-data" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/CreatePostRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "description" : "Post created successfully",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/PostEntity"
+                }
+              }
+            }
+          },
+          "400" : {
+            "description" : "Invalid input"
+          },
+          "401" : {
+            "description" : "User not authorized"
+          },
+          "404" : {
+            "description" : "User Not Found"
+          }
+        }
+      }
+    },
+    "/post/{id}" : {
+      "get" : {
+        "tags" : [ "RepoPost" ],
+        "summary" : "Get a specific post",
+        "parameters" : [ {
+          "name" : "id",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Post found",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/PostEntity"
+                }
+              }
+            }
+          },
+          "400" : {
+            "description" : "Invalid input"
+          },
+          "404" : {
+            "description" : "Post Not Found"
+          }
+        }
+      },
+      "put" : {
+        "tags" : [ "RepoPost" ],
+        "summary" : "Edit a post",
+        "parameters" : [ {
+          "name" : "id",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "requestBody" : {
+          "content" : {
+            "multipart/form-data" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/EditPostRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "description" : "Post edited successfully",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/PostEntity"
+                }
+              }
+            }
+          },
+          "400" : {
+            "description" : "Invalid input"
+          },
+          "401" : {
+            "description" : "User not authorized to modify Post"
+          },
+          "404" : {
+            "description" : "Post or User Not Found"
+          }
+        }
+      },
+      "delete" : {
+        "tags" : [ "RepoPost" ],
+        "summary" : "Delete a post",
+        "parameters" : [ {
+          "name" : "id",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "responses" : {
+          "204" : {
+            "description" : "Post deleted successfully",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/PostEntity"
+                }
+              }
+            }
+          },
+          "400" : {
+            "description" : "Invalid input"
+          },
+          "401" : {
+            "description" : "User not authorized to delete"
+          },
+          "404" : {
+            "description" : "User Not Found"
+          }
+        }
+      }
+    },
+    "/post/{id}/reply" : {
+      "get" : {
+        "tags" : [ "RepoPost" ],
+        "summary" : "Get all replies for a post",
+        "parameters" : [ {
+          "name" : "id",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Post created successfully",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/PostEntity"
+                }
+              }
+            }
+          },
+          "400" : {
+            "description" : "Invalid input"
+          },
+          "401" : {
+            "description" : "User not authorized"
+          },
+          "404" : {
+            "description" : "User Not Found"
+          }
+        }
+      },
+      "post" : {
+        "tags" : [ "RepoPost" ],
+        "summary" : "Reply to a post",
+        "parameters" : [ {
+          "name" : "id",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "requestBody" : {
+          "content" : {
+            "multipart/form-data" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/PostReplyRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "description" : "Post created successfully",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/PostEntity"
+                }
+              }
+            }
+          },
+          "400" : {
+            "description" : "Invalid input"
+          },
+          "401" : {
+            "description" : "User not authorized"
+          },
+          "404" : {
+            "description" : "User Not Found"
+          }
+        }
+      }
+    }
+  },
+  "components" : {
+    "schemas" : {
+      "AllRepliesResponse" : {
+        "type" : "object",
+        "properties" : {
+          "replies" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/PostEntity"
+            }
+          }
+        }
+      },
+      "CreatePostRequest" : {
+        "type" : "object",
+        "properties" : {
+          "text" : {
+            "type" : "string"
+          },
+          "extension" : {
+            "type" : "string"
+          },
+          "media" : {
+            "format" : "binary",
+            "description" : "Media input stream",
+            "type" : "string"
+          }
+        }
+      },
+      "EditPostRequest" : {
+        "type" : "object",
+        "properties" : {
+          "text" : {
+            "type" : "string"
+          },
+          "extension" : {
+            "type" : "string"
+          },
+          "media" : {
+            "format" : "binary",
+            "description" : "Media input stream",
+            "type" : "string"
+          }
+        }
+      },
+      "LocalDateTime" : {
+        "format" : "date-time",
+        "type" : "string",
+        "example" : "2022-03-10T12:15:50"
+      },
+      "PostEntity" : {
+        "type" : "object",
+        "properties" : {
+          "id" : {
+            "type" : "string"
+          },
+          "ownerId" : {
+            "type" : "string"
+          },
+          "text" : {
+            "type" : "string"
+          },
+          "media" : {
+            "type" : "string"
+          },
+          "repostId" : {
+            "type" : "string"
+          },
+          "replyToPostId" : {
+            "type" : "string"
+          },
+          "isReply" : {
+            "type" : "boolean"
+          },
+          "createdAt" : {
+            "$ref" : "#/components/schemas/LocalDateTime"
+          },
+          "updatedAt" : {
+            "$ref" : "#/components/schemas/LocalDateTime"
+          },
+          "deleted" : {
+            "type" : "boolean"
+          }
+        }
+      },
+      "PostReplyRequest" : {
+        "type" : "object",
+        "properties" : {
+          "text" : {
+            "type" : "string"
+          },
+          "extension" : {
+            "type" : "string"
+          },
+          "media" : {
+            "format" : "binary",
+            "description" : "Media input stream",
+            "type" : "string"
+          }
+        }
+      }
+    },
+    "securitySchemes" : {
+      "SecurityScheme" : {
+        "type" : "http",
+        "description" : "Authentication",
+        "scheme" : "basic"
+      }
+    }
+  }
+}

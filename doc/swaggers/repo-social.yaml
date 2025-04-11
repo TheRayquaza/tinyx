@@ -1,0 +1,769 @@
+---
+openapi: 3.0.3
+info:
+  title: repo-social API
+  version: 1.0.0-SNAPSHOT
+paths:
+  "/social/post/{id}/like":
+    get:
+      tags:
+      - Repo Social Controller
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  "$ref": "#/components/schemas/UserResponse"
+    post:
+      tags:
+      - Repo Social Controller
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+    delete:
+      tags:
+      - Repo Social Controller
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+  "/social/post/{postId}/like":
+    get:
+      summary: Get the likes of a post
+      parameters:
+      - name: postId
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Likes retrieved
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  "$ref": "#/components/schemas/UserResponse"
+        '400':
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/RepoSocialErrorCode"
+        '401':
+          description: User not authorized
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/RepoSocialErrorCode"
+        '403':
+          description: User blocked
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/RepoSocialErrorCode"
+        '404':
+          description: Post not found
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/RepoSocialErrorCode"
+        '500':
+          description: Error during the cypher script execution
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/RepoSocialErrorCode"
+    post:
+      summary: Like a post
+      parameters:
+      - name: postId
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '201':
+          description: Like created
+        '400':
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/RepoSocialErrorCode"
+        '401':
+          description: User not authorized
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/RepoSocialErrorCode"
+        '403':
+          description: User blocked
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/RepoSocialErrorCode"
+        '404':
+          description: Post not found
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/RepoSocialErrorCode"
+        '500':
+          description: Error during the cypher script execution
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/RepoSocialErrorCode"
+    delete:
+      summary: Deletes the like of a post
+      parameters:
+      - name: postId
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '204':
+          description: Like deleted
+        '400':
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/RepoSocialErrorCode"
+        '401':
+          description: User not authorized
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/RepoSocialErrorCode"
+        '404':
+          description: Like not found
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/RepoSocialErrorCode"
+        '500':
+          description: Error during the cypher script execution
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/RepoSocialErrorCode"
+  "/social/user/{id}/block":
+    post:
+      tags:
+      - Repo Social Controller
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+    delete:
+      tags:
+      - Repo Social Controller
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+  "/social/user/{id}/blocked":
+    get:
+      tags:
+      - Repo Social Controller
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  "$ref": "#/components/schemas/UserResponse"
+  "/social/user/{id}/blockedBy":
+    get:
+      tags:
+      - Repo Social Controller
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  "$ref": "#/components/schemas/UserResponse"
+  "/social/user/{id}/follow":
+    post:
+      tags:
+      - Repo Social Controller
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+    delete:
+      tags:
+      - Repo Social Controller
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+  "/social/user/{id}/follower":
+    get:
+      tags:
+      - Repo Social Controller
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  "$ref": "#/components/schemas/UserResponse"
+  "/social/user/{id}/following":
+    get:
+      tags:
+      - Repo Social Controller
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  "$ref": "#/components/schemas/UserResponse"
+  "/social/user/{id}/like":
+    get:
+      tags:
+      - Repo Social Controller
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  "$ref": "#/components/schemas/PostResponse"
+  "/social/user/{userId}/block":
+    post:
+      summary: Blocks another user
+      parameters:
+      - name: userId
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '201':
+          description: Block created
+        '400':
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/RepoSocialErrorCode"
+        '401':
+          description: User not authorized
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/RepoSocialErrorCode"
+        '404':
+          description: User not found
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/RepoSocialErrorCode"
+        '500':
+          description: Error during the cypher script execution
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/RepoSocialErrorCode"
+    delete:
+      summary: Unblocks another user
+      parameters:
+      - name: userId
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '204':
+          description: Block deleted
+        '400':
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/RepoSocialErrorCode"
+        '401':
+          description: User not authorized
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/RepoSocialErrorCode"
+        '404':
+          description: Not blocked this user
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/RepoSocialErrorCode"
+        '500':
+          description: Error during the cypher script execution
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/RepoSocialErrorCode"
+  "/social/user/{userId}/blocked":
+    get:
+      summary: Get the users blocked by a user
+      parameters:
+      - name: userId
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Users blocked retrieved
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  "$ref": "#/components/schemas/UserResponse"
+        '400':
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/RepoSocialErrorCode"
+        '401':
+          description: User not authorized
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/RepoSocialErrorCode"
+        '403':
+          description: Forbidden - can only see own blocked list
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/RepoSocialErrorCode"
+        '404':
+          description: User not found
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/RepoSocialErrorCode"
+        '500':
+          description: Error during the cypher script execution
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/RepoSocialErrorCode"
+  "/social/user/{userId}/blockedBy":
+    get:
+      summary: Get the users who blocked a user
+      parameters:
+      - name: userId
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Users who blocked retrieved
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  "$ref": "#/components/schemas/UserResponse"
+        '400':
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/RepoSocialErrorCode"
+        '401':
+          description: User not authorized
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/RepoSocialErrorCode"
+        '403':
+          description: Forbidden - can only see own blocked-by list
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/RepoSocialErrorCode"
+        '404':
+          description: User not found
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/RepoSocialErrorCode"
+        '500':
+          description: Error during the cypher script execution
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/RepoSocialErrorCode"
+  "/social/user/{userId}/follow":
+    post:
+      summary: Follows another user
+      parameters:
+      - name: userId
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '201':
+          description: Follow created
+        '400':
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/RepoSocialErrorCode"
+        '401':
+          description: User not authorized
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/RepoSocialErrorCode"
+        '403':
+          description: User blocked
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/RepoSocialErrorCode"
+        '404':
+          description: User not found
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/RepoSocialErrorCode"
+        '500':
+          description: Error during the cypher script execution
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/RepoSocialErrorCode"
+    delete:
+      summary: Unfollows another user
+      parameters:
+      - name: userId
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '204':
+          description: Follow deleted
+        '400':
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/RepoSocialErrorCode"
+        '401':
+          description: User not authorized
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/RepoSocialErrorCode"
+        '404':
+          description: Not following this user
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/RepoSocialErrorCode"
+        '500':
+          description: Error during the cypher script execution
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/RepoSocialErrorCode"
+  "/social/user/{userId}/follower":
+    get:
+      summary: Get the followers of a user
+      parameters:
+      - name: userId
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Followers retrieved
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  "$ref": "#/components/schemas/UserResponse"
+        '400':
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/RepoSocialErrorCode"
+        '401':
+          description: User not authorized
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/RepoSocialErrorCode"
+        '403':
+          description: User blocked
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/RepoSocialErrorCode"
+        '404':
+          description: User not found
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/RepoSocialErrorCode"
+        '500':
+          description: Error during the cypher script execution
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/RepoSocialErrorCode"
+  "/social/user/{userId}/following":
+    get:
+      summary: Get the users followed by a user
+      parameters:
+      - name: userId
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Users followed retrieved
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  "$ref": "#/components/schemas/UserResponse"
+        '400':
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/RepoSocialErrorCode"
+        '401':
+          description: User not authorized
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/RepoSocialErrorCode"
+        '403':
+          description: User blocked
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/RepoSocialErrorCode"
+        '404':
+          description: User not found
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/RepoSocialErrorCode"
+        '500':
+          description: Error during the cypher script execution
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/RepoSocialErrorCode"
+  "/social/user/{userId}/like":
+    get:
+      summary: Get the posts liked by a user
+      parameters:
+      - name: userId
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Posts liked retrieved
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  "$ref": "#/components/schemas/PostResponse"
+        '400':
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/RepoSocialErrorCode"
+        '401':
+          description: User not authorized
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/RepoSocialErrorCode"
+        '403':
+          description: User blocked
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/RepoSocialErrorCode"
+        '404':
+          description: User not found
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/RepoSocialErrorCode"
+        '500':
+          description: Error during the cypher script execution
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/RepoSocialErrorCode"
+components:
+  schemas:
+    LocalDateTime:
+      format: date-time
+      type: string
+      example: '2022-03-10T12:15:50'
+    PostResponse:
+      type: object
+      properties:
+        id:
+          type: string
+        ownerId:
+          type: string
+        text:
+          type: string
+        media:
+          type: string
+        repostId:
+          type: string
+        replyToPostId:
+          type: string
+        isReply:
+          type: boolean
+        createdAt:
+          "$ref": "#/components/schemas/LocalDateTime"
+        updatedAt:
+          "$ref": "#/components/schemas/LocalDateTime"
+        deleted:
+          type: boolean
+    RepoSocialErrorCode:
+      enum:
+      - BAD_REQUEST
+      - UNAUTHORIZED
+      - FORBIDDEN
+      - NOT_FOUND
+      - ERROR_DURING_CYPHER_EXEC
+      - INTERNAL_SERVER_ERROR
+      type: string
+    UserResponse:
+      type: object
+      properties:
+        id:
+          type: string
+        username:
+          type: string
+        email:
+          type: string
+        bio:
+          type: string
+        profileImage:
+          type: string
+        createdAt:
+          "$ref": "#/components/schemas/LocalDateTime"
+        updatedAt:
+          "$ref": "#/components/schemas/LocalDateTime"
+        deleted:
+          type: boolean
+  securitySchemes:
+    SecurityScheme:
+      type: http
+      description: Authentication
+      scheme: basic
+
