@@ -17,3 +17,10 @@ spec:
                 name: port-frontend
                 port:
                   number: 80
+          - path: /static
+            pathType: Prefix
+            backend:
+              service:
+                name: port-frontend
+                port:
+                  number: 80
