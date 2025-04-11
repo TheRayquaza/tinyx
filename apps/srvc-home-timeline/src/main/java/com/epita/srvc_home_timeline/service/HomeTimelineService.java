@@ -160,7 +160,7 @@ public class HomeTimelineService {
       homeTimelineEntity.setFollowersId(followers);
       List<HomeTimelineEntity.HomeTimelineEntryEntity> newEntries =
           homeTimelineEntity.getEntries().stream()
-              .filter(entry -> entry.getAuthorId().equals(followerId))
+              .filter(entry -> !entry.getAuthorId().equals(followerId))
               .collect(Collectors.toList());
       homeTimelineEntity.setEntries(newEntries);
       for (HomeTimelineEntity.HomeTimelineEntryEntity homeTimelineEntryEntity :
@@ -172,6 +172,7 @@ public class HomeTimelineService {
                   .collect(Collectors.toList()));
         }
       }
+      homeTimelineEntity.setEntries(homeTimelineEntity.getEntries().stream().filter(entry -> entry.getLikedBy().size() != 0).toList());
       homeTimelineRepository.updateModel(
           homeTimelineEnityToModel.convertNotNull(homeTimelineEntity));
     } else {
