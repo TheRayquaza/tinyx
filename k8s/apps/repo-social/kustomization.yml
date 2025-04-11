@@ -7,3 +7,8 @@ resources:
   - deployment.yml
   - service.yml
   - ingress.yml
+configMapGenerator:
+  - name: repo-social-config
+    namespace: apps
+    literals:
+      - QUARKUS_NEO4J_URI=bolt://neo4j.neo4j.svc.cluster.local:7687
