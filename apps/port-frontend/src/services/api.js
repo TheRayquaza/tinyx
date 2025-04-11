@@ -1,5 +1,3 @@
-const API_URL = 'http://localhost:8080'; // Replace with your API base URL
-
 const getHeaders = () => {
   const token = localStorage.getItem('token');
   const headers = { 'Content-Type': 'application/json' };
@@ -14,7 +12,7 @@ const getHeaders = () => {
 const api = {
   get: async (endpoint) => {
     try {
-      const response = await fetch(`${API_URL}${endpoint}`, {
+      const response = await fetch(`${endpoint}`, {
         method: 'GET',
         headers: getHeaders(),
       });
@@ -40,7 +38,7 @@ const api = {
         body: isFormData ? data : JSON.stringify(data),
       };
       
-      const response = await fetch(`${API_URL}${endpoint}`, options);
+      const response = await fetch(`${endpoint}`, options);
       
       if (!response.ok) {
         throw new Error(`Error: ${response.status}`);
@@ -63,7 +61,7 @@ const api = {
         body: isFormData ? data : JSON.stringify(data),
       };
       
-      const response = await fetch(`${API_URL}${endpoint}`, options);
+      const response = await fetch(`${endpoint}`, options);
       
       if (!response.ok) {
         throw new Error(`Error: ${response.status}`);
@@ -78,7 +76,7 @@ const api = {
   
   delete: async (endpoint) => {
     try {
-      const response = await fetch(`${API_URL}${endpoint}`, {
+      const response = await fetch(`${endpoint}`, {
         method: 'DELETE',
         headers: getHeaders(),
       });

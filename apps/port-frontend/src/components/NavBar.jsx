@@ -23,10 +23,11 @@ const Navbar = () => {
     <nav className="bg-blue-500 p-4 text-white">
       <div className="container mx-auto flex justify-between items-center">
         <div className="flex items-center">
-          <Link to="/" className="text-xl font-bold">Tweeter</Link>
+          <Link to="/" className="text-xl font-bold">EpiTweet</Link>
         </div>
         
-        <div className="flex-1 mx-4">
+        { isAuthenticated ? (
+          <div className="flex-1 mx-4">
           <form onSubmit={handleSearch}>
             <input
               type="text"
@@ -37,6 +38,7 @@ const Navbar = () => {
             />
           </form>
         </div>
+        ) : null }
         
         <div className="flex items-center space-x-4">
           {isAuthenticated ? (

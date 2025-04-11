@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import api from '../services/api';
 
 const SearchPage = () => {
   const [query, setQuery] = useState('');
@@ -6,10 +7,14 @@ const SearchPage = () => {
   
   const handleSearch = async () => {
     if (!query) return;
-    // Perform search logic (fetch from API)
     console.log(`Searching for: ${query}`);
-    // Set the search results (simulating with static data)
-    setResults([{ username: 'user1', tweet: 'Hello World' }]);
+    api.get(`/search?query=${query}`)
+      .then(response => {
+        setResults(response.data);
+      })
+      .catch(error => {
+        console.error('Error fetching search results:', error);
+      });
   };
 
   return (

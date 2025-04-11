@@ -65,7 +65,7 @@ const HomePage = () => {
     return (
       <div className="container mx-auto p-4">
         <div className="bg-white shadow rounded-lg p-6 text-center">
-          <h2 className="text-2xl font-bold mb-4">Welcome to Tweeter</h2>
+          <h2 className="text-2xl font-bold mb-4">Welcome to EpiTweet</h2>
           <p className="mb-4">Please log in or sign up to see your timeline and start posting.</p>
         </div>
       </div>

@@ -4,7 +4,7 @@ const authService = {
   login: async (username, password) => {
     try {
       const data = await api.post('/login', { username, password });
-      localStorage.setItem('token', data.id); // Using id as token based on your API
+      localStorage.setItem('token', btoa(data.id + "," + data.username));
       localStorage.setItem('user', JSON.stringify(data));
       return data;
     } catch (error) {

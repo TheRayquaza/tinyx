@@ -35,7 +35,7 @@ const LoginPage = () => {
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-100">
       <div className="w-full max-w-md p-8 bg-white rounded-lg shadow-md">
-        <h2 className="text-2xl font-bold text-center mb-8 text-blue-500">Log in to Tweeter</h2>
+        <h2 className="text-2xl font-bold text-center mb-8 text-blue-500">Log in to EpiTweet</h2>
         
         {error && (
           <div className="mb-4 p-3 bg-red-100 text-red-700 rounded">

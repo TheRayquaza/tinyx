@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+//import { toast } from 'react-toastify';
 
 const SignupPage = () => {
   const [username, setUsername] = useState('');
@@ -36,7 +38,7 @@ const SignupPage = () => {
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-100">
       <div className="w-full max-w-md p-8 bg-white rounded-lg shadow-md">
-        <h2 className="text-2xl font-bold text-center mb-8 text-blue-500">Sign Up for Tweeter</h2>
+        <h2 className="text-2xl font-bold text-center mb-8 text-blue-500">Sign Up for EpiTweet</h2>
         
         {error && (
           <div className="mb-4 p-3 bg-red-100 text-red-700 rounded">
@@ -98,9 +100,9 @@ const SignupPage = () => {
 
         <p className="mt-6 text-center text-sm text-gray-600">
           Already have an account?{' '}
-          <link to="/login" className="text-blue-500 hover:underline">
+          <Link to="/login" className="text-blue-500 hover:underline">
             Log in
-          </link>
+          </Link>
         </p>
       </div>
     </div>
