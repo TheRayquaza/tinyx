@@ -39,3 +39,9 @@ docker-compose.override.yml
 
 # Vagrant
 .vagrant/
+
+# Frontend
+node_modules/
+build/
+dist/
+package-lock.json
