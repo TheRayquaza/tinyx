@@ -24,7 +24,7 @@ spec:
         - name: pull-secret
       containers:
         - name: srvc-home-timeline
-          image: registry.cri.epita.fr/ing/majeures/tc/info/student/2026/2025-epitweet-tinyx-02/srvc-home-timeline:v2.0.0
+          image: registry.cri.epita.fr/ing/majeures/tc/info/student/2026/2025-epitweet-tinyx-02/srvc-home-timeline:v2.0.1
           imagePullPolicy: IfNotPresent
           ports:
             - name: http
