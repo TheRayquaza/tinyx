@@ -8,7 +8,7 @@
 # ========== SERVICES ==========
 
 /apps/srvc-search/         @armand.blin @mateo.lelong @gabriel.monteillard @timothe.merle
-/apps/srvc-home-timeline/  @anton.vella @baptiste.arnold
+/apps/srvc-home-timeline/  @anton.vella @timothe.merle @baptiste.arnold
 /apps/srvc-user-timeline/  @alexis.pinson @gabriel.toledano @timothe.merle @noe.susset
 
 # ========== INFRA ==========
