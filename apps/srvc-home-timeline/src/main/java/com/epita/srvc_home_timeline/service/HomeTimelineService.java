@@ -107,14 +107,7 @@ public class HomeTimelineService {
   }
 
   public void homeTimelineAdd(PostAggregate postAggregate) {
-    System.out.println("home post owner id: " + postAggregate.getOwnerId());
     List<HomeTimelineModel> homeTimelinesModel = homeTimelineRepository.getHomeTimelineContainingUserId(postAggregate.getOwnerId(), "0");
-    if (homeTimelinesModel.isEmpty()) {
-      logger.error("no home timeline found for post %s".formatted(postAggregate.getId()));
-      return;
-    } else {
-      logger.error("multiple home timelines found for post %s".formatted(postAggregate.getId()));
-    }
     for (HomeTimelineModel homeTimelineModel : homeTimelinesModel) {
       if (homeTimelineModel.getBlockedUsersId().contains(postAggregate.getOwnerId())) {
         continue;
@@ -265,21 +258,30 @@ public class HomeTimelineService {
       HomeTimelineEntity homeTimelineEntity =
           homeTimelineModelToEntity.convertNotNull(homeTimelineModel);
       List<HomeTimelineEntity.HomeTimelineEntryEntity> entries = homeTimelineEntity.getEntries();
-      List<HomeTimelineEntity.HomeTimelineLikedByEntity> likedBy = new ArrayList<>();
-      HomeTimelineEntity.HomeTimelineLikedByEntity likedByEntity =
-          new HomeTimelineEntity.HomeTimelineLikedByEntity()
-              .withUserId(UserId)
-              .withLikedAt(LocalDateTime.now());
-      likedBy.add(likedByEntity);
-      HomeTimelineEntity.HomeTimelineEntryEntity toAdd =
-          new HomeTimelineEntity.HomeTimelineEntryEntity()
-              .withPostId(postId)
-              .withAuthorId(PostModel.getOwnerId())
-              .withContent(PostModel.getText())
-              .withLikedBy(likedBy)
-              .withType(PostModel.getMedia())
-              .withTimestamp(LocalDateTime.now());
-      entries.add(toAdd);
+      boolean exists = false;
+      for (HomeTimelineEntity.HomeTimelineEntryEntity homeTimelineEntryEntity : entries) {
+        if (homeTimelineEntryEntity.getPostId().equals(postId)) {
+          List<HomeTimelineEntity.HomeTimelineLikedByEntity> newLikedBy = homeTimelineEntryEntity.getLikedBy();
+          newLikedBy.add(new HomeTimelineEntity.HomeTimelineLikedByEntity().withLikedAt(LocalDateTime.now()).withUserId(UserId));
+          homeTimelineEntryEntity.setLikedBy(newLikedBy);
+          exists = true;
+        }
+      }
+      if (!exists) {
+        List<HomeTimelineEntity.HomeTimelineLikedByEntity> likedBy = new ArrayList<>();
+        HomeTimelineEntity.HomeTimelineLikedByEntity likedByEntity = new HomeTimelineEntity.HomeTimelineLikedByEntity()
+                .withUserId(UserId)
+                .withLikedAt(LocalDateTime.now());
+        likedBy.add(likedByEntity);
+        HomeTimelineEntity.HomeTimelineEntryEntity newEntry = new HomeTimelineEntity.HomeTimelineEntryEntity()
+                .withPostId(postId)
+                .withAuthorId(PostModel.getOwnerId())
+                .withContent(PostModel.getText())
+                .withLikedBy(likedBy)
+                .withType(PostModel.getMedia())
+                .withTimestamp(LocalDateTime.now());
+        entries.add(newEntry);
+      }
       homeTimelineEntity.setEntries(entries);
       homeTimelineRepository.updateModel(
           homeTimelineEnityToModel.convertNotNull(homeTimelineEntity));
