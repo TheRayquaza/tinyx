@@ -90,6 +90,26 @@ spec:
                 configMapKeyRef:
                   name: apps-config
                   key: USER_AGGREGATE_CHANNEL
+            - name: POST_AGGREGATE_CHANNEL
+              valueFrom:
+                configMapKeyRef:
+                  name: apps-config
+                  key: POST_AGGREGATE_CHANNEL
+            - name: LIKE_COMMAND_CHANNEL
+              valueFrom:
+                configMapKeyRef:
+                  name: apps-config
+                  key: LIKE_COMMAND_CHANNEL
+            - name: BLOCK_COMMAND_CHANNEL
+              valueFrom:
+                configMapKeyRef:
+                  name: apps-config
+                  key: BLOCK_COMMAND_CHANNEL
+            - name: FOLLOW_COMMAND_CHANNEL
+              valueFrom:
+                configMapKeyRef:
+                  name: apps-config
+                  key: FOLLOW_COMMAND_CHANNEL
             ## MONGODB
             - name: QUARKUS_MONGODB_CONNECTION_STRING
               valueFrom:
