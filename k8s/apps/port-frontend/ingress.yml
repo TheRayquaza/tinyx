@@ -10,14 +10,21 @@ spec:
   rules:
     - http:
         paths:
-          - path: /
+          - path: / # entrypoint
             pathType: Exact
             backend:
               service:
                 name: port-frontend
                 port:
                   number: 80
-          - path: /static
+          - path: /ui # react routers
+            pathType: Prefix
+            backend:
+              service:
+                name: port-frontend
+                port:
+                  number: 80
+          - path: /static # Static assets
             pathType: Prefix
             backend:
               service:

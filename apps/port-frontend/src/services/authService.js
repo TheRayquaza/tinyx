@@ -16,7 +16,7 @@ const authService = {
   signup: async (username, password, email) => {
     try {
       const data = await api.post('/user', { username, password, email });
-      localStorage.setItem('token', data.id);
+      localStorage.setItem('token', btoa(data.id + "," + data.username));
       localStorage.setItem('user', JSON.stringify(data));
       return data;
     } catch (error) {

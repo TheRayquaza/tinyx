@@ -9,13 +9,13 @@ const Navbar = () => {
 
   const handleLogout = () => {
     logout();
-    navigate('/login');
+    navigate('/ui/login');
   };
 
   const handleSearch = (e) => {
     e.preventDefault();
     if (searchQuery.trim()) {
-      navigate(`/search?query=${encodeURIComponent(searchQuery)}`);
+      navigate(`/ui/search?query=${encodeURIComponent(searchQuery)}`);
     }
   };
 
@@ -44,13 +44,13 @@ const Navbar = () => {
           {isAuthenticated ? (
             <>
               <Link to="/" className="hover:underline">Home</Link>
-              <Link to={`/profile/${currentUser.id}`} className="hover:underline">Profile</Link>
+              <Link to={`/ui/profile/${currentUser.id}`} className="hover:underline">Profile</Link>
               <button onClick={handleLogout} className="hover:underline">Logout</button>
             </>
           ) : (
             <>
-              <Link to="/login" className="hover:underline">Login</Link>
-              <Link to="/signup" className="hover:underline bg-white text-blue-500 px-3 py-1 rounded">Sign Up</Link>
+              <Link to="/ui/login" className="hover:underline">Login</Link>
+              <Link to="/ui/signup" className="hover:underline bg-white text-blue-500 px-3 py-1 rounded">Sign Up</Link>
             </>
           )}
         </div>

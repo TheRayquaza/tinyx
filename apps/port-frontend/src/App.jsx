@@ -18,11 +18,11 @@ function App() {
       <div>
         <Routes>
           <Route path="/" element={<HomePage />} />
-          <Route path="/login" element={<LoginPage />} />
-          <Route path="/signup" element={<SignupPage />} />
-          <Route path="/profile" element={<ProfilePage />} />
-          <Route path="/post/:id" element={<PostDetailPage />} />
-          <Route path="/search" element={<SearchPage />} />
+          <Route path="/ui/login" element={<LoginPage />} />
+          <Route path="/ui/signup" element={<SignupPage />} />
+          <Route path="/ui/profile" element={<ProfilePage />} />
+          <Route path="/ui/post/:id" element={<PostDetailPage />} />
+          <Route path="/ui/search" element={<SearchPage />} />
           
           {!isAuthenticated && <Route path="/" element={<LoginPage />} />}
         </Routes>
