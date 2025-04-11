@@ -112,11 +112,11 @@ spec:
 
 
             ## NEO4J
-            - name: QUARKUS_NEO4J_AUTHENTICATION_URI
+            - name: QUARKUS_NEO4J_URI
               valueFrom:
                 configMapKeyRef:
                   name: repo-social-config
-                  key: QUARKUS_NEO4J_AUTHENTICATION_URI
+                  key: QUARKUS_NEO4J_URI
             - name: QUARKUS_NEO4J_AUTHENTICATION_USERNAME
               valueFrom:
                 secretKeyRef:

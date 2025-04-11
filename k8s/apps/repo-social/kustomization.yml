@@ -11,4 +11,4 @@ configMapGenerator:
   - name: repo-social-config
     namespace: apps
     literals:
-      - QUARKUS_NEO4J_AUTHENTICATION_URI=bolt://neo4j.neo4j.svc.cluster.local
+      - QUARKUS_NEO4J_URI=bolt://neo4j.neo4j.svc.cluster.local:7687
