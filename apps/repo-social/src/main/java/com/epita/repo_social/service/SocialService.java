@@ -32,9 +32,11 @@ public class SocialService implements Logger {
 
   String likeCommandChannel = System.getenv().getOrDefault("LIKE_COMMAND_CHANNEL", "like_command");
 
-  String blockCommandChannel = System.getenv().getOrDefault("BLOCK_COMMAND_CHANNEL", "block_command");
+  String blockCommandChannel =
+      System.getenv().getOrDefault("BLOCK_COMMAND_CHANNEL", "block_command");
 
-  String followCommandChannel = System.getenv().getOrDefault("FOLLOW_COMMAND_CHANNEL", "follow_command");
+  String followCommandChannel =
+      System.getenv().getOrDefault("FOLLOW_COMMAND_CHANNEL", "follow_command");
 
   @Inject PostNodeToPostEntity postNodeToPostEntity;
 
