@@ -263,7 +263,7 @@ public class HomeTimelineTest {
     publishAndWait("post_aggregate", newpost2);
     System.out.println("user 2 posts - done");
 
-    // Checking user 1 and user 3 home timelines
+    // Checking user 3 home timelines
     response = given().header("Authorization", "Bearer " + TOKEN_USER_3).when().get(USER_ID_3);
 
     System.out.println(response.body().prettyPrint());

@@ -32,6 +32,10 @@ public class HomeTimelineRepository implements PanacheMongoRepository<HomeTimeli
     return this.find("followersId", userId).list();
   }
 
+  public List<HomeTimelineModel> getFollowersHomeTimelines(List<String> followersId) {
+    return this.find("userId in ?1", followersId).list();
+  }
+
   public List<HomeTimelineModel> getHomeTimelineContainingUserId(
       String userId, String blockedUserId) {
     return this.find("followersId = ?1 and blockedUsersId <> ?2", userId, blockedUserId).list();

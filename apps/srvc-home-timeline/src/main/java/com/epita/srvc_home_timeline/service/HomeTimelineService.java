@@ -106,13 +106,23 @@ public class HomeTimelineService {
   }
 
   public void homeTimelineAdd(PostAggregate postAggregate) {
+    Optional<HomeTimelineModel> optionalAuthorHometimelineModel =
+        homeTimelineRepository.findByUserId(postAggregate.getOwnerId());
+
+    if (optionalAuthorHometimelineModel.isEmpty()) {
+      logger.error("user %s does not exist".formatted(postAggregate.getOwnerId()));
+      return;
+    }
+    
+    HomeTimelineModel authorHometimelineModel = optionalAuthorHometimelineModel.get();
+
     List<HomeTimelineModel> hometimelinesModel =
-        homeTimelineRepository.getHomeTimelineContainingUserId(postAggregate.getOwnerId());
+        homeTimelineRepository.getFollowersHomeTimelines(authorHometimelineModel.getFollowersId());
+
     for (HomeTimelineModel homeTimelineModel : hometimelinesModel) {
       if (homeTimelineModel.getBlockedUsersId().contains(postAggregate.getOwnerId())) {
         continue;
       }
-
       HomeTimelineEntity homeTimelineEntity =
           homeTimelineModelToEntity.convertNotNull(homeTimelineModel);
       List<HomeTimelineEntity.HomeTimelineEntryEntity> entries = homeTimelineEntity.getEntries();
