@@ -107,7 +107,7 @@ public class HomeTimelineService {
   }
 
   public void homeTimelineAdd(PostAggregate postAggregate) {
-    List<HomeTimelineModel> homeTimelinesModel = homeTimelineRepository.getHomeTimelineContainingUserId(postAggregate.getId());
+    List<HomeTimelineModel> homeTimelinesModel = homeTimelineRepository.getHomeTimelineContainingUserId(postAggregate.getOwnerId());
     for (HomeTimelineModel homeTimelineModel : homeTimelinesModel) {
       if (homeTimelineModel.getBlockedUsersId().contains(postAggregate.getOwnerId())) {
         continue;

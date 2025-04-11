@@ -29,7 +29,7 @@ public class HomeTimelineRepository implements PanacheMongoRepository<HomeTimeli
   }
 
   public List<HomeTimelineModel> getHomeTimelineContainingUserId(String userId) {
-    return this.find("{ 'followersId' : ?1 }", userId).list();
+    return this.find("followersId = ?1", userId).list();
   }
 
   public List<HomeTimelineModel> getFollowersHomeTimelines(List<String> followersId) {
