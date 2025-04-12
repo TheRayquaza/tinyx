@@ -151,17 +151,10 @@ public class HomeTimelineService {
       HomeTimelineModel homeTimelineModel = homeTimeline.get();
       HomeTimelineEntity homeTimelineEntity =
           homeTimelineModelToEntity.convertNotNull(homeTimelineModel);
-      List<String> followers = homeTimelineEntity.getFollowersId();
-      if (followers.contains(followerId)) {
-        followers.remove(followerId);
-      }
-      homeTimelineEntity.setFollowersId(followers);
+      homeTimelineEntity.setFollowersId(homeTimelineEntity.getFollowersId().stream().filter(follower -> follower != followerId).toList());
       List<HomeTimelineEntity.HomeTimelineEntryEntity> newEntries =
           homeTimelineEntity.getEntries().stream()
-              .filter(entry -> !entry.getAuthorId().equals(followerId))
-              .collect(Collectors.toList());
-      homeTimelineEntity.setEntries(newEntries);
-      newEntries = homeTimelineEntity.getEntries();
+              .filter(entry -> !entry.getAuthorId().equals(followerId)).toList();
       for (HomeTimelineEntity.HomeTimelineEntryEntity homeTimelineEntryEntity :
           newEntries) {
         if (homeTimelineEntryEntity.getLikedBy().stream().anyMatch(likedBy -> likedBy.getUserId().equals(followerId))) {
@@ -171,8 +164,7 @@ public class HomeTimelineService {
                   .collect(Collectors.toList()));
         }
       }
-      homeTimelineEntity.setEntries(newEntries);
-      homeTimelineEntity.setEntries(homeTimelineEntity.getEntries().stream().filter(entry -> entry.getLikedBy().size() != 0).toList());
+      homeTimelineEntity.setEntries(newEntries.stream().filter(entry -> entry.getLikedBy().size() != 0).toList());
       homeTimelineRepository.updateModel(
           homeTimelineEnityToModel.convertNotNull(homeTimelineEntity));
     } else {
