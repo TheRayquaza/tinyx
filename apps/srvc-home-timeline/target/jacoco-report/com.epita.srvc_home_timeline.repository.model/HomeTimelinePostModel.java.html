@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>HomeTimelinePostModel.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">quarkus-application</a> &gt; <a href="index.source.html" class="el_package">com.epita.srvc_home_timeline.repository.model</a> &gt; <span class="el_source">HomeTimelinePostModel.java</span></div><h1>HomeTimelinePostModel.java</h1><pre class="source lang-java linenums">package com.epita.srvc_home_timeline.repository.model;
+
+import io.quarkus.mongodb.panache.common.MongoEntity;
+import java.time.LocalDateTime;
+import lombok.*;
+import org.bson.codecs.pojo.annotations.BsonId;
+import org.bson.types.ObjectId;
+
+@Getter
+<span class="nc" id="L10">@Setter</span>
+<span class="nc" id="L11">@AllArgsConstructor</span>
+<span class="nc" id="L12">@NoArgsConstructor</span>
+@With
+@MongoEntity(collection = &quot;HomeTimelinePostModel&quot;, database = &quot;SrvcHomeTimeline&quot;)
+public class HomeTimelinePostModel {
+<span class="nc bnc" id="L16" title="All 2 branches missed.">  @BsonId private ObjectId id;</span>
+<span class="nc bnc" id="L17" title="All 2 branches missed.">  private String postId;</span>
+<span class="nc bnc" id="L18" title="All 2 branches missed.">  private String ownerId;</span>
+<span class="nc bnc" id="L19" title="All 2 branches missed.">  private String text;</span>
+<span class="nc bnc" id="L20" title="All 2 branches missed.">  private String media;</span>
+<span class="nc bnc" id="L21" title="All 2 branches missed.">  private String repostId;</span>
+<span class="nc bnc" id="L22" title="All 2 branches missed.">  private String replyToPostId;</span>
+<span class="nc bnc" id="L23" title="All 2 branches missed.">  private boolean isReply;</span>
+<span class="nc bnc" id="L24" title="All 2 branches missed.">  private LocalDateTime createdAt;</span>
+<span class="nc bnc" id="L25" title="All 2 branches missed.">  private LocalDateTime updatedAt;</span>
+<span class="nc bnc" id="L26" title="All 2 branches missed.">  private boolean deleted;</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.9.202303310957</span></div></body></html>

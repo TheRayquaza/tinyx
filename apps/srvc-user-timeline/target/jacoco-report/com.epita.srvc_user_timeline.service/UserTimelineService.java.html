@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>UserTimelineService.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">quarkus-application</a> &gt; <a href="index.source.html" class="el_package">com.epita.srvc_user_timeline.service</a> &gt; <span class="el_source">UserTimelineService.java</span></div><h1>UserTimelineService.java</h1><pre class="source lang-java linenums">package com.epita.srvc_user_timeline.service;
+
+import com.epita.exchange.redis.aggregate.PostAggregate;
+import com.epita.exchange.redis.aggregate.UserAggregate;
+import com.epita.exchange.redis.command.BlockCommand;
+import com.epita.exchange.redis.command.LikeCommand;
+import com.epita.srvc_user_timeline.converter.UserTimelinePostModelToUserTimelinePostEntity;
+import com.epita.srvc_user_timeline.repository.UserTimelineRepository;
+import com.epita.srvc_user_timeline.repository.model.UserTimelinePostModel;
+import com.epita.srvc_user_timeline.service.entity.UserTimelineEntity;
+import com.epita.srvc_user_timeline.service.entity.UserTimelinePostEntity;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.stream.Collectors;
+import org.bson.types.ObjectId;
+import org.jboss.logging.Logger;
+
+@ApplicationScoped
+<span class="fc" id="L21">public class UserTimelineService {</span>
+  @Inject UserTimelineRepository userTimelineRepository;
+
+  @Inject
+  UserTimelinePostModelToUserTimelinePostEntity userTimelinePostModelToUserTimelinePostEntity;
+
+  @Inject Logger logger;
+
+  private List&lt;UserTimelinePostEntity&gt; sortPosts(List&lt;UserTimelinePostEntity&gt; posts) {
+<span class="fc" id="L30">    posts.sort(</span>
+        (post1, post2) -&gt; {
+<span class="pc bpc" id="L32" title="2 of 4 branches missed.">          if (post1.getLikedAt() != null &amp;&amp; post2.getLikedAt() != null) {</span>
+<span class="nc" id="L33">            return post1.getLikedAt().compareTo(post2.getLikedAt());</span>
+          }
+<span class="pc bpc" id="L35" title="1 of 2 branches missed.">          if (post1.getLikedAt() != null) {</span>
+<span class="fc" id="L36">            return post1.getLikedAt().compareTo(post2.getCreatedAt());</span>
+          }
+<span class="nc bnc" id="L38" title="All 2 branches missed.">          if (post2.getLikedAt() != null) {</span>
+<span class="nc" id="L39">            return post1.getCreatedAt().compareTo(post2.getLikedAt());</span>
+          }
+<span class="nc" id="L41">          return post1.getCreatedAt().compareTo(post2.getCreatedAt());</span>
+        });
+<span class="fc" id="L43">    return posts;</span>
+  }
+
+  public UserTimelineEntity getUserTimeline(String userId) {
+<span class="fc" id="L47">    List&lt;UserTimelinePostModel&gt; posts =</span>
+<span class="fc" id="L48">        userTimelineRepository.find(&quot;userId&quot;, userId).stream().toList();</span>
+
+<span class="fc" id="L50">    List&lt;UserTimelinePostEntity&gt; postsEntity =</span>
+<span class="fc" id="L51">        posts.stream()</span>
+<span class="fc" id="L52">            .map(userTimelinePostModelToUserTimelinePostEntity::convertNotNull)</span>
+<span class="fc" id="L53">            .collect(Collectors.toList());</span>
+
+<span class="fc" id="L55">    return new UserTimelineEntity().withPosts(sortPosts(postsEntity));</span>
+  }
+
+  public void handlePostAggregate(PostAggregate postAggregate) {
+<span class="pc bpc" id="L59" title="1 of 2 branches missed.">    if (postAggregate.isDeleted()) {</span>
+<span class="nc" id="L60">      userTimelineRepository.delete(&quot;postId&quot;, postAggregate.getId());</span>
+<span class="nc" id="L61">      return;</span>
+    }
+
+<span class="fc" id="L64">    UserTimelinePostModel userTimelinePostModel =</span>
+        new UserTimelinePostModel()
+<span class="fc" id="L66">            .withId(new ObjectId())</span>
+<span class="fc" id="L67">            .withPostId(postAggregate.getId())</span>
+<span class="fc" id="L68">            .withUserId(postAggregate.getOwnerId())</span>
+<span class="fc" id="L69">            .withOwnerId(postAggregate.getOwnerId())</span>
+<span class="fc" id="L70">            .withText(postAggregate.getText())</span>
+<span class="fc" id="L71">            .withMedia(postAggregate.getMedia())</span>
+<span class="fc" id="L72">            .withRepostId(postAggregate.getRepostId())</span>
+<span class="fc" id="L73">            .withReplyToPostId(postAggregate.getReplyToPostId())</span>
+<span class="fc" id="L74">            .withIsReply(postAggregate.isReply())</span>
+<span class="fc" id="L75">            .withCreatedAt(postAggregate.getCreatedAt())</span>
+<span class="fc" id="L76">            .withUpdatedAt(postAggregate.getUpdatedAt())</span>
+<span class="fc" id="L77">            .withDeleted(postAggregate.isDeleted());</span>
+
+<span class="fc" id="L79">    userTimelineRepository.persist(userTimelinePostModel);</span>
+<span class="fc" id="L80">  }</span>
+
+  public void handleUserAggregate(UserAggregate userAggregate) {
+<span class="pc bpc" id="L83" title="1 of 2 branches missed.">    if (!userAggregate.isDeleted()) return;</span>
+
+<span class="fc" id="L85">    userTimelineRepository.delete(&quot;ownerId = ?1 or userId = ?1&quot;, userAggregate.getId());</span>
+<span class="fc" id="L86">  }</span>
+
+  public void handleLikeCommand(LikeCommand likeCommand) {
+<span class="fc" id="L89">    UserTimelinePostModel likedPost =</span>
+<span class="fc" id="L90">        userTimelineRepository.find(&quot;postId = ?1&quot;, likeCommand.getPostId()).firstResult();</span>
+
+<span class="pc bpc" id="L92" title="1 of 2 branches missed.">    if (likedPost == null) {</span>
+<span class="nc" id="L93">      logger.error(&quot;Post not found: &quot; + likeCommand.getPostId());</span>
+<span class="nc" id="L94">      return;</span>
+    }
+
+<span class="fc bfc" id="L97" title="All 2 branches covered.">    if (!likeCommand.isLiked()) {</span>
+<span class="fc" id="L98">      userTimelineRepository.delete(</span>
+<span class="fc" id="L99">          &quot;postId = ?1 and userId = ?2&quot;, likeCommand.getPostId(), likeCommand.getUserId());</span>
+    } else {
+<span class="fc" id="L101">      UserTimelinePostModel newTimelinePost =</span>
+          new UserTimelinePostModel()
+<span class="fc" id="L103">              .withId(new ObjectId())</span>
+<span class="fc" id="L104">              .withPostId(likedPost.getPostId())</span>
+<span class="fc" id="L105">              .withUserId(likeCommand.getUserId())</span>
+<span class="fc" id="L106">              .withOwnerId(likedPost.getOwnerId())</span>
+<span class="fc" id="L107">              .withText(likedPost.getText())</span>
+<span class="fc" id="L108">              .withMedia(likedPost.getMedia())</span>
+<span class="fc" id="L109">              .withRepostId(likedPost.getRepostId())</span>
+<span class="fc" id="L110">              .withCreatedAt(likedPost.getCreatedAt())</span>
+<span class="fc" id="L111">              .withUpdatedAt(likedPost.getUpdatedAt())</span>
+<span class="fc" id="L112">              .withLikedAt(LocalDateTime.now());</span>
+
+<span class="fc" id="L114">      userTimelineRepository.persist(newTimelinePost);</span>
+    }
+<span class="fc" id="L116">  }</span>
+
+  public void handleBlockCommand(BlockCommand blockCommand) {
+<span class="fc bfc" id="L119" title="All 2 branches covered.">    if (!blockCommand.isBlocked()) return;</span>
+
+<span class="fc" id="L121">    userTimelineRepository.delete(</span>
+        &quot;userId = ?1 and ownerId = ?2 or userId = ?2 and ownerId = ?1&quot;,
+<span class="fc" id="L123">        blockCommand.getUserId(),</span>
+<span class="fc" id="L124">        blockCommand.getTargetId());</span>
+<span class="fc" id="L125">  }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.9.202303310957</span></div></body></html>

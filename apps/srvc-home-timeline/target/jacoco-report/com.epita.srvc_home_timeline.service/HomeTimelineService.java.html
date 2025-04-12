@@ -1,0 +1,318 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>HomeTimelineService.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">quarkus-application</a> &gt; <a href="index.source.html" class="el_package">com.epita.srvc_home_timeline.service</a> &gt; <span class="el_source">HomeTimelineService.java</span></div><h1>HomeTimelineService.java</h1><pre class="source lang-java linenums">package com.epita.srvc_home_timeline.service;
+
+import com.epita.exchange.redis.aggregate.PostAggregate;
+import com.epita.srvc_home_timeline.HomeTimelineErrorCode;
+import com.epita.srvc_home_timeline.controller.response.HomeTimelineResponse;
+import com.epita.srvc_home_timeline.converter.HomeTimelineEntityToHomeTimelineModel;
+import com.epita.srvc_home_timeline.converter.HomeTimelineModelToHomeTimelineEntity;
+import com.epita.srvc_home_timeline.converter.HomeTimelinePostModelToHomeTimelinePostEntity;
+import com.epita.srvc_home_timeline.repository.HomeTimelinePostRepository;
+import com.epita.srvc_home_timeline.repository.HomeTimelineRepository;
+import com.epita.srvc_home_timeline.repository.model.HomeTimelineModel;
+import com.epita.srvc_home_timeline.repository.model.HomeTimelinePostModel;
+import com.epita.srvc_home_timeline.service.entity.HomeTimelineEntity;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+import org.jboss.logging.Logger;
+
+@ApplicationScoped
+<span class="fc" id="L24">public class HomeTimelineService {</span>
+  @Inject HomeTimelineRepository homeTimelineRepository;
+  @Inject HomeTimelinePostRepository postRepository;
+  @Inject HomeTimelineModelToHomeTimelineEntity homeTimelineModelToEntity;
+  @Inject HomeTimelinePostModelToHomeTimelinePostEntity homeTimelinePostModelToEntity;
+  @Inject HomeTimelineEntityToHomeTimelineModel homeTimelineEnityToModel;
+  @Inject HomeTimelinePostRepository homeTimelinePostRepository;
+  @Inject Logger logger;
+
+  HomeTimelineModel initHomeTimeline(String userId) {
+<span class="fc" id="L34">    HomeTimelineModel homeTimelineModel = new HomeTimelineModel();</span>
+<span class="fc" id="L35">    homeTimelineModel.setCreatedAt(LocalDateTime.now());</span>
+<span class="fc" id="L36">    homeTimelineModel.setUserId(userId);</span>
+<span class="fc" id="L37">    homeTimelineModel.setEntries(new ArrayList&lt;&gt;());</span>
+<span class="fc" id="L38">    homeTimelineModel.setFollowersId(new ArrayList&lt;&gt;());</span>
+<span class="fc" id="L39">    homeTimelineModel.setBlockedUsersId(new ArrayList&lt;&gt;());</span>
+<span class="fc" id="L40">    return homeTimelineModel;</span>
+  }
+
+  HomeTimelinePostModel initHomeTimelinePost(PostAggregate postAggregate) {
+<span class="nc" id="L44">    return new HomeTimelinePostModel()</span>
+<span class="nc" id="L45">        .withPostId(postAggregate.getId())</span>
+<span class="nc" id="L46">        .withOwnerId(postAggregate.getOwnerId())</span>
+<span class="nc" id="L47">        .withText(postAggregate.getText())</span>
+<span class="nc" id="L48">        .withMedia(postAggregate.getMedia())</span>
+<span class="nc" id="L49">        .withRepostId(postAggregate.getRepostId())</span>
+<span class="nc" id="L50">        .withReplyToPostId(postAggregate.getReplyToPostId())</span>
+<span class="nc" id="L51">        .withReply(postAggregate.isReply())</span>
+<span class="nc" id="L52">        .withCreatedAt(postAggregate.getCreatedAt())</span>
+<span class="nc" id="L53">        .withUpdatedAt(postAggregate.getUpdatedAt())</span>
+<span class="nc" id="L54">        .withDeleted(postAggregate.isDeleted());</span>
+  }
+
+  public HomeTimelineResponse getHomeTimelineById(String userId) {
+<span class="nc" id="L58">    Optional&lt;HomeTimelineModel&gt; homeTimeline = homeTimelineRepository.findByUserId(userId);</span>
+
+<span class="nc bnc" id="L60" title="All 2 branches missed.">    if (homeTimeline.isPresent()) {</span>
+<span class="nc" id="L61">      HomeTimelineModel homeTimelineModel = homeTimeline.get();</span>
+<span class="nc" id="L62">      homeTimelineModel.setEntries(</span>
+<span class="nc" id="L63">          homeTimelineModel.getEntries().stream()</span>
+<span class="nc" id="L64">              .sorted((entry1, entry2) -&gt; entry2.getTimestamp().compareTo(entry1.getTimestamp()))</span>
+<span class="nc" id="L65">              .toList());</span>
+<span class="nc" id="L66">      return new HomeTimelineResponse(homeTimelineModelToEntity.convertNotNull(homeTimelineModel));</span>
+    } else {
+<span class="nc" id="L68">      throw HomeTimelineErrorCode.USER_NOT_FOUND.createError(userId);</span>
+    }
+  }
+
+  public void handlePostAggregate(PostAggregate postAggregate) {
+<span class="nc bnc" id="L73" title="All 2 branches missed.">    if (postAggregate.isDeleted()) {</span>
+<span class="nc" id="L74">      Optional&lt;HomeTimelinePostModel&gt; toDelete =</span>
+<span class="nc" id="L75">          homeTimelinePostRepository.findByPostId(postAggregate.getId());</span>
+<span class="nc bnc" id="L76" title="All 2 branches missed.">      if (!toDelete.isPresent()) {</span>
+<span class="nc" id="L77">        return;</span>
+      }
+<span class="nc" id="L79">      homeTimelinePostRepository.deleteModel(toDelete.get());</span>
+<span class="nc" id="L80">      homeTimelineDelete(postAggregate.getId());</span>
+<span class="nc" id="L81">    } else {</span>
+<span class="nc" id="L82">      homeTimelinePostRepository.create(initHomeTimelinePost(postAggregate));</span>
+<span class="nc" id="L83">      homeTimelineAdd(postAggregate);</span>
+    }
+<span class="nc" id="L85">  }</span>
+
+  public void homeTimelineDelete(String postId) {
+<span class="nc" id="L88">    List&lt;HomeTimelineModel&gt; hometimelinesModel =</span>
+<span class="nc" id="L89">        homeTimelineRepository.getHomeTimelineContainingPostId(postId);</span>
+<span class="nc bnc" id="L90" title="All 2 branches missed.">    for (HomeTimelineModel homeTimelineModel : hometimelinesModel) {</span>
+<span class="nc" id="L91">      HomeTimelineEntity homeTimelineEntity =</span>
+<span class="nc" id="L92">          homeTimelineModelToEntity.convertNotNull(homeTimelineModel);</span>
+<span class="nc" id="L93">      List&lt;HomeTimelineEntity.HomeTimelineEntryEntity&gt; entries = homeTimelineEntity.getEntries();</span>
+<span class="nc" id="L94">      HomeTimelineEntity.HomeTimelineEntryEntity toDelete = null;</span>
+<span class="nc bnc" id="L95" title="All 2 branches missed.">      for (HomeTimelineEntity.HomeTimelineEntryEntity homeTimelineEntryEntity : entries) {</span>
+<span class="nc bnc" id="L96" title="All 2 branches missed.">        if (homeTimelineEntryEntity.getPostId().equals(postId)) {</span>
+<span class="nc" id="L97">          toDelete = homeTimelineEntryEntity;</span>
+        }
+<span class="nc" id="L99">      }</span>
+<span class="nc bnc" id="L100" title="All 2 branches missed.">      if (toDelete != null) {</span>
+<span class="nc" id="L101">        entries.remove(toDelete);</span>
+      }
+<span class="nc" id="L103">      homeTimelineEntity.setEntries(entries);</span>
+<span class="nc" id="L104">      homeTimelineRepository.updateModel(</span>
+<span class="nc" id="L105">          homeTimelineEnityToModel.convertNotNull(homeTimelineEntity));</span>
+<span class="nc" id="L106">    }</span>
+<span class="nc" id="L107">  }</span>
+
+  public void homeTimelineAdd(PostAggregate postAggregate) {
+<span class="nc" id="L110">    List&lt;HomeTimelineModel&gt; homeTimelinesModel =</span>
+<span class="nc" id="L111">        homeTimelineRepository.getHomeTimelineContainingUserId(postAggregate.getOwnerId(), &quot;0&quot;);</span>
+<span class="nc bnc" id="L112" title="All 2 branches missed.">    for (HomeTimelineModel homeTimelineModel : homeTimelinesModel) {</span>
+<span class="nc bnc" id="L113" title="All 2 branches missed.">      if (homeTimelineModel.getBlockedUsersId().contains(postAggregate.getOwnerId())) {</span>
+<span class="nc" id="L114">        continue;</span>
+      }
+<span class="nc" id="L116">      HomeTimelineEntity homeTimelineEntity =</span>
+<span class="nc" id="L117">          homeTimelineModelToEntity.convertNotNull(homeTimelineModel);</span>
+<span class="nc" id="L118">      List&lt;HomeTimelineEntity.HomeTimelineEntryEntity&gt; entries = homeTimelineEntity.getEntries();</span>
+<span class="nc" id="L119">      HomeTimelineEntity.HomeTimelineEntryEntity toAdd =</span>
+          new HomeTimelineEntity.HomeTimelineEntryEntity()
+<span class="nc" id="L121">              .withPostId(postAggregate.getId())</span>
+<span class="nc" id="L122">              .withAuthorId(postAggregate.getOwnerId())</span>
+<span class="nc" id="L123">              .withContent(postAggregate.getText())</span>
+<span class="nc" id="L124">              .withLikedBy(new ArrayList&lt;&gt;())</span>
+<span class="nc" id="L125">              .withType(postAggregate.getMedia())</span>
+<span class="nc" id="L126">              .withTimestamp(LocalDateTime.now());</span>
+<span class="nc" id="L127">      entries.add(toAdd);</span>
+<span class="nc" id="L128">      homeTimelineEntity.setEntries(entries);</span>
+<span class="nc" id="L129">      homeTimelineRepository.updateModel(</span>
+<span class="nc" id="L130">          homeTimelineEnityToModel.convertNotNull(homeTimelineEntity));</span>
+<span class="nc" id="L131">    }</span>
+<span class="nc" id="L132">  }</span>
+
+  public void handleFollow(String userId, String followerId) {
+<span class="nc" id="L135">    Optional&lt;HomeTimelineModel&gt; homeTimeline = homeTimelineRepository.findByUserId(userId);</span>
+<span class="nc bnc" id="L136" title="All 2 branches missed.">    if (homeTimeline.isPresent()) {</span>
+<span class="nc" id="L137">      HomeTimelineModel homeTimelineModel = homeTimeline.get();</span>
+<span class="nc" id="L138">      List&lt;String&gt; followers = homeTimelineModel.getFollowersId();</span>
+<span class="nc bnc" id="L139" title="All 2 branches missed.">      if (!followers.contains(followerId)) {</span>
+<span class="nc" id="L140">        followers.add(followerId);</span>
+      }
+<span class="nc" id="L142">      homeTimelineModel.setFollowersId(followers);</span>
+<span class="nc" id="L143">      homeTimelineRepository.updateModel(homeTimelineModel);</span>
+<span class="nc" id="L144">    } else {</span>
+<span class="nc" id="L145">      logger.error(&quot;user %s does not exist&quot;.formatted(userId));</span>
+    }
+<span class="nc" id="L147">  }</span>
+
+  public void handleUnfollow(String userId, String followerId) {
+<span class="nc" id="L150">    Optional&lt;HomeTimelineModel&gt; homeTimeline = homeTimelineRepository.findByUserId(userId);</span>
+
+<span class="nc bnc" id="L152" title="All 2 branches missed.">    if (homeTimeline.isPresent()) {</span>
+<span class="nc" id="L153">      HomeTimelineModel homeTimelineModel = homeTimeline.get();</span>
+<span class="nc" id="L154">      HomeTimelineEntity homeTimelineEntity =</span>
+<span class="nc" id="L155">          homeTimelineModelToEntity.convertNotNull(homeTimelineModel);</span>
+
+<span class="nc" id="L157">      List&lt;String&gt; followers = homeTimelineEntity.getFollowersId();</span>
+<span class="nc" id="L158">      followers.remove(followerId);</span>
+
+<span class="nc" id="L160">      homeTimelineEntity.setFollowersId(followers);</span>
+<span class="nc" id="L161">      List&lt;HomeTimelineEntity.HomeTimelineEntryEntity&gt; newEntries =</span>
+<span class="nc" id="L162">          homeTimelineEntity.getEntries().stream()</span>
+<span class="nc bnc" id="L163" title="All 2 branches missed.">              .filter(entry -&gt; !entry.getAuthorId().equals(followerId))</span>
+<span class="nc" id="L164">              .toList();</span>
+<span class="nc bnc" id="L165" title="All 2 branches missed.">      for (HomeTimelineEntity.HomeTimelineEntryEntity homeTimelineEntryEntity : newEntries) {</span>
+<span class="nc" id="L166">        if (homeTimelineEntryEntity.getLikedBy().stream()</span>
+<span class="nc bnc" id="L167" title="All 2 branches missed.">            .anyMatch(likedBy -&gt; likedBy.getUserId().equals(followerId))) {</span>
+<span class="nc" id="L168">          homeTimelineEntryEntity.setLikedBy(</span>
+<span class="nc" id="L169">              homeTimelineEntryEntity.getLikedBy().stream()</span>
+<span class="nc bnc" id="L170" title="All 2 branches missed.">                  .filter(likedBy -&gt; !likedBy.equals(followerId))</span>
+<span class="nc" id="L171">                  .collect(Collectors.toList()));</span>
+        }
+<span class="nc" id="L173">      }</span>
+<span class="nc" id="L174">      homeTimelineEntity.setEntries(</span>
+<span class="nc bnc" id="L175" title="All 2 branches missed.">          newEntries.stream().filter(entry -&gt; entry.getLikedBy().size() != 0).toList());</span>
+<span class="nc" id="L176">      homeTimelineRepository.updateModel(</span>
+<span class="nc" id="L177">          homeTimelineEnityToModel.convertNotNull(homeTimelineEntity));</span>
+<span class="nc" id="L178">    } else {</span>
+<span class="nc" id="L179">      logger.error(&quot;user %s does not exist&quot;.formatted(userId));</span>
+    }
+<span class="nc" id="L181">  }</span>
+
+  public void handleBlock(String userId, String blockedUserId) {
+<span class="nc" id="L184">    Optional&lt;HomeTimelineModel&gt; homeTimeline = homeTimelineRepository.findByUserId(userId);</span>
+<span class="nc bnc" id="L185" title="All 2 branches missed.">    if (homeTimeline.isPresent()) {</span>
+<span class="nc" id="L186">      HomeTimelineModel homeTimelineModel = homeTimeline.get();</span>
+
+<span class="nc" id="L188">      List&lt;String&gt; blockedUsers = homeTimelineModel.getBlockedUsersId();</span>
+<span class="nc bnc" id="L189" title="All 2 branches missed.">      if (!blockedUsers.contains(blockedUserId)) {</span>
+<span class="nc" id="L190">        blockedUsers.add(blockedUserId);</span>
+      }
+<span class="nc" id="L192">      homeTimelineModel.setBlockedUsersId(blockedUsers);</span>
+<span class="nc" id="L193">      homeTimelineRepository.updateModel(homeTimelineModel);</span>
+<span class="nc" id="L194">      handleUnfollow(userId, blockedUserId);</span>
+<span class="nc" id="L195">    } else {</span>
+<span class="nc" id="L196">      logger.error(&quot;user %s does not exist&quot;.formatted(userId));</span>
+    }
+<span class="nc" id="L198">  }</span>
+
+  public void handleUnblock(String userId, String blockedUserId) {
+<span class="nc" id="L201">    Optional&lt;HomeTimelineModel&gt; homeTimeline = homeTimelineRepository.findByUserId(userId);</span>
+<span class="nc bnc" id="L202" title="All 2 branches missed.">    if (homeTimeline.isPresent()) {</span>
+<span class="nc" id="L203">      HomeTimelineModel homeTimelineModel = homeTimeline.get();</span>
+<span class="nc" id="L204">      List&lt;String&gt; blockedUsers = homeTimelineModel.getBlockedUsersId();</span>
+<span class="nc bnc" id="L205" title="All 2 branches missed.">      if (blockedUsers.contains(blockedUserId)) {</span>
+<span class="nc" id="L206">        blockedUsers.remove(blockedUserId);</span>
+      }
+<span class="nc" id="L208">      homeTimelineModel.setBlockedUsersId(blockedUsers);</span>
+<span class="nc" id="L209">      homeTimelineRepository.updateModel(homeTimelineModel);</span>
+<span class="nc" id="L210">    } else {</span>
+<span class="nc" id="L211">      logger.error(&quot;user %s does not exist&quot;.formatted(userId));</span>
+    }
+<span class="nc" id="L213">  }</span>
+
+  public void handleLike(String UserId, String postId) {
+<span class="nc" id="L216">    Optional&lt;HomeTimelinePostModel&gt; homeTimelinePostModel =</span>
+<span class="nc" id="L217">        homeTimelinePostRepository.findByPostId(postId);</span>
+<span class="nc bnc" id="L218" title="All 2 branches missed.">    if (homeTimelinePostModel.isEmpty()) {</span>
+      // maybe error because there is a like of a post that doesn't exist
+<span class="nc" id="L220">      return;</span>
+    }
+<span class="nc" id="L222">    String followerId = homeTimelinePostModel.get().getOwnerId();</span>
+<span class="nc" id="L223">    List&lt;HomeTimelineModel&gt; hometimelinesModel =</span>
+<span class="nc" id="L224">        homeTimelineRepository.getHomeTimelineContainingUserId(UserId, followerId);</span>
+
+<span class="nc bnc" id="L226" title="All 2 branches missed.">    if (hometimelinesModel.isEmpty()) {</span>
+<span class="nc" id="L227">      logger.error(&quot;no home timeline found for post %s&quot;.formatted(postId));</span>
+<span class="nc" id="L228">      return;</span>
+    }
+
+<span class="nc" id="L231">    HomeTimelinePostModel PostModel = homeTimelinePostModel.get();</span>
+<span class="nc bnc" id="L232" title="All 2 branches missed.">    for (HomeTimelineModel homeTimelineModel : hometimelinesModel) {</span>
+<span class="nc" id="L233">      HomeTimelineEntity homeTimelineEntity =</span>
+<span class="nc" id="L234">          homeTimelineModelToEntity.convertNotNull(homeTimelineModel);</span>
+<span class="nc" id="L235">      List&lt;HomeTimelineEntity.HomeTimelineEntryEntity&gt; entries = homeTimelineEntity.getEntries();</span>
+<span class="nc" id="L236">      boolean exists = false;</span>
+<span class="nc bnc" id="L237" title="All 2 branches missed.">      for (HomeTimelineEntity.HomeTimelineEntryEntity homeTimelineEntryEntity : entries) {</span>
+<span class="nc bnc" id="L238" title="All 2 branches missed.">        if (homeTimelineEntryEntity.getPostId().equals(postId)) {</span>
+<span class="nc" id="L239">          List&lt;HomeTimelineEntity.HomeTimelineLikedByEntity&gt; newLikedBy =</span>
+<span class="nc" id="L240">              homeTimelineEntryEntity.getLikedBy();</span>
+<span class="nc" id="L241">          newLikedBy.add(</span>
+              new HomeTimelineEntity.HomeTimelineLikedByEntity()
+<span class="nc" id="L243">                  .withLikedAt(LocalDateTime.now())</span>
+<span class="nc" id="L244">                  .withUserId(UserId));</span>
+<span class="nc" id="L245">          homeTimelineEntryEntity.setLikedBy(newLikedBy);</span>
+<span class="nc" id="L246">          exists = true;</span>
+        }
+<span class="nc" id="L248">      }</span>
+<span class="nc bnc" id="L249" title="All 2 branches missed.">      if (!exists) {</span>
+<span class="nc" id="L250">        List&lt;HomeTimelineEntity.HomeTimelineLikedByEntity&gt; likedBy = new ArrayList&lt;&gt;();</span>
+<span class="nc" id="L251">        HomeTimelineEntity.HomeTimelineLikedByEntity likedByEntity =</span>
+            new HomeTimelineEntity.HomeTimelineLikedByEntity()
+<span class="nc" id="L253">                .withUserId(UserId)</span>
+<span class="nc" id="L254">                .withLikedAt(LocalDateTime.now());</span>
+<span class="nc" id="L255">        likedBy.add(likedByEntity);</span>
+<span class="nc" id="L256">        HomeTimelineEntity.HomeTimelineEntryEntity newEntry =</span>
+            new HomeTimelineEntity.HomeTimelineEntryEntity()
+<span class="nc" id="L258">                .withPostId(postId)</span>
+<span class="nc" id="L259">                .withAuthorId(PostModel.getOwnerId())</span>
+<span class="nc" id="L260">                .withContent(PostModel.getText())</span>
+<span class="nc" id="L261">                .withLikedBy(likedBy)</span>
+<span class="nc" id="L262">                .withType(PostModel.getMedia())</span>
+<span class="nc" id="L263">                .withTimestamp(LocalDateTime.now());</span>
+<span class="nc" id="L264">        entries.add(newEntry);</span>
+      }
+<span class="nc" id="L266">      homeTimelineEntity.setEntries(entries);</span>
+<span class="nc" id="L267">      homeTimelineRepository.updateModel(</span>
+<span class="nc" id="L268">          homeTimelineEnityToModel.convertNotNull(homeTimelineEntity));</span>
+<span class="nc" id="L269">    }</span>
+<span class="nc" id="L270">  }</span>
+
+  public void handleUnlike(String UserId, String postId) {
+<span class="nc" id="L273">    List&lt;HomeTimelineModel&gt; homeTimelinesModel =</span>
+<span class="nc" id="L274">        homeTimelineRepository.getHomeTimelineContainingPostId(postId);</span>
+
+<span class="nc bnc" id="L276" title="All 2 branches missed.">    for (HomeTimelineModel homeTimelineModel : homeTimelinesModel) {</span>
+<span class="nc" id="L277">      HomeTimelineEntity homeTimelineEntity =</span>
+<span class="nc" id="L278">          homeTimelineModelToEntity.convertNotNull(homeTimelineModel);</span>
+<span class="nc" id="L279">      List&lt;HomeTimelineEntity.HomeTimelineEntryEntity&gt; entries = homeTimelineEntity.getEntries();</span>
+<span class="nc bnc" id="L280" title="All 2 branches missed.">      for (HomeTimelineEntity.HomeTimelineEntryEntity entry : entries) {</span>
+<span class="nc bnc" id="L281" title="All 2 branches missed.">        if (entry.getLikedBy().stream().anyMatch(likedBy -&gt; likedBy.getUserId().equals(UserId))) {</span>
+<span class="nc" id="L282">          entry.setLikedBy(</span>
+<span class="nc" id="L283">              entry.getLikedBy().stream()</span>
+<span class="nc bnc" id="L284" title="All 2 branches missed.">                  .filter(likedBy -&gt; !likedBy.getUserId().equals(UserId))</span>
+<span class="nc" id="L285">                  .toList());</span>
+        }
+<span class="nc" id="L287">      }</span>
+<span class="nc" id="L288">      homeTimelineEntity.setEntries(entries);</span>
+<span class="nc" id="L289">      homeTimelineEntity.setEntries(</span>
+<span class="nc" id="L290">          homeTimelineEntity.getEntries().stream()</span>
+<span class="nc" id="L291">              .filter(</span>
+                  entry -&gt;
+<span class="nc bnc" id="L293" title="All 2 branches missed.">                      !(entry.getLikedBy().size() == 0</span>
+<span class="nc bnc" id="L294" title="All 2 branches missed.">                          &amp;&amp; !homeTimelineEntity.getFollowersId().contains(entry.getAuthorId())))</span>
+<span class="nc" id="L295">              .toList());</span>
+<span class="nc" id="L296">      homeTimelineRepository.updateModel(</span>
+<span class="nc" id="L297">          homeTimelineEnityToModel.convertNotNull(homeTimelineEntity));</span>
+<span class="nc" id="L298">    }</span>
+<span class="nc" id="L299">  }</span>
+
+  public void handleUserDeletion(String userId) {
+<span class="nc" id="L302">    Optional&lt;HomeTimelineModel&gt; homeTimeline = homeTimelineRepository.findByUserId(userId);</span>
+<span class="nc bnc" id="L303" title="All 2 branches missed.">    if (homeTimeline.isPresent()) {</span>
+<span class="nc" id="L304">      HomeTimelineModel toDelete = homeTimeline.get();</span>
+<span class="nc" id="L305">      homeTimelineRepository.deleteModel(toDelete);</span>
+    }
+<span class="nc" id="L307">  }</span>
+
+  public void handleUserCreation(String userId) {
+<span class="fc" id="L310">    Optional&lt;HomeTimelineModel&gt; homeTimeline = homeTimelineRepository.findByUserId(userId);</span>
+<span class="pc bpc" id="L311" title="1 of 2 branches missed.">    if (homeTimeline.isPresent()) {</span>
+<span class="nc" id="L312">      logger.error(&quot;user %s already exists&quot;.formatted(userId));</span>
+    } else {
+<span class="fc" id="L314">      homeTimelineRepository.create(initHomeTimeline(userId));</span>
+    }
+<span class="fc" id="L316">  }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.9.202303310957</span></div></body></html>
