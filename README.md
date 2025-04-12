@@ -84,7 +84,7 @@ The project is built with a microservices architecture including the following c
 - `port-frontend`: Small React front app (distributed by nginx)
 - `exchange`: Common library for inter-service communication
 
-![Architecture Diagram](doc/arch/ARCH_v1.2.pdf)
+![Architecture Diagram](doc/arch/ARCH_v1.2.png)
 
 ## Data Model
 
