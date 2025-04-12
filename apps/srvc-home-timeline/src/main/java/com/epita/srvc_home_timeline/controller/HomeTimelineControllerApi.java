@@ -17,7 +17,6 @@ import org.eclipse.microprofile.openapi.annotations.responses.APIResponses;
 public interface HomeTimelineControllerApi extends Logger {
   @GET
   @Path("/{id}")
-  @Authenticated
   @Consumes(MediaType.APPLICATION_JSON)
   @Produces(MediaType.APPLICATION_JSON)
   @Operation(summary = "extract the home feed")

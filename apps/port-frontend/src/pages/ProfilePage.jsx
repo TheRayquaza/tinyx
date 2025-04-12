@@ -22,28 +22,29 @@ const ProfilePage = () => {
     const fetchUserProfile = async () => {
       try {
         setLoading(true);
-        // Fetch user profile by id
+
         const userData = await api.get(`/user/${id}`);
         setUser(userData);
-        
-        if (currentUser) {
-          const followStatus = await api.get(`/social/follows/${userData.id}`); // TODO: fix this
-          setIsFollowing(followStatus.isFollowing);
-        }
-        
+
         const userPosts = await postService.getUserTimeline(userData.id);
         setPosts(userPosts);
-        
+
         const followersData = await api.get(`/social/followers/${userData.id}`);
         const followingData = await api.get(`/social/following/${userData.id}`);
         setFollowers(followersData);
         setFollowing(followingData);
-        
+
+        if (currentUser) {
+          const currentUserFollowing = await api.get(`/social/following/${currentUser.id}`);
+          const isUserFollowed = currentUserFollowing.some(f => f.id === userData.id);
+          setIsFollowing(isUserFollowed);
+        }
+
         setLoading(false);
       } catch (err) {
+        console.error('Error fetching profile:', err);
         setError('Failed to load profile');
         setLoading(false);
-        console.error('Error fetching profile:', err);
       }
     };
 
@@ -61,14 +62,14 @@ const ProfilePage = () => {
       } else {
         await api.post(`/social/follow/${user.id}`);
         setIsFollowing(true);
-        // Add current user to followers list
-        if (currentUser) {
-          setFollowers([...followers, {
+        setFollowers([
+          ...followers,
+          {
             id: currentUser.id,
             username: currentUser.username,
-            avatar: currentUser.avatar
-          }]);
-        }
+            profileImage: currentUser.profileImage,
+          },
+        ]);
       }
     } catch (err) {
       console.error('Error updating follow status:', err);
@@ -83,13 +84,13 @@ const ProfilePage = () => {
     <div className="container mx-auto max-w-3xl p-4">
       <div className="bg-white rounded-lg shadow p-6 mb-6">
         <UserProfile user={user} />
-        
+
         {currentUser && currentUser.id !== user.id && (
           <button
             onClick={handleFollowToggle}
             className={`mt-4 px-6 py-2 rounded-full ${
-              isFollowing 
-                ? 'bg-gray-200 text-gray-800 hover:bg-gray-300' 
+              isFollowing
+                ? 'bg-gray-200 text-gray-800 hover:bg-gray-300'
                 : 'bg-blue-500 text-white hover:bg-blue-600'
             }`}
           >
@@ -99,19 +100,25 @@ const ProfilePage = () => {
 
         <div className="flex mt-6 border-b">
           <button
-            className={`px-4 py-2 font-medium ${activeTab === 'posts' ? 'text-blue-500 border-b-2 border-blue-500' : 'text-gray-500'}`}
+            className={`px-4 py-2 font-medium ${
+              activeTab === 'posts' ? 'text-blue-500 border-b-2 border-blue-500' : 'text-gray-500'
+            }`}
             onClick={() => setActiveTab('posts')}
           >
             Posts ({posts.length})
           </button>
           <button
-            className={`px-4 py-2 font-medium ${activeTab === 'followers' ? 'text-blue-500 border-b-2 border-blue-500' : 'text-gray-500'}`}
+            className={`px-4 py-2 font-medium ${
+              activeTab === 'followers' ? 'text-blue-500 border-b-2 border-blue-500' : 'text-gray-500'
+            }`}
             onClick={() => setActiveTab('followers')}
           >
             Followers ({followers.length})
           </button>
           <button
-            className={`px-4 py-2 font-medium ${activeTab === 'following' ? 'text-blue-500 border-b-2 border-blue-500' : 'text-gray-500'}`}
+            className={`px-4 py-2 font-medium ${
+              activeTab === 'following' ? 'text-blue-500 border-b-2 border-blue-500' : 'text-gray-500'
+            }`}
             onClick={() => setActiveTab('following')}
           >
             Following ({following.length})
@@ -130,7 +137,7 @@ const ProfilePage = () => {
           )}
         </div>
       )}
-      
+
       {activeTab === 'followers' && (
         <div className="followers-container">
           {followers.length === 0 ? (
@@ -139,18 +146,18 @@ const ProfilePage = () => {
             </div>
           ) : (
             <div className="grid gap-3">
-              {followers.map(follower => (
-                <div key={follower.id} className="border rounded-lg p-3 flex items-center">
-                  <img 
-                    src={follower.avatar || "/api/placeholder/40/40"} 
-                    alt={follower.username} 
-                    className="w-10 h-10 rounded-full mr-3" 
+              {followers.map(f => (
+                <div key={f.id} className="border rounded-lg p-3 flex items-center">
+                  <img
+                    src={f.profileImage}
+                    alt={f.username}
+                    className="w-10 h-10 rounded-full mr-3"
                   />
                   <div>
-                    <Link to={`/ui/profile/${follower.id}`} className="font-medium hover:underline">
-                      {follower.username}
+                    <Link to={`/ui/profile/${f.id}`} className="font-medium hover:underline">
+                      {f.username}
                     </Link>
-                    <p className="text-gray-500 text-sm">{follower.bio || ''}</p>
+                    <p className="text-gray-500 text-sm">{f.bio || ''}</p>
                   </div>
                 </div>
               ))}
@@ -158,7 +165,7 @@ const ProfilePage = () => {
           )}
         </div>
       )}
-      
+
       {activeTab === 'following' && (
         <div className="following-container">
           {following.length === 0 ? (
@@ -167,18 +174,18 @@ const ProfilePage = () => {
             </div>
           ) : (
             <div className="grid gap-3">
-              {following.map(followed => (
-                <div key={followed.id} className="border rounded-lg p-3 flex items-center">
-                  <img 
-                    src={followed.avatar || "/api/placeholder/40/40"} 
-                    alt={followed.username} 
-                    className="w-10 h-10 rounded-full mr-3" 
+              {following.map(f => (
+                <div key={f.id} className="border rounded-lg p-3 flex items-center">
+                  <img
+                    src={f.profileImage}
+                    alt={f.username}
+                    className="w-10 h-10 rounded-full mr-3"
                   />
                   <div>
-                    <Link to={`/profile/${followed.username}`} className="font-medium hover:underline">
-                      {followed.username}
+                    <Link to={`/ui/profile/${f.id}`} className="font-medium hover:underline">
+                      {f.username}
                     </Link>
-                    <p className="text-gray-500 text-sm">{followed.bio || ''}</p>
+                    <p className="text-gray-500 text-sm">{f.bio || ''}</p>
                   </div>
                 </div>
               ))}

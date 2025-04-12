@@ -18,7 +18,6 @@ public class HomeTimelineController implements HomeTimelineControllerApi {
 
   @GET
   @Path("/{id}")
-  @Authenticated
   @Override
   public HomeTimelineResponse getHomeTimelineById(@PathParam("id") @Valid String id) {
     logger().info("GET /home-timeline/{} - Retrieve Home Timeline for user {}", id, id);

@@ -3,8 +3,8 @@ import api from './api';
 const authService = {
   login: async (username, password) => {
     try {
-      const data = await api.post('/login', { username, password });
-      localStorage.setItem('token', btoa(data.id + "," + data.username));
+      const data = await api.post('/login', { "username": username, "password": password });
+      localStorage.setItem('token', data.jwt);
       localStorage.setItem('user', JSON.stringify(data));
       return data;
     } catch (error) {
@@ -15,7 +15,7 @@ const authService = {
   
   signup: async (username, password, email) => {
     try {
-      const data = await api.post('/user', { username, password, email });
+      const data = await api.post('/user', { "username": username, "password": password, "email": email });
       localStorage.setItem('token', btoa(data.id + "," + data.username));
       localStorage.setItem('user', JSON.stringify(data));
       return data;

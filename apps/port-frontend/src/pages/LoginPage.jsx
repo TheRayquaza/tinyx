@@ -1,7 +1,7 @@
 import React, { useState, useContext } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
-import api from '../services/api';
+import authService from '../services/authService';
 
 const LoginPage = () => {
   const [username, setUsername] = useState('');
@@ -22,15 +22,7 @@ const LoginPage = () => {
       setLoading(true);
       setError('');
       
-      const response = await api.post('/login', {
-        username: username,
-        password: password
-      });
-      
-      localStorage.setItem('token', response.token);
-      
-      setCurrentUser(response.user);
-      
+      await authService.login(username, password);
       navigate('/');
     } catch (err) {
       setError('Failed to login. Please check your credentials.');
@@ -91,7 +83,7 @@ const LoginPage = () => {
         
         <p className="mt-6 text-center text-sm text-gray-600">
           Don't have an account?{' '}
-          <Link to="/signup" className="text-blue-500 hover:underline">
+          <Link to="/ui/signup" className="text-blue-500 hover:underline">
             Sign up
           </Link>
         </p>
