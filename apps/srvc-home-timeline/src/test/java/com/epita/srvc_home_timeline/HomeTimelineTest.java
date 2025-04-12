@@ -59,18 +59,19 @@ public class HomeTimelineTest {
     publishAndWait("like_command", like);
   }
 
-  void followUser(String userId, String follower, boolean following) throws InterruptedException {
+  void followUser(String UserFollowed, String userFollowing, boolean following)
+      throws InterruptedException {
     FollowCommand follow = new FollowCommand();
-    follow.setUserId(userId);
-    follow.setFollowerId(follower);
-    follow.setFollowing(true);
+    follow.setUserId(userFollowing);
+    follow.setFollowerId(UserFollowed);
+    follow.setFollowing(following);
 
     publishAndWait("follow_command", follow);
   }
 
   void publishAndWait(String channel, Object object) throws InterruptedException {
     redisPublisher.publish(channel, object);
-    Thread.sleep(300);
+    Thread.sleep(3000);
   }
 
   @BeforeAll
@@ -245,9 +246,11 @@ public class HomeTimelineTest {
     // User 3 follows user 1
     followUser(USER_ID_1, USER_ID_3, true);
 
-    // Checking user 2 home timelines
+    Thread.sleep(1000);
+
+    // Checking user 3 home timelines
     Response response =
-        given().header("Authorization", "Bearer " + TOKEN_USER_2).when().get(USER_ID_2);
+        given().header("Authorization", "Bearer " + TOKEN_USER_2).when().get(USER_ID_3);
     System.out.println(response.body().prettyPrint());
     response.then().statusCode(200);
     // .body("hometimeline.followers.text", hasItem("15a1a100c293c91129883573"));
@@ -260,10 +263,12 @@ public class HomeTimelineTest {
     newpost2.setText("new Post from user 2");
     newpost2.setCreatedAt(LocalDateTime.now());
     newpost2.setUpdatedAt(LocalDateTime.now());
+    newpost2.setDeleted(false);
     publishAndWait("post_aggregate", newpost2);
     System.out.println("user 2 posts - done");
+    Thread.sleep(1000);
 
-    // Checking user 1 and user 3 home timelines
+    // Checking user 3 home timelines
     response = given().header("Authorization", "Bearer " + TOKEN_USER_3).when().get(USER_ID_3);
 
     System.out.println(response.body().prettyPrint());
@@ -274,6 +279,9 @@ public class HomeTimelineTest {
     // User 1 likes post from user 2
     likePost(USER_ID_1, newpostId2, true);
 
+    System.out.println("user 1 likes post from user 2 - done");
+    Thread.sleep(1000);
+
     // Checking user 3 home timelines
     response = given().header("Authorization", "Bearer " + TOKEN_USER_3).when().get(USER_ID_3);
     System.out.println(response.body().prettyPrint());
@@ -281,7 +289,11 @@ public class HomeTimelineTest {
     // .body("hometimeline.entries.text", hasItem("new Post from user 2"));
 
     // User 3 unfollows user 1
+
+    System.out.println("user 3 unfollows user 1 - done");
+
     followUser(USER_ID_1, USER_ID_3, false);
+    Thread.sleep(1000);
 
     // Checking user 3 home timelines
     response = given().header("Authorization", "Bearer " + TOKEN_USER_3).when().get(USER_ID_3);
@@ -289,8 +301,11 @@ public class HomeTimelineTest {
     response.then().statusCode(200);
     // .body("hometimeline.entries.text", hasItem("new Post from user 2"));
 
+    System.out.println("user 3 unfollows user 2 - done");
+
     // User 3 unfollows user 2
     followUser(USER_ID_2, USER_ID_3, false);
+    Thread.sleep(1000);
 
     // Checking user 3 home timelines
     response = given().header("Authorization", "Bearer " + TOKEN_USER_3).when().get(USER_ID_3);
@@ -367,6 +382,12 @@ public class HomeTimelineTest {
     publishAndWait("post_aggregate", newpost2);
     System.out.println("user 2 posts - done");
 
+    // Checking user 1 home timelines
+    Response response =
+        given().header("Authorization", "Bearer " + TOKEN_USER_1).when().get(USER_ID_1);
+    System.out.println(response.body().prettyPrint());
+    response.then().statusCode(200);
+
     // User 1 blocks user 2
     BlockCommand block = new BlockCommand();
     block.setUserId(USER_ID_1);
@@ -375,8 +396,7 @@ public class HomeTimelineTest {
     publishAndWait("block_command", block);
 
     // Checking user 1 home timelines
-    Response response =
-        given().header("Authorization", "Bearer " + TOKEN_USER_1).when().get(USER_ID_1);
+    response = given().header("Authorization", "Bearer " + TOKEN_USER_1).when().get(USER_ID_1);
     System.out.println(response.body().prettyPrint());
     response.then().statusCode(200);
     // .body("hometimeline.entries.text", not(hasItem("new Post from user 2")));
@@ -401,5 +421,42 @@ public class HomeTimelineTest {
     System.out.println(response.body().prettyPrint());
     response.then().statusCode(200);
     // .body("hometimeline.entries.text", hasItem("new Post from user 2"));
+  }
+
+  @Test
+  @Order(11)
+  void LikeTest() throws Exception {
+    // User 3 follows user 1
+    followUser(USER_ID_1, USER_ID_3, true);
+
+    // User 2 posts
+    String postId2 = new ObjectId().toString();
+    PostAggregate post2 = new PostAggregate();
+    post2.setId(postId2);
+    post2.setOwnerId(USER_ID_2);
+    post2.setText("Post from user 2");
+    post2.setCreatedAt(LocalDateTime.now());
+    post2.setUpdatedAt(LocalDateTime.now());
+    publishAndWait("post_aggregate", post2);
+    System.out.println("user 2 posts - done");
+
+    // User 1 likes post from user 2
+    likePost(USER_ID_1, postId2, true);
+
+    // Checking user 3 home timelines
+    Response response =
+        given().header("Authorization", "Bearer " + TOKEN_USER_3).when().get(USER_ID_3);
+    System.out.println(response.body().prettyPrint());
+    response.then().statusCode(200);
+    // .body("hometimeline.entries.text", hasItem("Post from user 2"));
+
+    // User 1 unlikes post from user 2
+    likePost(USER_ID_1, postId2, false);
+
+    // Checking user 3 home timelines
+    response = given().header("Authorization", "Bearer " + TOKEN_USER_3).when().get(USER_ID_3);
+    System.out.println(response.body().prettyPrint());
+    response.then().statusCode(200);
+    // .body("hometimeline.entries.text", not(hasItem("Post from user 2")));
   }
 }
