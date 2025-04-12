@@ -22,7 +22,7 @@ const HomePage = () => {
       setLoading(true);
       setError(null);
       const response = await postService.getHomeTimeline(currentUser.id);
-      setPosts(response.hometimeline || []);
+      setPosts(response.hometimeline?.entries || []);
     } catch (err) {
       setError('Failed to load timeline. Please try again later.');
       console.error('Error fetching home timeline:', err);
