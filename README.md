@@ -84,7 +84,7 @@ The project is built with a microservices architecture including the following c
 - `port-frontend`: Small React front app (distributed by nginx)
 - `exchange`: Common library for inter-service communication
 
-![Architecture Diagram](doc/ARCH_v1.2.pdf)
+![Architecture Diagram](doc/arch/ARCH_v1.2.pdf)
 
 ## Data Model
 
@@ -96,7 +96,7 @@ We use different databases optimized for our specific needs:
 - Minio: Media storage for repo-user and repo-post, downloading via srvc-media
 - Elasticsearch: Search of post using a query
 
-![Data Model](doc/DATAMODEL_v1.1.png)
+![Data Model](doc/datamodel/DATAMODEL_v1.1.png)
 
 ## Testing
 
