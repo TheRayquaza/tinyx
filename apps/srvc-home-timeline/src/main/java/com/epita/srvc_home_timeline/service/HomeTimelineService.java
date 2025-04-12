@@ -147,11 +147,21 @@ public class HomeTimelineService {
 
   public void handleUnfollow(String userId, String followerId) {
     Optional<HomeTimelineModel> homeTimeline = homeTimelineRepository.findByUserId(userId);
+
+    if (homeTimeline.isEmpty()) {
+      logger.error("user %s does not exist".formatted(userId));
+      return;
+    }
+
     if (homeTimeline.isPresent()) {
       HomeTimelineModel homeTimelineModel = homeTimeline.get();
       HomeTimelineEntity homeTimelineEntity =
           homeTimelineModelToEntity.convertNotNull(homeTimelineModel);
-      homeTimelineEntity.setFollowersId(homeTimelineEntity.getFollowersId().stream().filter(follower -> follower != followerId).toList());
+
+      List<String> followers = homeTimelineEntity.getFollowersId();
+      followers.remove(followerId);
+
+      homeTimelineEntity.setFollowersId(followers);
       List<HomeTimelineEntity.HomeTimelineEntryEntity> newEntries =
           homeTimelineEntity.getEntries().stream()
               .filter(entry -> !entry.getAuthorId().equals(followerId)).toList();

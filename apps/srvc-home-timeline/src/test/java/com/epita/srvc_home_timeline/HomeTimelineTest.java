@@ -63,7 +63,7 @@ public class HomeTimelineTest {
     FollowCommand follow = new FollowCommand();
     follow.setUserId(userFollowing);
     follow.setFollowerId(UserFollowed);
-    follow.setFollowing(true);
+    follow.setFollowing(following);
 
     publishAndWait("follow_command", follow);
   }
