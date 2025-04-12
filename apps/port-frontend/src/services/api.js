@@ -30,11 +30,9 @@ const api = {
   
   post: async (endpoint, data, isFormData = false) => {
     try {
-      const headers = isFormData ? {} : getHeaders();
-      
       const options = {
         method: 'POST',
-        headers: !isFormData ? headers : undefined,
+        headers: getHeaders(),
         body: isFormData ? data : JSON.stringify(data),
       };
       
@@ -53,11 +51,9 @@ const api = {
   
   put: async (endpoint, data, isFormData = false) => {
     try {
-      const headers = isFormData ? {} : getHeaders();
-      
       const options = {
         method: 'PUT',
-        headers: !isFormData ? headers : undefined,
+        headers: getHeaders(),
         body: isFormData ? data : JSON.stringify(data),
       };
       
