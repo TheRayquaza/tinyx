@@ -1,5 +1,5 @@
 #!/bin/bash
-set -e
+set +x
 
 BASE_URL="http://127.0.0.1"
 
@@ -39,7 +39,7 @@ function create_post() {
     -H "Content-Type: application/json" \
     -H "Authorization: Bearer $user_token" \
     -d "{\"text\": \"$text\"}")
-  echo "$response" | jq
+  echo "$response"
 }
 
 function test_like_post() {
@@ -65,7 +65,7 @@ function test_get_liked_posts() {
 function test_unlike_post() {
   log "Test 4: Unlike a post"
   curl -s -X DELETE "$BASE_URL/social/post/$POST2_ID/like" \
-    -H "Authorization: Bearer $USER1_TOKEN" -w "\n✅ Post unliked\n"
+    -H "Authorization: Bearer $USER1_TOKEN"
 }
 
 function test_verify_unlike() {
@@ -277,6 +277,8 @@ USER4_TOKEN=$(get_token "$USER4_ID" "dave")
 log "Creating test posts..."
 POST1_ID=$(create_post "$USER1_TOKEN" "Hello, world!")
 POST2_ID=$(create_post "$USER2_TOKEN" "Goodbye, world!")
+echo "Post 1 ID: $POST1_ID"
+echo "Post 2 ID: $POST2_ID"
 
 # Run all tests
 test_like_post

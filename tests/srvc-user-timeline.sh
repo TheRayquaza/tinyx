@@ -21,21 +21,6 @@ function log() {
   echo -e "\n🔹 $1"
 }
 
-function publish_to_redis() {
-  local channel=$1
-  local payload=$2
-  
-  log "Publishing to Redis channel: $channel"
-  echo "$payload"
-  
-  curl -s -X POST "$REDIS_PUBLISH_ENDPOINT" \
-    -H "Content-Type: application/json" \
-    -d "{\"channel\": \"$channel\", \"payload\": $payload}"
-  
-  echo "⏳ Waiting for processing..."
-  sleep 1
-}
-
 function get_timeline() {
   local user_id=$1
   local auth_header=$2
@@ -109,9 +94,6 @@ function test_create_posts() {
     "updatedAt": "'"$(date --iso-8601=seconds)"'"
   }'
   
-  publish_to_redis "post_aggregate" "$post1"
-  publish_to_redis "post_aggregate" "$post2"
-  
   assert_timeline_contains "$USER_ID_1" "$AUTH_HEADER_1" "Post from user 1" "true"
   assert_timeline_contains "$USER_ID_1" "$AUTH_HEADER_1" "Post from user 2" "false"
 }
@@ -125,8 +107,6 @@ function test_user1_likes_post_from_user2() {
     "liked": true
   }'
   
-  publish_to_redis "like_command" "$like"
-  
   assert_timeline_contains "$USER_ID_1" "$AUTH_HEADER_1" "Post from user 2" "true"
 }
 
@@ -138,8 +118,6 @@ function test_user1_unlikes_post_from_user2() {
     "postId": "'"$POST_ID_2"'",
     "liked": false
   }'
-  
-  publish_to_redis "like_command" "$unlike"
   
   assert_timeline_contains "$USER_ID_1" "$AUTH_HEADER_1" "Post from user 2" "false"
 }
@@ -153,8 +131,6 @@ function test_user1_blocks_user2() {
     "blocked": true
   }'
   
-  publish_to_redis "block_command" "$block"
-  
   assert_timeline_contains "$USER_ID_1" "$AUTH_HEADER_1" "Post from user 2" "false"
 }
 
@@ -167,15 +143,11 @@ function test_user1_unblocks_user2_and_relikes() {
     "blocked": false
   }'
   
-  publish_to_redis "block_command" "$unblock"
-  
   local relike='{
     "userId": "'"$USER_ID_1"'",
     "postId": "'"$POST_ID_2"'",
     "liked": true
   }'
-  
-  publish_to_redis "like_command" "$relike"
   
   assert_timeline_contains "$USER_ID_1" "$AUTH_HEADER_1" "Post from user 2" "true"
 }
@@ -188,8 +160,6 @@ function test_delete_user2_account() {
     "deleted": true
   }'
   
-  publish_to_redis "user_aggregate" "$delete_user2"
-  
   assert_timeline_contains "$USER_ID_1" "$AUTH_HEADER_1" "Post from user 2" "false"
 }
 
@@ -200,8 +170,6 @@ function test_delete_user1_account() {
     "id": "'"$USER_ID_1"'",
     "deleted": true
   }'
-  
-  publish_to_redis "user_aggregate" "$delete_user1"
   
   local response=$(curl -s -X GET "$TIMELINE_ENDPOINT/$USER_ID_1" -H "$AUTH_HEADER_1")
   echo "$response" | jq .
