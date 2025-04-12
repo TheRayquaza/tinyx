@@ -25,7 +25,7 @@ public class HomeTimelineRepository implements PanacheMongoRepository<HomeTimeli
   }
 
   public List<HomeTimelineModel> getHomeTimelineContainingPostId(String postId) {
-    return this.find("entries.PostId", postId).list();
+    return this.find("entries.postId", postId).list();
   }
 
   public List<HomeTimelineModel> getHomeTimelineContainingUserId(String userId) {

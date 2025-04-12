@@ -107,7 +107,8 @@ public class HomeTimelineService {
   }
 
   public void homeTimelineAdd(PostAggregate postAggregate) {
-    List<HomeTimelineModel> homeTimelinesModel = homeTimelineRepository.getHomeTimelineContainingUserId(postAggregate.getOwnerId(), "0");
+    List<HomeTimelineModel> homeTimelinesModel =
+        homeTimelineRepository.getHomeTimelineContainingUserId(postAggregate.getOwnerId(), "0");
     for (HomeTimelineModel homeTimelineModel : homeTimelinesModel) {
       if (homeTimelineModel.getBlockedUsersId().contains(postAggregate.getOwnerId())) {
         continue;
@@ -148,11 +149,6 @@ public class HomeTimelineService {
   public void handleUnfollow(String userId, String followerId) {
     Optional<HomeTimelineModel> homeTimeline = homeTimelineRepository.findByUserId(userId);
 
-    if (homeTimeline.isEmpty()) {
-      logger.error("user %s does not exist".formatted(userId));
-      return;
-    }
-
     if (homeTimeline.isPresent()) {
       HomeTimelineModel homeTimelineModel = homeTimeline.get();
       HomeTimelineEntity homeTimelineEntity =
@@ -164,21 +160,23 @@ public class HomeTimelineService {
       homeTimelineEntity.setFollowersId(followers);
       List<HomeTimelineEntity.HomeTimelineEntryEntity> newEntries =
           homeTimelineEntity.getEntries().stream()
-              .filter(entry -> !entry.getAuthorId().equals(followerId)).toList();
-      for (HomeTimelineEntity.HomeTimelineEntryEntity homeTimelineEntryEntity :
-          newEntries) {
-        if (homeTimelineEntryEntity.getLikedBy().stream().anyMatch(likedBy -> likedBy.getUserId().equals(followerId))) {
+              .filter(entry -> !entry.getAuthorId().equals(followerId))
+              .toList();
+      for (HomeTimelineEntity.HomeTimelineEntryEntity homeTimelineEntryEntity : newEntries) {
+        if (homeTimelineEntryEntity.getLikedBy().stream()
+            .anyMatch(likedBy -> likedBy.getUserId().equals(followerId))) {
           homeTimelineEntryEntity.setLikedBy(
               homeTimelineEntryEntity.getLikedBy().stream()
                   .filter(likedBy -> !likedBy.equals(followerId))
                   .collect(Collectors.toList()));
         }
       }
-      homeTimelineEntity.setEntries(newEntries.stream().filter(entry -> entry.getLikedBy().size() != 0).toList());
+      homeTimelineEntity.setEntries(
+          newEntries.stream().filter(entry -> entry.getLikedBy().size() != 0).toList());
       homeTimelineRepository.updateModel(
           homeTimelineEnityToModel.convertNotNull(homeTimelineEntity));
     } else {
-      // FIXME Shouldn't happen handle error
+      logger.error("user %s does not exist".formatted(userId));
     }
   }
 
@@ -192,33 +190,10 @@ public class HomeTimelineService {
         blockedUsers.add(blockedUserId);
       }
       homeTimelineModel.setBlockedUsersId(blockedUsers);
-
-      List<HomeTimelineModel.HomeTimelineEntryModel> entries =
-          homeTimelineModel.getEntries().stream()
-              .filter(entry -> !entry.getAuthorId().equals(blockedUserId))
-              .toList();
-
-      entries.forEach(
-          entry -> {
-            entry.setLikedBy(
-                entry.getLikedBy().stream()
-                    .filter(likedBy -> !likedBy.getUserId().equals(blockedUserId))
-                    .toList());
-            if (entry.getLikedBy().isEmpty()
-                && !homeTimelineModel.getFollowersId().contains(entry.getAuthorId())) {
-              entries.remove(entry);
-            }
-          });
-
-      homeTimelineModel.setEntries(entries);
-
       homeTimelineRepository.updateModel(homeTimelineModel);
+      handleUnfollow(userId, blockedUserId);
     } else {
-      HomeTimelineModel newModel = initHomeTimeline(userId);
-      List<String> blockedUsers = newModel.getBlockedUsersId();
-      blockedUsers.add(blockedUserId);
-      newModel.setBlockedUsersId(blockedUsers);
-      homeTimelineRepository.create(newModel);
+      logger.error("user %s does not exist".formatted(userId));
     }
   }
 
@@ -233,8 +208,7 @@ public class HomeTimelineService {
       homeTimelineModel.setBlockedUsersId(blockedUsers);
       homeTimelineRepository.updateModel(homeTimelineModel);
     } else {
-      HomeTimelineModel newModel = initHomeTimeline(blockedUserId);
-      homeTimelineRepository.create(newModel);
+      logger.error("user %s does not exist".formatted(userId));
     }
   }
 
@@ -248,13 +222,12 @@ public class HomeTimelineService {
     String followerId = homeTimelinePostModel.get().getOwnerId();
     List<HomeTimelineModel> hometimelinesModel =
         homeTimelineRepository.getHomeTimelineContainingUserId(UserId, followerId);
+
     if (hometimelinesModel.isEmpty()) {
       logger.error("no home timeline found for post %s".formatted(postId));
       return;
     }
-    else {
-      logger.error("multiple home timelines found for post %s".formatted(postId));
-    }
+
     HomeTimelinePostModel PostModel = homeTimelinePostModel.get();
     for (HomeTimelineModel homeTimelineModel : hometimelinesModel) {
       HomeTimelineEntity homeTimelineEntity =
@@ -263,19 +236,25 @@ public class HomeTimelineService {
       boolean exists = false;
       for (HomeTimelineEntity.HomeTimelineEntryEntity homeTimelineEntryEntity : entries) {
         if (homeTimelineEntryEntity.getPostId().equals(postId)) {
-          List<HomeTimelineEntity.HomeTimelineLikedByEntity> newLikedBy = homeTimelineEntryEntity.getLikedBy();
-          newLikedBy.add(new HomeTimelineEntity.HomeTimelineLikedByEntity().withLikedAt(LocalDateTime.now()).withUserId(UserId));
+          List<HomeTimelineEntity.HomeTimelineLikedByEntity> newLikedBy =
+              homeTimelineEntryEntity.getLikedBy();
+          newLikedBy.add(
+              new HomeTimelineEntity.HomeTimelineLikedByEntity()
+                  .withLikedAt(LocalDateTime.now())
+                  .withUserId(UserId));
           homeTimelineEntryEntity.setLikedBy(newLikedBy);
           exists = true;
         }
       }
       if (!exists) {
         List<HomeTimelineEntity.HomeTimelineLikedByEntity> likedBy = new ArrayList<>();
-        HomeTimelineEntity.HomeTimelineLikedByEntity likedByEntity = new HomeTimelineEntity.HomeTimelineLikedByEntity()
+        HomeTimelineEntity.HomeTimelineLikedByEntity likedByEntity =
+            new HomeTimelineEntity.HomeTimelineLikedByEntity()
                 .withUserId(UserId)
                 .withLikedAt(LocalDateTime.now());
         likedBy.add(likedByEntity);
-        HomeTimelineEntity.HomeTimelineEntryEntity newEntry = new HomeTimelineEntity.HomeTimelineEntryEntity()
+        HomeTimelineEntity.HomeTimelineEntryEntity newEntry =
+            new HomeTimelineEntity.HomeTimelineEntryEntity()
                 .withPostId(postId)
                 .withAuthorId(PostModel.getOwnerId())
                 .withContent(PostModel.getText())
@@ -293,6 +272,7 @@ public class HomeTimelineService {
   public void handleUnlike(String UserId, String postId) {
     List<HomeTimelineModel> homeTimelinesModel =
         homeTimelineRepository.getHomeTimelineContainingPostId(postId);
+
     for (HomeTimelineModel homeTimelineModel : homeTimelinesModel) {
       HomeTimelineEntity homeTimelineEntity =
           homeTimelineModelToEntity.convertNotNull(homeTimelineModel);
@@ -327,10 +307,9 @@ public class HomeTimelineService {
   }
 
   public void handleUserCreation(String userId) {
-    logger.info("received user creation for user %s".formatted(userId));
     Optional<HomeTimelineModel> homeTimeline = homeTimelineRepository.findByUserId(userId);
     if (homeTimeline.isPresent()) {
-      // FIXME handle error (it shouldn't happen)
+      logger.error("user %s already exists".formatted(userId));
     } else {
       homeTimelineRepository.create(initHomeTimeline(userId));
     }
