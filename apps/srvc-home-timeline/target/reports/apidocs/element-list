@@ -1,9 +1,0 @@
-com.epita.srvc_home_timeline
-com.epita.srvc_home_timeline.controller
-com.epita.srvc_home_timeline.controller.response
-com.epita.srvc_home_timeline.controller.subscribers
-com.epita.srvc_home_timeline.converter
-com.epita.srvc_home_timeline.repository
-com.epita.srvc_home_timeline.repository.model
-com.epita.srvc_home_timeline.service
-com.epita.srvc_home_timeline.service.entity

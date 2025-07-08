@@ -1,9 +1,0 @@
-com.epita.repo_post
-com.epita.repo_post.controller
-com.epita.repo_post.controller.request
-com.epita.repo_post.controller.response
-com.epita.repo_post.converter
-com.epita.repo_post.repository
-com.epita.repo_post.repository.model
-com.epita.repo_post.service
-com.epita.repo_post.service.entity

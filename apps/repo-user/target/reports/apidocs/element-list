@@ -1,9 +1,0 @@
-com.epita.repo_user
-com.epita.repo_user.controller
-com.epita.repo_user.controller.request
-com.epita.repo_user.controller.response
-com.epita.repo_user.converter
-com.epita.repo_user.repository
-com.epita.repo_user.repository.model
-com.epita.repo_user.service
-com.epita.repo_user.service.entity

@@ -1,9 +1,0 @@
-com.epita.srvc_user_timeline
-com.epita.srvc_user_timeline.controller
-com.epita.srvc_user_timeline.controller.contract
-com.epita.srvc_user_timeline.controller.subscribers
-com.epita.srvc_user_timeline.converter
-com.epita.srvc_user_timeline.repository
-com.epita.srvc_user_timeline.repository.model
-com.epita.srvc_user_timeline.service
-com.epita.srvc_user_timeline.service.entity
